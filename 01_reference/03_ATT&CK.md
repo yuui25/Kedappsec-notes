@@ -76,9 +76,3 @@
 - NIST Special Publication 800-115 — https://csrc.nist.gov/publications/detail/sp/800-115/final  
 - OWASP Web Security Testing Guide (WSTG) — https://owasp.org/www-project-web-security-testing-guide/latest/  
 - OWASP ASVS（参考） — https://owasp.org/www-project-application-security-verification-standard/  
-- （必要であれば、これらに加え攻撃技術別のCWE/CVEやPortSwigger記事などを追加可）
-
----
-
-## 出力形式
-- 本ファイルは**ダウンロード可能なMarkdown（.md）**です。社内共有やレポートテンプレートのベースとしてご利用ください。
