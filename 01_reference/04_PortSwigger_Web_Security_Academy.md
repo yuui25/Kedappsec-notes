@@ -1,5 +1,4 @@
-# PortSwigger Web Security AcademyではじめるWebペネトレーション：要件まとめ
-*更新日: 2025-10-06*
+# PortSwigger Web Security Academyに基づく Webペネトレーション開始要件
 
 このドキュメントは、**PortSwigger Web Security Academy（WSA）**を用いて**Webペネトレーション**（WebPT）を始めるための**実務的な要件**を整理したものです。単なる**Web脆弱性診断（Vulnerability Assessment）**との違いも明確化し、関連**ソース（公式ドキュメント・一次資料）**へのリンクを併記します。
 
@@ -130,12 +129,6 @@
   - NIST SP 800‑115 本文（PDF）: <https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>  
   - NIST CSRC 用語集（Penetration Testing）: <https://csrc.nist.gov/glossary/term/penetration_testing>
 
----
-
-## 付録：最小セットのインストール＆起動（Burp CE）
-1. PortSwigger公式から **Burp CE** をダウンロード＆インストール。  
-2. Burp を起動し、**Proxy > Intercept > Open browser** で組み込みブラウザを起動。  
-3. **Academy にログイン**し、**学習パスを開始**。  
 4. ラボは**問題文 → 攻撃条件の把握 → リクエスト改変 → 成功判定（Solved）**の手順で進める。
 
 ---
