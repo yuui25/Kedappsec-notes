@@ -17,7 +17,7 @@ Webペネトレーション（WebPT）に特化したナレッジ。OWASP/WSTG�
 ## フォルダ構成（最小）
 ```
 Kedappsec-notes/
-├─ 00_meta/                          # リポ方針・命名規約・注意事項
+├─ 00_meta/                          # 方針・命名規約・注意事項
 │  └─ README.md
 ├─ 01_reference/                     # 一次資料の要点と使い分け
 │  ├─ index.md
