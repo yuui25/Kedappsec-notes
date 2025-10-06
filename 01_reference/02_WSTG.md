@@ -1,111 +1,140 @@
 # WSTGに基づく Webペネトレーション開始要件
 
----
-
-## 要約（1行）
-Webペネトレーションは「計画的に攻撃を模擬し、攻撃連鎖や実際の侵害可能性を検証する活動」です。開始前に**スコープ・権限・安全対策・テスト方針・成果物**を明確にし、書面で合意してから実施します。
+**目的**：WSTG（OWASP Web Security Testing Guide）を一次資料として、**Webペネトレーションテスト（WebPT）**を開始・遂行・報告するための要件と具体的運用を示す。  
 
 ---
 
-## 1) 前提（最重要） — 実施前に必ず揃えるもの（必須チェックリスト）
-1. **明確なスコープ**  
-   対象 URL / サブドメイン / API / IP / 資産リスト。除外項目（例：バックエンドDB、クリティカルネットワーク）を明示。  
-2. **書面による許可（Rules of Engagement）**  
-   テスト範囲・許容する手法（DoSの可否等）・期間を明記した法的承認書。  
-3. **連絡窓口と緊急対応手順**  
-   テスト中の障害時に連絡する担当者（運用、SRE、法務等）と復旧手順。  
-4. **認証情報とテストアカウント**  
-   必要な場合は事前にテスト用アカウント/データを用意し、実データ使用の可否を合意。  
-5. **業務影響・停止ウィンドウの合意**  
-   影響を許容する時間帯（例：業務時間外）や障害時の対応方針。  
-6. **報告様式・深度の合意**  
-   PoC の取り扱い、ログ添付の可否、再現手順のフォーマットや納期。  
-7. **コンプライアンス要件の確認**  
-   PCI、個人情報保護法、顧客契約などの制約確認。
+## 1. WSTG の位置付けと参照原則
+- **WSTG とは**：Webアプリ/サービスのセキュリティ試験のための**標準ガイド**（観点・手順・テストケース群）。“Latest” 版は章立て「2. Introduction / 3. The OWASP Testing Framework / 4. Web Application Security Testing / 5. Reporting…」で構成される。  
+  - 参考：WSTG Latest 目次 https://owasp.org/www-project-web-security-testing-guide/latest/
+- **本リポジトリでの扱い**：WSTGは**検証観点と手順**の一次根拠。ASVS（要件）・ATT&CK（攻撃連鎖）と組み合わせ、根拠の優先度は *OWASP（ASVS/WSTG） > MITRE（ATT&CK） > そのほか* とする。
+
+**用語**  
+- **テストID表記**：WSTG の章・節・テスト名（例：`4.4.4 Bypassing Authentication Schema` / `4.5.4 IDOR` / `4.2.6 Test HTTP Methods` など）。  
+- **DoD（Definition of Done）**：各作業の完了基準。本書で後述。
 
 ---
 
-## 2) 技術的要件（ツール・手法・スキル）
-- **マッピング & 情報収集能力**：SPA/SSR/API/認可フローなどアプリ構成を把握する能力。  
-- **自動ツール + 手動確認の両立**：自動スキャンで候補を洗い出し、手動で認可バイパスやビジネスロジックを深掘り。  
-- **エクスプロイト／PoC作成スキル**：合意範囲内で影響を実証するスキル（安全に実行できること）。  
-- **ログ/証跡収集能力**：Burpログ、スクリーンショット、パケットキャプチャ等の証跡収集と整理。  
-- **安全対策（スナップショット/バックアップ）**：障害発生時に復旧可能な体制（ステージング鏡像やスナップショット推奨）。
+## 2. 「Web脆弱性診断」との違い（WSTG × WebPT）
+- **脆弱性診断**：WSTG 等の観点に基づき**弱点の有無を識別**する活動。通常は**非破壊**かつ**個別観点の可否**に留める。  
+- **WebPT**：識別に加え、**実際の悪用成立（Exploit）**や**攻撃連鎖（Privilege Escalation / 横展開 / 影響）**を**合意範囲内**で立証する活動。WSTG “Penetration Testing Methodologies（PTES準拠）” の 7 フェーズ（Pre-engagement / Intelligence Gathering / Threat Modeling / Vulnerability Analysis / Exploitation / Post-Exploitation / Reporting）を準用する。  
+  - 参考：Penetration Testing Methodologies https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies
+
+> **要点**：WSTG は “観点と手順の一次資料”。WebPT はその観点を**連鎖させ、影響を実証**する。
 
 ---
 
-## 3) プロセス（段取り）
-1. **Pre‑engagement（契約・準備）**  
-   スコープ、許可、連絡網、除外項目を確定。  
-2. **Recon & Mapping（情報収集）**  
-   公開情報収集、アプリマップ、認証フロー理解。  
-3. **Threat modelling & 攻撃シナリオ設計**  
-   ビジネス影響に基づく優先度付けと攻撃経路設計。  
-4. **Vulnerability Analysis（自動＋手動）**  
-   DAST や静的情報を起点に手動で深掘り。  
-5. **Exploitation / Post‑exploitation**  
-   合意した範囲で PoC／エクスプロイトを実施（ログ保持、影響可視化）。  
-6. **Reporting & Remediation Support**  
-   再現手順、優先度、緩和策、攻撃連鎖図を含む報告書提出と必要に応じたフォロー。
+## 3. WebPT 開始要件（合意事項 / 前提）
+**(A) 前提合意（Pre-engagement / Rules of Engagement）**  
+1) **目的**・**範囲（URL/機能/API/テナント）**・**期間/時間帯**  
+2) **禁止事項**（DoS/大量送信/破壊系/本番データ改変）  
+3) **アカウント**・**ロール**・**多要素認証(MFA)方針**（試験可否/手順）  
+4) **ログ/監視**・**通知窓口**（緊急連絡/停止判断）  
+5) **証跡**（Req/Res・スクショ・ログ保持方針）・**データ取り扱い**（機密度/削除期限）
+
+**(B) 受入基準（DoD）**  
+- 観点カバレッジ：`4.1〜4.12` の**適用カテゴリ**と**除外理由**を明記  
+- 主要機能で**認証/認可/セッション/入力検証/ビジネスロジック**の**最低1つ以上の成立/不成立**を示す  
+- 重大発見は**再現手順**・**最小破壊PoC**・**影響/前提/対策**・**WSTGテストID**の紐付けを報告  
+- 終了判定：致命的リスクの**一時対処勧告**と**再試験方針**（必要に応じ）
 
 ---
 
-## 4) 「Web脆弱性診断」と「Webペネトレーション」— 実務で押さえる差分（表）
-| 項目 | 脆弱性診断（Vulnerability Assessment） | Webペネトレーション（Penetration Test） |
-|---|---|---|
-| 目的 | 既知脆弱性の検出と一覧化 | 攻撃者視点での侵害可能性検証と攻撃連鎖の実証 |
-| 手法 | 主に自動スキャン + 確認 | 自動＋高度な手動（認可バイパス、ビジネスロジック） |
-| 深度 | 広く浅く（定期的） | 限定範囲で深く掘る（エクスプロイト含む） |
-| リスク | 低（通常は非破壊） | 高め（業務障害／法的リスクあり） |
-| 運用頻度 | CI/CD 等で定期 | プロジェクト単位／年1〜2回等 |
+## 4. 具体的な使い方（実務フロー）
+
+### 4.1 計画（Testing Framework の当てはめ）
+1) スコープ整理 → **対象資産/構成/データフロー**の“軽量脅威モデル”を作る  
+2) **WSTG-4章**のカテゴリから**適用観点**を選定（下記 4.2）  
+3) **前提合意**と**証跡ルール**を確定（§3）  
+  - 参考：The Web Security Testing Framework（SDLC全体での適用）  
+    https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/0-The_Web_Security_Testing_Framework
+
+### 4.2 観点選定（WSTG 4章の主カテゴリ）
+- **4.1 情報収集（Information Gathering）**  
+- **4.2 設計/デプロイ構成（Configuration & Deployment）**  
+- **4.3 アイデンティティ管理（Identity Mgmt）**  
+- **4.4 認証（Authentication）**  
+- **4.5 認可（Authorization）**  
+- **4.6 セッション管理（Session Mgmt）**  
+- **4.7 入力検証（Input Validation）**  
+- **4.8 例外処理（Error Handling）**  
+- **4.9 弱い暗号（Weak Cryptography）**  
+- **4.10 ビジネスロジック（Business Logic）**  
+- **4.11 クライアントサイド（Client-side）**  
+- **4.12 API**  
+  - 参考：4章カテゴリ一覧 https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/
+
+### 4.3 代表シナリオ（“観点→連鎖” の型）
+- **(S1) 認証まわり**  
+  - `4.4.4 Bypassing Authentication` を試行 → 失敗でも **`4.4.11 Testing Multi-Factor Authentication`** の**実装/回避**を確認  
+  - 連鎖：弱いロックアウト（`4.4.3`） → **パスワードスプレー** → セッション固定/再利用（`4.6`）  
+  - 参考（認証 目次）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/README  
+  - 参考（MFA）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication
+- **(S2) 認可（IDOR）**  
+  - `4.5.4 Testing for Insecure Direct Object References`：リソースID/参照の**直接操作**と**アクセス制御**の実証  
+  - 連鎖：閲覧→更新→削除／**テナント越境**→**水平/垂直特権昇格（4.5.3）**  
+  - 参考（IDOR）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References
+- **(S3) 入力検証→横展開**  
+  - `4.7.4 Testing for HTTP Parameter Pollution`（同名パラメータ多重）→ サーバ側の**優先規則**悪用 → **認可/ACL回避**の検証  
+  - `4.7.5 Testing for SQL Injection`：読み取り→更新→**認証回避**→**データ抽出**の最小PoC  
+  - 参考（HPP）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution  
+  - 参考（SQLi）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05-Testing_for_SQL_Injection
+- **(S4) 配置/運用の抜け穴**  
+  - `4.2.6 Test HTTP Methods`（`OPTIONS`）で**許可メソッド**把握 → `PUT/DELETE/PATCH` 誤許可の**横展開**  
+  - 古いバックアップ露出→**情報収集（4.1）**に**逆フィード**  
+  - 参考（HTTP Methods）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods
+- **(S5) ビジネスロジック**  
+  - `4.10`：**フロー逸脱**／**境界条件**／**手数料や割引計算**の**人間系エラー**を攻撃連鎖に接続  
+  - 参考（Data Validation）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/01-Test_Business_Logic_Data_Validation
+
+> **証跡化**：各シナリオで **(a) 前提** **(b) 試験手順** **(c) 期待/実結果** **(d) 影響** **(e) 推奨対策** を最小構成で記録し、**テストID**を紐付ける。
 
 ---
 
-## 5) 実務テンプレ（発注書／要件書にコピペ可）
-- **テスト目的**（例：重要データ到達可能性／認可バイパス有無の検証）  
-- **対象資産**（完全な URL / サブドメイン / API パス / IP リスト）  
-- **除外項目**（例：DoS 試験、特定バックエンド等）  
-- **期間・時間帯**（例：2025‑10‑20 09:00 — 2025‑10‑24 18:00、業務時間外のみ実施等）  
-- **連絡先／緊急停止条件**（kill‑switch）  
-- **署名／許可証**（発注者・責任者の署名）  
-- **証跡の扱い**（PoC の提供可否、ログの機密扱い等）  
-- **報告フォーマット**（サマリ、詳細、再現手順、攻撃連鎖図、修正提案）
+## 5. 成果物（レポート DoD）
+- **エグゼクティブサマリ**（到達点：未認証/認証後／水平/垂直／データ影響）  
+- **発見一覧**：`タイトル / リスク / 影響 / 再現手順 / PoC / 証跡 / WSTGテストID / 参考`  
+- **攻撃連鎖図**（任意）：**入口→拡張→影響**を可視化（必要に応じて ATT&CK を併用）  
+- **是正支援**：**再試験の条件**と**簡易セルフチェック**（WSTG該当節へのリンク）
 
 ---
 
-## 6) 推奨（運用・Ops 向け）
-- 可能なら **ステージング環境** で全攻撃を再現 → 本番は最小限にする。  
-- 自動スキャン結果を「出発点」とし、手動検証に十分な工数を割く運用を推奨。  
-- 診断・ペネトレーションの結果は「改善サイクル」に組み込み、修正後の再検証を契約に含めると効果的。
+## 6. スコープ外/安全配慮
+- **DoS**・**大量送信**・**本番データ破壊**は原則禁止（個別合意がある場合のみ最小で実施）  
+- 第三者資産・外部SaaS は**事前同意**または**スタブ**で代替  
+- **ステージング優先**・**本番は最小限**・**証跡の機微情報マスキング**
 
 ---
 
-## 参考（主要ソース）
-- OWASP — Web Security Testing Guide (WSTG)（公式）  
+## 7. 参考（一次資料／公式）
+- **WSTG Latest（総目次）**  
   https://owasp.org/www-project-web-security-testing-guide/latest/  
-- NIST SP 800‑115 — Technical Guide to Information Security Testing and Assessment（NIST）  
-  https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-115.pdf  
-- PortSwigger — Web security resources / Web penetration testing 解説  
-  https://portswigger.net/web-security  
-- PTES — Penetration Testing Execution Standard（フェーズ概念の参考）  
-  http://www.pentest-standard.org/  
-- 業界比較記事（Pen test vs Vulnerability scan 等の解説記事） — 各社ブログ等を参照
+- **The Web Security Testing Framework（SDLC全体の適用）**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/0-The_Web_Security_Testing_Framework  
+- **Penetration Testing Methodologies（PTES準拠）**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies  
+- **Web Application Security Testing（4章カテゴリ一覧）**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/  
+- **Authentication（目次）**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/README  
+- **Testing MFA**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication  
+- **IDOR**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References  
+- **Test HTTP Methods**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods  
+- **HTTP Parameter Pollution**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution  
+- **SQL Injection**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/05-Testing_for_SQL_Injection  
+- **Business Logic Data Validation**  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/01-Test_Business_Logic_Data_Validation
 
 ---
 
-## 最後に（短い助言）
-1. 最優先は **スコープと許可（書面）** の確保。  
-2. WSTG のチェックリストをベースに、ビジネス影響（機微情報優先）で優先順位を付ける運用を推奨。
-
----
-
-### 付録：発注用チェックリスト（短縮版、1枚で貼れる）
-- テスト目的：______  
-- 対象（URL / サブドメイン / API）：______  
-- 除外項目：______  
-- 期間：______（開始 — 終了）  
-- 連絡先（運用 / SRE / 法務）：______  
-- PoC 提供（可 / 否）：______  
-- DoS 許可（可 / 否）：______  
-- 署名（発注者）：______  日付：______
-
+### 付録：チェックリスト（最小）
+- [ ] 前提合意（目的/範囲/禁止/アカウント/MFA/窓口/証跡）を締結  
+- [ ] 4章カテゴリの**適用/除外**を明確化（理由付き）  
+- [ ] 代表シナリオ **(S1)〜(S5)** を対象に合わせて採否決定  
+- [ ] 重大発見は **再現手順+最小PoC** と **WSTGテストID** を必ず付記  
+- [ ] 機密データの**痕跡削除/マスキング**を実施（期日まで）
