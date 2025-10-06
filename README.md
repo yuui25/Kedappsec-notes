@@ -21,7 +21,7 @@ Kedappsec-notes/
 │  └─ README.md
 ├─ 01_reference/                     # 一次資料の要点と使い分け
 │  ├─ index.md
-│  ├─ wstg.md / asvs.md / attack-mitre.md / hacktricks.md / payloadsallthethings.md
+│  ├─ wstg.md / asvs.md / attack-mitre.md / hacktricks.md / payloadsallthethings.md / ...
 ├─ 02_chains/                        # 攻撃連鎖（入口→横展開→到達点→影響→対策）
 │  └─ YYYYMMDD-<short>-v1.md
 ├─ 03_matrices/                      # 脆弱性×技術スタック×Web機能の入口マトリクス
