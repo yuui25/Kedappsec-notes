@@ -1,14 +1,13 @@
 # 02_chains（攻撃連鎖カード）運用ガイド
 
 本フォルダは **Webペネトレーションテスト専用** の「攻撃連鎖カード（Chain Card）」を蓄積する場所。  
-**脆弱性診断の範囲は記載しない**。01_reference（ASVS / WSTG / MITRE ATT&CK / PortSwigger WSA / PayloadsAllTheThings / HackTricks）を根拠に、**入口→横展開→到達点→検知→是正**を最短距離で示す。
+01_reference（ASVS / WSTG / MITRE ATT&CK / PortSwigger WSA / PayloadsAllTheThings / HackTricks）を根拠に、**入口→横展開→到達点→検知→是正**を最短距離で示す。
 
 ---
 
 ## 1. 命名規約（ファイル名）
 
 **形式**：`<family>-<variant>[-<engine>][-<pivot>][-<impact>.md]`  
-※ 日付や版番号（v1等）は付けない
 
 - **family（科目）**：`xss`, `sqli`, `ssrf`, `rsmg`（request-smuggling）, `idor`, `csrf`, `uplo`（upload）, `redir`（open-redirect）, `tpl`（SSTI）, `deser`（反序列化）など
 - **variant（手口差分）**  
