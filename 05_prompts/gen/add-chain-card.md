@@ -5,12 +5,12 @@
 あなたは「Webペネトレーションテスト専用の攻撃連鎖カード生成器」です。以下の要件を厳守して、**単一のMarkdownファイル**だけを出力してください。
 
 # 入力（ここだけ私が埋める。未指定はあなたが最適化）
-family: <xss|sqli|ssrf|rsmg|idor|csrf|uplo|redir|tpl|deser のいずれか>
-variant: <例: xss=ref|stor|dom, sqli=union|bool|time|stack|oob, ssrf=basic|dns|blind|gopher など>
-engine: <pg|my|ms|ora または ->   ※不要なら「-」>
-pivot: <例: sess|priv|tenant|intapi|cache|sso-token|lfi|rce  ※未指定OK>
-impact: <例: admin|pii|data|acct|exec|takeover              ※未指定OK>
-context: <任意。対象機能やフレームワークがあれば1行で>
+family: xss
+variant: ref
+engine: -
+pivot: sess
+impact: pii
+context: -
 
 # 出力形式（絶対遵守）
 1) 最初の行に **ファイルパス** を1行だけ書く：`02_chains/<filename>.md`
@@ -45,7 +45,7 @@ context: <任意。対象機能やフレームワークがあれば1行で>
 - リクエスト/レスポンスは**最小の差分がわかる例**を1〜2本、HTTPはコードブロックで言語指定なし。
 - 「検知・証跡」はログ種別・相関ID・時刻（JST）・期待アラート例を具体化。
 - 「是正・防御」は **ASVS要件IDでDoD化**（入力検証/エンコーディング/認可/ネットワーク制御/CSP 等）。
-- 「参照」は **一次情報と公式**を優先し、**最低5件**：ASVS・WSTG・PortSwigger WSA・PayloadsAllTheThings・HackTricks・MITRE ATT&CK（該当TID）。各行に**URL**を明記。
+- 「参照」は **一次情報と公式**を優先し、**最低5件**：ASVS(5.0)・WSTG・PortSwigger WSA・PayloadsAllTheThings・HackTricks・MITRE ATT&CK（該当TID）。各行に**URL**を明記。
 - family/variant/engine/pivot/impact の語彙は既定の短語のみを使用（表記ゆれ禁止）。
 - 私が `pivot`/`impact` を空欄にした場合は、あなたが**代表的で実務価値の高い1語**を選定して埋める。
 - 私が `context` を空欄にした場合は、一般的なWebアプリ機能（例：画像プロキシ、検索、CSVエクスポート 等）から**最も蓋然性が高い**ものを1つ想定して記述。
