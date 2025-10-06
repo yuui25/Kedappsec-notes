@@ -1,122 +1,128 @@
 # ASVSに基づく Webペネトレーション開始要件
 
-## 1. 目的と位置づけ
-- **目的**：Webアプリ/APIに対する実攻撃シナリオの再現・連鎖検証を行い、**ASVS要件の充足状況**を実証的に評価する。  
-- **ASVSの使い方**：ASVSは**セキュリティ要件の標準**であり、ペンテストの**観点・合格基準**として用いる（WSTGは“手順”、ASVSは“要件”）。
+
+> 本書は **Kedappsec-notes/01_reference** に収録される「ASVSに基づくWebPT開始要件」の実務ガイドです。  
+> 立ち位置：ASVS＝**要件標準**、WSTG＝**検証手順**（READMEの方針に準拠）。
 
 ---
 
-## 2. VA（脆弱性診断）との違い
-| 項目 | 脆弱性診断（VA） | Webペネトレーションテスト |
-|------|------------------|-----------------------------|
-| 目的 | 弱点の網羅的列挙・リスク可視化 | 実際の侵害可能性・攻撃連鎖を実証 |
-| 手法 | 自動＋簡易手動（定型） | 手動中心（攻撃連鎖・到達確認） |
-| 深度 | 浅く広く | 深く狭く（ASVSレベルで定義） |
-| 成果 | 脆弱性リスト中心 | 攻撃経路＋影響＋修正指針まで |
-| 基準 | WSTGチェックリスト | ASVS要件（L1/L2/L3） |
+## 1. ASVSの立ち位置（なに者か）
+
+- **ASVSは「Webアプリ／Webサービスの技術的セキュリティ**を検証するための**要件標準**。**
+  - 目的：市場における「検証範囲と厳密さ（rigor）」のばらつきを**標準化**し、開発・調達・検証で共通の土台にする。  
+    参考: OWASP ASVS project「What is the ASVS?」<https://owasp.org/www-project-application-security-verification-standard/>
+- **最新版は v5.0.0（2025年5月リリース）**。要件IDは `v<version>-<chapter>.<section>.<requirement>` 形式で引用する（例：`v5.0.0-1.2.5`）。  
+  参考: GitHub OWASP/ASVS README（5.0）<https://github.com/OWASP/ASVS>  
+
+> **補足：** ASVSは「要件の**何を満たすか**」を示す標準であり、「**どう試験するか**」はWSTGが担います（後述）。
 
 ---
 
-## 3. 事前合意（Rules of Engagement）
-- **対象と境界**：ドメイン/環境/API一覧、管理画面・非機能エンドポイントの扱い  
-- **非破壊の原則**：可用性を損なう恐れのある攻撃は除外または模擬化  
-- **アカウント/権限**：ブラック/グレーの別、複数ロールのテストアカウント提供  
-- **ログ・監視連携**：検知/ブロック挙動を観測し、再現性を確保  
-- **法令・倫理**：時間帯、レート制限、情報取扱い、録画/キャプチャ許可を明確化  
+## 2. 検証レベル（L1/L2/L3）とWebPTとの関係
+
+- ASVSは**3つの検証レベル**（L1/L2/L3）で要件の深さを段階化。**L1は“完全にペネトレーションテスト可能”**とOWASP資料に明記。  
+  参考（OWASP Developer Guide）: <https://owasp.org/www-project-developer-guide/assets/exports/OWASP_Developer_Guide.pdf>  
+  参考（OWASP Dev Guide / SecurityRAT）: <https://devguide.owasp.org/en/03-requirements/04-security-rat/>
+
+**実務指針（最低限）：**  
+- **既定はL2**（機微データ／取引扱いがある一般的なB2Bアプリ）。重要資産/規制要件が強い場合は**L3**。限定スコープのPoC検証やローリスク用途のみ**L1**。  
+- **契約・合意書で採用レベルを明示**（例：「本WebPTはASVS **L2**準拠の要件達成度をDoDとして判定する」）。
 
 ---
 
-## 4. ASVS準拠のスコーピング
-### ■ レベル選定
-| レベル | 概要 | 適用対象 |
-|--------|------|----------|
-| **L1** | 最低限（外部向け一般アプリ） | 公開系アプリ、非機密 |
-| **L2** | 標準（大半の業務アプリ） | 業務・個人情報を扱う |
-| **L3** | 高度（金融・医療等） | 高機密/高リスクシステム |
+## 3. 「Web脆弱性診断」との明確な区別（定義ベース）
 
-- テスト計画では **ASVS要件ID（例：`v5.0.0-1.2.5`）** によるトレーサビリティを付与。
+| 項目 | Web脆弱性診断（VA） | Webペネトレーションテスト（WebPT） |
+|---|---|---|
+| 目的 | 既知の弱点の**網羅的把握** | **悪用可能性と連鎖**の実証・影響示威 |
+| 手法 | 自動スキャン＋観点点検中心 | **実攻撃シミュレーション**（人手で迂回・連鎖） |
+| 標準 | （ASVSは**要件**参照可、WSTGは**観点**） | **ASVSでDoD定義**＋**WSTGで手順**設計 |
+| 定義根拠 | （一般定義） | **NIST**: 現実の攻撃を模倣し防御の迂回を試みる試験（SP800-115等） |
+| 成果物 | 脆弱性リスト（可能性中心） | **再現手順・証跡・ビジネス影響**／**攻撃連鎖** |
 
----
-
-## 5. 着手前に必要な入力情報
-- システム概要（アーキ図、データフロー、依存サービス）  
-- 環境差（本番/ステージング）  
-- ロール別ユーザ、認証方式、セッション仕様  
-- 主要ユースケース/取引フロー  
-- 機微情報の分類と保護要件  
-- ロギング方針、外部連携、既知制約・既存対策  
-→ **ASVS V1: アーキテクチャ/設計要件**に対応。
+参考: NIST CSRC Glossary「Penetration testing」<https://csrc.nist.gov/glossary/term/penetration_testing>  
+参考: OWASP WSTG トップ <https://owasp.org/www-project-web-security-testing-guide/>
 
 ---
 
-## 6. ASVS × 攻撃連鎖による検証例
-| 検証観点 | 主な攻撃例 |
-|-----------|-------------|
-| **認証/セッション** | パスワード/SSO/MFA、セッション固定化、Remember-me、トークン失効 |
-| **認可制御** | 水平・垂直権限昇格、不可視フィールド操作、強制ブラウジング |
-| **入力/エンコーディング** | SQLi、NoSQLi、OSコマンド、テンプレート注入、SSRF、XSS |
-| **暗号/機密保護** | 通信/保存時の暗号、鍵管理、秘密情報の出力抑止 |
-| **ロギング/監査** | 操作ログの改ざん耐性、プライバシー保護 |
-| **API特性** | スコープ検証、認証強度、CORS、レート制御 |
+## 4. WebPT開始要件（受入れ基準／DoDの置き方）
 
-→ 各観点をASVS要件IDと紐付けて、**攻撃チェーン評価**を実施。
+### 4.1 合意事項（前提）
+- **非破壊の原則**・禁止行為・負荷上限・営業時間外施行の可否を明記（READMEの品質ルールに準拠）。
+- **ASVSレベル（L1/L2/L3）**と**対象機能/役割/環境**（本番/ステージング）を合意。
+- **DoD（Definition of Done）**を**ASVS要件IDで規定**：例）`v5.0.0-1.2.5`（OSコマンドインジェクション対策）を満たすこと。  
+  参考: ASVS v5 READMEの**要件ID表記規則** <https://github.com/OWASP/ASVS>
 
----
+### 4.2 DoD（例）
+- **必須達成**：採用レベル（L2 など）に**Required**とされる要件ID群が**満たされる／満たされない**の可視化（後述テンプレート）。
+- **不達成の扱い**：WebPTで**実際に悪用が成立**（WSTG手順で再現）した場合は、該当要件IDを**未達**と判定し、修正後再検証。
 
-## 7. 成果物（ASVSトレーサブル）
-- **サマリ**：経営層向けに「重要リスク／事業影響／推奨方針」を要約  
-- **詳細報告**：各発見事項に  
-  - ASVS要件ID（例：`v5.0.0-4.1.2`）  
-  - 再現手順、攻撃連鎖図、被害想定、PoC、回避策（設計・実装・運用）  
-- **証跡**：リクエスト/レスポンス、ログ抜粋、スクリーンショット  
-- **再試験**：修正確認（差分検証）オプション  
-- **付録**：スコープ、環境条件、未実施項目、残余リスク
+> **要件ID記述例**（ASVS v5 READMEより引用のサンプルID）：  
+> `v5.0.0-1.2.5` = 「OSコマンドインジェクション防止を検証」
 
 ---
 
-## 8. 受け入れ基準（Definition of Done）
-- 重大リスク（認証/認可破綻、注入、情報漏えい）がASVSレベル相当で網羅されている  
-- 各IssueがASVS要件IDで参照可能  
-- 再現性・修正指針が明確  
-- 非破壊・法令順守で実施し、関係者レビュー完了
+## 5. ASVSの**具体的な使い方**（WebPTワークフローに組み込む）
+
+### 5.1 企画・計画
+1) **レベル決定**：アプリの機微度・規制・ビジネス影響に応じ **L1/L2/L3** を選定。  
+2) **要件選定**：対象スコープに対応するASVS要件IDリストを作成（例：認証、セッション、アクセス制御、入力処理、暗号、ログなど）。  
+3) **試験計画**：各要件IDに対し、**WSTGの該当章**と**Burp操作案**（改変点、成功判定）を紐付ける。  
+   - 参考: WSTG トップ <https://owasp.org/www-project-web-security-testing-guide/>
+
+### 5.2 実施（手を動かす）
+- **エビデンス化**：各試行を**要件ID**でタグ付けし、**Req/Res・スクショ・ログ**を保存。  
+- **実効性の実証**：成立した攻撃は**影響（データ・権限・横移動）**まで記録。  
+- **迂回・連鎖**：単発の欠陥を**認可・CSRF・SSRF・ストレージ設定**等に連鎖させ、**業務影響**を具体化。
+
+### 5.3 判定・報告
+- **トレーサビリティ表**：要件IDごとに「達成/未達」「証跡リンク」「再現手順（WSTG参照）」を一覧化。  
+- **レベル達成**：採用レベル（例：L2）の**必須要件**が満たされているかを合否判定。  
+- **契約・調達**：ASVSは**契約要件**として明記できる（ASVS公式「Use during procurement」）。  
+  参考: ASVS project page（調達での利用目的）<https://owasp.org/www-project-application-security-verification-standard/>
 
 ---
 
-## 付録A：VAとWebペネトレの対比（要約）
-- **VA**：広く浅く。自動化中心、単発的な脆弱性列挙。  
-- **Webペンテ**：深く実証。攻撃連鎖・横展開・影響評価をASVS基準で行う。
+## 6. すぐ使えるテンプレート
+
+### 6.1 DoD（Definition of Done）雛形
+```text
+本WebPTの受入れ基準（DoD）
+- 準拠標準：OWASP ASVS v5.0.0
+- 検証レベル：L2
+- スコープ：/auth, /admin, /api/*（ロール：user/admin）
+- 必須要件：L2でRequiredとされる要件のうち、本スコープに属するID群
+- 判定基準：
+  (A) すべての対象要件IDが「満たす」
+  (B) いずれかの要件IDが未達の場合：修正後に再検証を実施
+- 例示ID：v5.0.0-1.2.5（OSコマンドインジェクション対策） 等
+```
+
+### 6.2 トレーサビリティ（要件×証跡）
+| 要件ID | 章・節（要約） | 試験観点（WSTG参照） | 結果 | 証跡 |
+|---|---|---|---|---|
+| v5.0.0-1.2.5 | Injection Prevention（例） | コマンド注入の成立有無、パラメタライズ/エンコード | OK/NG | link |
+
+> **表記ルール**：ASVS v5 READMEに従い `v<version>-<chapter>.<section>.<requirement>` で明記。
 
 ---
 
-## 参考ソース
-1. **OWASP ASVS Project Page**  
-   https://owasp.org/www-project-application-security-verification-standard/
+## 7. 参照・根拠（一次資料優先）
 
-2. **ASVS v5.0.0（最新安定版）**  
-   https://github.com/OWASP/ASVS
-
-3. **ASVS vs WSTG の位置づけ**  
-   - ASVS：セキュリティ「要件」標準  
-   - WSTG：検証「手順」標準  
-   （両者を併用することでペネトレーション深度を定義）
-
-4. **VAとPenTestの違い（到達深度・目的の差）**  
-   https://owasp.org/www-project-web-security-testing-guide/latest/
-
-5. **ASVS レベル概要（L1/L2/L3）**  
-   https://owasp.org/www-project-application-security-verification-standard/#levels
+- **ASVS 総合ページ**（目的・調達での利用等）  
+  <https://owasp.org/www-project-application-security-verification-standard/>  
+- **ASVS v5.0.0（最新版）と要件ID表記ルール**  
+  <https://github.com/OWASP/ASVS>  （README内「Latest Stable Version - 5.0.0」「How To Reference ASVS Requirements」）
+- **「L1は完全にPT可能」等のレベル解説（OWASP系資料）**  
+  - OWASP Developer Guide（ASVS解説章 PDF）: <https://owasp.org/www-project-developer-guide/assets/exports/OWASP_Developer_Guide.pdf>  
+  - OWASP Dev Guide / SecurityRAT ガイド: <https://devguide.owasp.org/en/03-requirements/04-security-rat/>  
+- **WSTG（試験手順の標準）**  
+  <https://owasp.org/www-project-web-security-testing-guide/>  
+- **NIST（WebPTの定義）**  
+  <https://csrc.nist.gov/glossary/term/penetration_testing>
 
 ---
 
-## 記載例（報告書向け）
-> 「IDORにより他ユーザの明細が取得可能：**`v5.0.0-4.1.2`** 未達（水平アクセス制御）。  
-> 再現手順および対策を添付。」
-
-※要件番号は該当章に応じて差し替え。  
-ASVSリポジトリの表記規則（`vX.Y.Z-A.B.C`形式）に準拠。
-
----
-
-**作成者メモ**  
-この文書は、ASVSをベースにWebペネトレーションテストを設計・実施するための社内基準案です。  
-報告書テンプレート、契約書添付要件、顧客説明資料などに転用可.
+### 付録）READMEとの対応
+- 「**ASVS＝要件標準**、**WSTG＝検証手順**、**ATT&CK＝連鎖の説明**」という役割分担に準拠。
+- 参照フロー（ASVSで深度→WSTGで計画→実施→ATT&CKで連鎖整理）を踏襲。
