@@ -1,69 +1,151 @@
 # PayloadsAllTheThingsに基づく Webペネトレーション開始要件
 
-## 1. 概要
-**PayloadsAllTheThings** は、Web アプリケーションセキュリティ向けのペイロードとバイパス集（ペイロードリスト）で、ペンテスト／CTF／バグバウンティの現場でよく参照されます。実用的なペイロード、各種脆弱性ごとの例、Burp 用の Intruder ファイルなどが揃っています。  
-参照: PayloadsAllTheThings（GitHub / docs）.  
-(公式リポジトリ／ホスティングページ参照)  
-- https://github.com/swisskyrepo/PayloadsAllTheThings  
-- https://swisskyrepo.github.io/PayloadsAllTheThings/  
+**対象**: Webペネトレーションテスト（WebPT）で **PayloadsAllTheThings（PATT）** を安全かつ効果的に活用するための要件・手順・品質ルールをまとめる。  
+**想定読者**: WebPT担当者／レビュー担当／報告書作成者。
 
-## 2. 本書の目的
-PayloadsAllTheThings を **単なる参照集**としてではなく、実際の「Web ペネトレーションテスト（攻撃実行を伴うテスト）」に結びつけて利用するための最小要件を整理します。最後に、脆弱性診断（Vulnerability Assessment）との違いも明確にします。
+---
 
-## 3. 必須技術スキル（個人／チーム）
-- HTTP/HTTPS と関連ヘッダ（メソッド、Cookie, CORS, CSP, Content-Type 等）を理解。  
-- Web 認証・セッション管理（クッキー、JWT、OAuth フロー、MFA）に関する深い理解。  
-- 代表的な脆弱性の攻撃手法（XSS, SQLi, CSRF, SSRF, IDOR, File Upload, Deserialization 等）の実践的知識と PoC 作成能力。  
-- Burp Suite（Proxy/Intruder/Repeater/Extender）の上級操作。PayloadsAllTheThings は Burp 用のペイロードや Intruder ファイルを多く含むため、Burp のスキルは必須。
+## 1. 位置づけ（何者か・どう使うか）
 
-## 4. 必須ツールと環境
-- **Burp Suite Pro（推奨） / Community**（Proxy, Intruder, Repeater, Collaborator など）  
-- **ブラウザ開発者ツール**（DOM インスペクト、ネットワーク、Cookie）  
-- **軽量 HTTP クライアント**（curl, httpie）  
-- **スクリプト言語**（Python + requests / Node.js 等） — PoC 自動化やデータ整形に必須  
-- **ローカル実験環境**（Docker ベースの脆弱アプリや OWASP Juice Shop 等）で安全に攻撃を試せること  
-- **PayloadsAllTheThings のローカルコピー（git clone）**：ネットワークが不安定な現場でもオフラインで参照できるようにする。  
+- **PATTの立ち位置**: 実務に役立つ *ペイロード＆バイパス* のカタログ。探索済みの攻撃観点（WSTG 等）に対して、**試験入力（payload）を素早く準備**するためのリファレンス。  
+  - 公式: <https://swisskyrepo.github.io/PayloadsAllTheThings/> ／ GitHub: <https://github.com/swisskyrepo/PayloadsAllTheThings>
+- **使い分け（本リポ内の他参照と）**  
+  - **WSTG** …「何をどう検証するか（観点／手順）」を決める。  
+  - **PATT** …決まった観点に対して「**何を入れるか（payload）**」を即用意する。  
+  - **ASVS** …深度・受入基準（DoD）を定義。  
+  - **ATT&CK** …成立した攻撃を行動様式でマッピング（連鎖の説明）。
 
-## 5. 方法論・作業フロー（最低限）
-1. **スコープ確認と合意**（ターゲット範囲、認可済みアカウント、禁止事項、破壊行為の有無） — 法的安全確保が最優先。  
-2. **情報収集（Recon）**：公開情報、サブドメイン、公開API、技術スタックの把握。  
-3. **手動探索 + 適切な Payload 選定**：PayloadsAllTheThings から脆弱性カテゴリ別にペイロードを選び、Burp や Repeater/Intruder で手動検証。  
-4. **PoC 作成**：成功時は最低限の PoC（再現手順、リクエスト/レスポンス、スクリーンショット）を残す。  
-5. **深掘り（攻撃連鎖）**：単一脆弱性から横展開・特権昇格・情報漏洩に至る攻撃連鎖を検証する（これが“ペネトレーション”の核）。OWASP WSTG 等のテストケースを参照して深掘りすることを推奨。
+> **重要**: PATTは**一次資料（OWASP/WSTG・標準・ベンダー公式等）で裏取り**して使う。DoS/破壊系は書面合意なしに試さない（PATTの **DISCLAIMER** 参照）。
 
-## 6. 法務・エンゲージメント要件（必須）
-- **書面による許可（スコープ + ルール）**：必須。許可がない攻撃は犯罪行為。  
-- **通知先とエスカレーションルール**：重大な発見（情報漏洩等）時の連絡経路と対応手順。  
-- **非破壊条件の取り決め**（切断やサービス停止を避ける方針等）。  
-これらは脆弱性診断でも必要だが、攻撃実行を伴うペネトレーションではより厳密に。
+---
 
-## 7. 安全対策と証跡管理
-- **ログとキャプチャの保持**（リクエスト/レスポンス、Burp のセッション、PCAP 必要時）、トラブル発生時の証跡として必須。  
-- **タイムボックスとバックアウト基準**：検査手順の途中でサービス影響が出たら直ちに中断できる仕組み。  
-- **盗用/危険ペイロードの扱い注意**：PayloadsAllTheThings は実用的なペイロードを含むため、誤って運用環境で過度な攻撃を行わないよう注意。
+## 2. Web脆弱性診断との明確な違い（根拠つき）
 
-## 8. チーム体制・スキルセット（望ましい）
-- **リードテスター（攻撃設計・法務調整担当）**  
-- **アタッカー（探索・PoC作成）**  
-- **レポーター / エビデンス整理**  
-- **レビューア（品質保証）**  
-小規模であれば二人でローテーションしつつ、外部レビューを入れると良い。
+- **Web脆弱性診断（Vulnerability Scanning/Assessment）**  
+  - 目的: 既知の弱点を**幅広く検出・棚卸**する。自動化重視。  
+  - 手段: ネットワーク／アプリの**スキャン**で既知脆弱性やミス設定を特定。結果解釈が必要。  
+  - 根拠: **NIST SP 800-115** 第4章「Vulnerability Scanning」— スキャンはホスト属性と既知脆弱性の識別に有効（アウトデートソフト・パッチ有無・誤設定の把握）と記載（pp. 26–28）。
 
-## 9. Web 脆弱性診断（Vulnerability Assessment）との違い（明確化）
-- **目的**：脆弱性診断は「脆弱性の洗い出し・一覧化」が中心。ペネトレーションは「攻撃者になりきって実際に侵入や横展開を試す」点が違う。  
-- **深さ**：脆弱性診断は広く浅く。ペネトレーションは狭く深く（攻撃連鎖、特権昇格を重視）。  
-- **成果物**：脆弱性診断は一覧＋優先順位。ペネトレーションは詳細な攻撃シナリオ、PoC、攻撃連鎖レポート。  
-- **危険度**：ペネトレーションは実害リスク（サービス停止やデータ漏洩）を伴う可能性が高いので、より厳格な法的ルールと安全策が必要。
+- **Webペネトレーションテスト（Penetration Testing）**  
+  - 目的: **実攻撃**を模倣し、**実際に侵害が成立するか**と**影響範囲**を示す（防御検知能力も含む）。  
+  - 手段: 攻撃者の手口・ツールを用い、**複数脆弱性の組み合わせ**で横展開や権限昇格を狙う。計画・通知・安全対策が必須。  
+  - 根拠: **NIST SP 800-115** 第5.2章「Penetration Testing」— “実世界の攻撃を模倣し、セキュリティ機能の迂回方法を特定する。**実システム・実データに対する実攻撃**を含み得るため**リスクが高い**” 等（p.35–39）。
 
-## 10. PayloadsAllTheThings を安全かつ効果的に使うための運用ルール（実務チェックリスト）
-- ローカルに `git clone` して最新版を保持。更新はレビューして業務ルールに合うか確認。  
-- ペイロードをそのまま運用環境に投げない（事前にステージングで検証）。  
-- 攻撃実行前に必ずスコープ/ルールの確認（書面）。  
-- 成果物は PoC（手順・ログ・スクショ）を必ず残す。  
-- 重大インシデントの際は即エスカレーション、かつ変更履歴（誰が何をしたか）を明確に。  
+- **補足**: **WSTG** は Webテストの枠組み（観点と手順）を提供し、**PTES** は事前合意・スコープ定義等の**事前準備**を重視（WSTG「Penetration Testing Methodologies」からの参照、PTES Pre-engagement）。
+  - WSTG 最新: <https://owasp.org/www-project-web-security-testing-guide/>  
+  - WSTG「Penetration Testing Methodologies」: <https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies>  
+  - PTES Pre-engagement: <https://www.pentest-standard.org/index.php/Pre-engagement>  
+  - NIST SP 800-115: PDF <https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>
 
-## 11. 参考（主な一次資料）
-1. PayloadsAllTheThings — GitHub / ホームページ（ペイロード集・セクション一覧）。  
-2. PayloadsAllTheThings（ペイロード例：Reverse Shell 等のチートシート）。  
-3. OWASP Web Security Testing Guide（WSTG） — ペネトレーション手順とテストケースのフレームワーク。  
-4. Hack The Box / Deepstrike / Security vendor articles — 脆弱性診断とペネトレーションの違いを説明する記事（実務上の取り扱いの違い）。
+---
+
+## 3. 前提・禁止事項（安全・法令遵守）
+
+- **明示的許可のない試験禁止**（PATT **DISCLAIMER**）: 本資料は**教育・研究目的**。**適法かつ権限のある環境のみ**で利用すること。  
+  - PATT DISCLAIMER: <https://swisskyrepo.github.io/PayloadsAllTheThings/DISCLAIMER/>
+- **リスク低減策（NIST SP 800-115）**: 熟練テスター／包括的計画／活動ログ／**営業時間外**の実施／本番の複製（ステージング）での実験等を推奨（ES-2）。  
+- **ルール・オブ・エンゲージメント（RoE）**: NIST 付録Bの雛形を参照。**禁止系**（DoS・大量送信・破壊／データ流出）と**停止条件**を明文化。
+
+---
+
+## 4. 開始要件
+
+1) **事前合意（PTES準拠）**  
+   - スコープ：機能/画面/API、テナント、対象環境（優先は**ステージング**）、期間・時間帯、禁止事項。  
+   - アカウント：ロール別（一般/特権/ゲスト）、MFA方針、テストデータ。  
+   - 可用性配慮：レート制限／ジョブ/バッチ時間帯、監視・連絡体制、**緊急停止連絡先**。
+
+2) **証跡・再現性**  
+   - 収集物：**HTTP Req/Res（時刻・トレースID）**、スクリーンショット、Burpプロジェクト、サーバログ抜粋。  
+   - 論点整理：**成立条件／再現手順／影響評価**、既存防御の検知状況。
+
+3) **品質と安全**  
+   - **入力生成は段階的**（低リスク→高リスク）。WAF/RateLimit観測。  
+   - 失敗時ロールバック手順（データ汚染・キュー滞留・キャッシュ汚染の復旧）。
+
+---
+
+## 5. 具体的な使い方（最短ハンズオン）
+
+### 5.1 典型フロー
+1. **観点を決める（WSTG）**：例）Input Validation（HPP/SQLi/XSS）や SSRF 等。  
+   - 例: WSTG 4.7 Input Validation Testing → <https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README>
+2. **PATTでペイロード収集**：対象技術のページを選び、**最小→強力**の順で準備。  
+   - 例: HPP, SQL Injection, SSRF, Directory Traversal, Encoding & Transformations。  
+3. **Burp Intruder で実行**（Sniper/Cluster Bomb などを選択）。  
+   - Intruder概要: <https://portswigger.net/burp/documentation/desktop/tools/intruder>  
+   - 使い始め: <https://portswigger.net/burp/documentation/desktop/tools/intruder/getting-started>  
+   - 位置指定: <https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/positions>  
+   - 攻撃タイプ: <https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/attack-types>
+4. **観測とチューニング**：レスポンス差分・エラー兆候・リダイレクト・時間差を観測。検証できれば**tamper**（WAF回避／符号化変更）で再試行。  
+5. **連鎖と説明**：成立したら**権限上げ・横展開**を検討し、**ATT&CK**で技術IDを付して報告。
+
+### 5.2 ミニ・レシピ（例）
+
+- **HPP（HTTP Parameter Pollution）**  
+  - PATT: <https://swisskyrepo.github.io/PayloadsAllTheThings/HTTP%20Parameter%20Pollution/>  
+  - WSTG観点: <https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution>  
+  - 手順（概略）:  
+    1) 影響しそうなパラメータを洗い出し（例：`role=`, `redirect=`）。  
+    2) Intruder **Sniper**で同名パラメータの重複を注入（`?role=user&role=admin` など）。  
+    3) **順序**・**位置**・**符号化**（URL/Unicode/双方向）を変化させ差分観測。
+
+- **SQLi ログイン回避**  
+  - PATT Intruder ワードリスト例：Auth_Bypass.txt  
+    - <https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/Intruder/Auth_Bypass.txt>  
+  - 手順（概略）:  
+    1) ログインPOSTの`username`/`password`に位置指定。  
+    2) **Auth_Bypass**リストを設定し Sniper で走査。  
+    3) ステータスコード／長さ／Locationヘッダで成功判定。WAFで阻まれる場合は**tamper**（SQLmapのtamper参考）。
+
+- **SSRF メタデータ検証**  
+  - PATT: <https://swisskyrepo.github.io/PayloadsAllTheThings/Server%20Side%20Request%20Forgery/>  
+  - 手順（概略）:  
+    1) URL入力点を特定し、ローカル/クラウドメタデータ先（`169.254.169.254` 等）を段階的に試行。  
+    2) 内部到達可否の**タイムアウト差**や**ヘッダ挙動**を観測。  
+    3) 許可範囲内で**内部ポート探索**や**ファイル取得**に発展させる。
+
+- **Directory Traversal × Encoding 組合せ**  
+  - PATT: Traversal と **Encoding & Transformations**  
+    - Traversal: <https://swisskyrepo.github.io/PayloadsAllTheThings/Directory%20Traversal/>  
+    - Encoding: <https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20and%20Transformations/>  
+  - 手順（概略）: 二重URLエンコード、Unicode正規化、パス区切り多様化（`..%2f`, `%252e%252e%2f` 等）を順次適用。
+
+> **運用Tips**: Intruderの**payload positions**を最小化し、**レート**を抑制。既知の**危険ペイロード**（大量サイズ・fork爆弾等）は**ステージング限定**。
+
+---
+
+## 6. 成果物と報告（DoD 例）
+- **証跡**：Req/Res（時刻・相関ID）・スクショ・Burpプロジェクト・サーバログ抜粋。  
+- **成立条件**：入力値・前提状態・権限・データ必要性。  
+- **影響評価**：機微情報／認可逸脱／RCE 可能性／二次被害。  
+- **防御状況**：WAF／RateLimit／監査ログの検知有無。  
+- **再現手順**：手順書＋PATTの参照箇所（URL・見出し）。  
+- **連鎖整理**：ATT&CKの戦術・技術ID付与。
+
+---
+
+## 7. 品質ルール（この文書の運用）
+- **根拠の優先度**：OWASP（WSTG/ASVS）＞ NIST SP 800-115／PTES ＞ PortSwigger（Burp） ＞ PATT。  
+- **非破壊の原則**：同意なきDoS/破壊・大量送信禁止。危険ペイロードは**ステージング限定**。  
+- **更新**：PATTページの改訂に追随（特に DISCLAIMER／Methodology）。リンク死活監視。
+
+---
+
+## 参考（一次情報・公式・主要ページ）
+- **PayloadsAllTheThings** 本体：<https://swisskyrepo.github.io/PayloadsAllTheThings/> ／ GitHub：<https://github.com/swisskyrepo/PayloadsAllTheThings>  
+  - DISCLAIMER：<https://swisskyrepo.github.io/PayloadsAllTheThings/DISCLAIMER/>  
+  - HPP：<https://swisskyrepo.github.io/PayloadsAllTheThings/HTTP%20Parameter%20Pollution/>  
+  - SSRF：<https://swisskyrepo.github.io/PayloadsAllTheThings/Server%20Side%20Request%20Forgery/>  
+  - SQLi（Intruder/リスト例）：<https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/Intruder/Auth_Bypass.txt>  
+  - Encoding & Transformations：<https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20and%20Transformations/>
+- **OWASP WSTG**：<https://owasp.org/www-project-web-security-testing-guide/>  
+  - Input Validation Testing：<https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README>  
+  - HPPテスト：<https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution>
+- **NIST SP 800-115**（テスト計画・RoE・用語定義）：<https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>  
+- **PTES** Pre-engagement：<https://www.pentest-standard.org/index.php/Pre-engagement>  
+- **PortSwigger（Burp Intruder）**：  
+  - 概要：<https://portswigger.net/burp/documentation/desktop/tools/intruder>  
+  - はじめに：<https://portswigger.net/burp/documentation/desktop/tools/intruder/getting-started>  
+  - ポジション設定：<https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/positions>  
+  - 攻撃タイプ：<https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/attack-types>
