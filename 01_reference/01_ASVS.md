@@ -8,7 +8,7 @@
 
 ## 1. ASVSの立ち位置（なに者か）
 
-- **ASVSは「Webアプリ／Webサービスの技術的セキュリティ**を検証するための**要件標準**。**
+- **ASVSは「Webアプリ／Webサービスの技術的セキュリティ**を検証するための*要件標準。
   - 目的：市場における「検証範囲と厳密さ（rigor）」のばらつきを**標準化**し、開発・調達・検証で共通の土台にする。  
     参考: OWASP ASVS project「What is the ASVS?」<https://owasp.org/www-project-application-security-verification-standard/>
 - **最新版は v5.0.0（2025年5月リリース）**。要件IDは `v<version>-<chapter>.<section>.<requirement>` 形式で引用する（例：`v5.0.0-1.2.5`）。  
