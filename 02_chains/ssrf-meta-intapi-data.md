@@ -73,8 +73,8 @@
 
 ## 参照
 1. OWASP SSRF Prevention Cheat Sheet — https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html  
-2. OWASP WSTG（SSRF） — https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/14-Testing_for_Server_Side_Request_Forgery  
+2. OWASP WSTG（SSRF） — https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_Server-Side_Request_Forgery  
 3. PortSwigger Web Security Academy（SSRF） — https://portswigger.net/web-security/ssrf  
-4. PayloadsAllTheThings（SSRF） — https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/SSRF  
-5. HackTricks（SSRF） — https://book.hacktricks.xyz/pentesting-web/ssrf-server-side-request-forgery  
+4. PayloadsAllTheThings（SSRF） — https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Server%20Side%20Request%20Forgery  
+5. HackTricks（SSRF） — https://angelica.gitbook.io/hacktricks/pentesting-web/ssrf-server-side-request-forgery  
 6. MITRE ATT&CK — Exploit Public-Facing Application (T1190) — https://attack.mitre.org/techniques/T1190/
