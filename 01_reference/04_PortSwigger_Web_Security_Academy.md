@@ -1,136 +1,94 @@
 # PortSwigger Web Security Academyに基づく Webペネトレーション開始要件
 
-このドキュメントは、**PortSwigger Web Security Academy（WSA）**を用いて**Webペネトレーション**（WebPT）を始めるための**実務的な要件**を整理したものです。単なる**Web脆弱性診断（Vulnerability Assessment）**との違いも明確化し、関連**ソース（公式ドキュメント・一次資料）**へのリンクを併記します。
+---
+
+## 目的と立ち位置（WSAの役割）
+**Web Security Academy (WSA)** は PortSwigger が提供する無料のオンライン学習プラットフォームで、最新の研究・ドキュメントと**インタラクティブなラボ**により、手を動かして**エクスプロイト筋**を鍛えることを目的とします。  
+- “学ぶ (Learn)” → “練習する (Practice)” → “試す (Test)” の循環で、**Burp Suite** の実運用スキルと攻撃の再現力を養います。  
+- 学習パス（Learning Paths）により、初学者から実務者まで段階的に到達できます。
+
+> 本書は **WSAを「Webペネトレーション（WebPT）」の開始要件に結び付けるための運用指針**です。スキャナ中心の**Web脆弱性診断**とは明確に切り分け、**攻撃連鎖の成立と影響実証**に焦点を当てます。
 
 ---
 
-## 1) 目的と立ち位置（診断との違い）
-- **Web脆弱性診断**: 主に **自動・半自動の検出（スキャン）**で既知の弱点を洗い出し、広く漏れなく把握することを重視します。  
-- **Webペネトレーション（WebPT）**: **攻撃者の視点で実際に脆弱性を悪用・連鎖**させ、**到達可能な被害（Impact）を実証**します。目標達成型で「どこまで侵害できるか」を示すのが本質です。  
-  - 参考定義（NIST SP 800‑115 / 米NIST用語集）  
-    - Penetration testing は**実攻撃を模擬し攻撃経路を実証**する行為と定義。  
-    - 脆弱性診断はより広義の**テストとアセスメント**の一部であり、**発見**が重心。  
-    - 出典: NIST SP 800‑115, NIST CSRC Glossary
+## Web脆弱性診断との明確な違い（根拠つき）
+| 観点 | Web脆弱性診断（VA/DAST等） | Webペネトレーション（WebPT） |
+|---|---|---|
+| 目的 | 脆弱性の**存在**と**網羅**の把握 | **攻撃の成立**と**実害/到達範囲**の実証 |
+| 手段 | 自動スキャン＋限定的手動確認 | 手動主体（Burp/手法）＋**攻撃連鎖**の試行 |
+| 基準/定義 | OWASP: DAST（Vulnerability Scanning）は外形から脆弱性を探索する自動手法の総称 | OWASP WSTG/PTES: 事前合意のもとで**脆弱性を突いて侵攻**し、影響を評価 |
+| 成果物 | 検出一覧・設定不備・既知パターン | 再現手順・PoC・証跡・**到達境界**（権限/データ/横展開） |
+| 禁忌 | 破壊/業務影響の高い試験は禁止が標準 | **非破壊の原則**の範囲で、連鎖の成立を可能な限り実証 |
 
-**WSAの役割**: PortSwiggerが提供する**学習教材＋実践ラボ**を通じ、**実際に手を動かして exploit を成立**させる＝**WebPTの練習環境**です（無料）。
-
----
-
-## 2) アカウントと学習パス
-- **PortSwigger アカウント（無料）**  
-  - 目的: **進捗の保存、ランク表示、学習パスの利用**。  
-  - 出典: Getting started / All topics / All labs ページ（「Create an account」「Sign up」記載）
-- **学習パスの選択（最初の一歩）**  
-  - 初学者は **「Server‑side vulnerabilities（Apprentice）」** パスから開始するのがおすすめ。  
-  - 出典: Learning paths / Server‑side vulnerabilities（Apprentice）
+**一次資料（要点）**  
+- OWASP *Web Security Testing Guide* は、Webアプリの**能動的分析**（弱点の発見と検証）を定義（WSTG）  
+- OWASPは**スキャナ**を“Web Application Vulnerability Scanners（DAST）”として別枠で説明（VAとPTを役割分離）  
+- WSTGは**ペネトレーションテスト手法**として PTES 等7フェーズ（Pre-engagement〜Reporting）を参照（PTの本質は**侵攻/実証**）  
 
 ---
 
-## 3) 必須ツールと環境
-### 3.1 Burp Suite の版
-- **Burp Suite Community Edition（無料）**で**大半のラボは学習可能**。  
-- ただし、**OAST/Collaborator を要する一部ラボ**（例: **Blind SSRF** など）は**Professional**相当の機能が必要。  
-  - 公式比較に**「Auto & manual OAST（Burp Collaborator）」は Professional の機能**と明記。  
-  - さらに **SSRF（Blind, OAST）系ラボ**は**「デフォルトの Burp Collaborator 公開サーバを使う必要」**が明示。  
-  - 出典: Burp CE/Pro 比較、SSRF Blind（OAST）系ラボの注意書き、Community EULA（Collaboratorは Pro/DASTに属する旨）
+## 開始要件（技術・運用）
+### 1) アカウント & 環境
+- **PortSwigger アカウント**（無料） … 進捗保存・ラボ利用に必須  
+- **ブラウザ**（WSAラボはクラウド上に個別インスタンスを用意）  
+- **Burp Suite**  
+  - *Community*：手動ツール（Proxy/Repeater 等）中心で学習可能  
+  - *Professional*：**Intruder** 高速化、**スキャナ**、**Collaborator の連携機能**など実務に近い体験  
+- **Collaborator**（OAST）  
+  - ラボでは PortSwigger 提供の**Collaborator サーバ**や**Exploit Server**が用意されることがある  
+  - 実務では**プライベート Collaborator のデプロイ**により検出力を拡張（Blind SSRF/Blind XXE/Out-of-band XSS等）
 
-**実務的な指針**  
-- まずは **Community** で始め、**Collaborator 必須の課題に到達したら Pro を検討**。  
-- 代替として外部OAST（interact.sh等）を使う手法は一般サイトでは有用だが、**WSAラボは第三者宛て通信をブロック**しており**既定の Collaborator サーバ必須**のケースがある点に注意。
-
-### 3.2 システム要件（パフォーマンス目安）
-- **最小**: 2コア / 4GB RAM（基本のプロキシ・簡易Intruder）  
-- **推奨**: 2コア / 16GB RAM（汎用）  
-- **上級**: 4コア / 32GB RAM（大規模・複雑な攻撃やスキャン）  
-- 出典: Burp System requirements
-
-### 3.3 ブラウザ／プロキシ設定
-- **Burp の組み込みブラウザ（Chromium）**推奨：**起動直後からMITM設定済み**でHTTPSもそのまま可。  
-- 既存ブラウザを使う場合は**外部ブラウザのプロキシ設定**を実施。  
-- 出典: Burp’s browser, External browser configuration
+### 2) 運用上の前提（非破壊・同意・証跡）
+- **同意された範囲のみ**実施（対象・時間帯・送信レート・データ取り扱い）  
+- **非破壊の原則**：DoS/大量トラフィック/破壊操作は書面許可がない限り禁止  
+- **証跡**：HTTP リクエスト/レスポンス、スクリーンショット、ログ、時刻（TZ）を保存  
+- **報告標準**：OWASP Risk Rating で影響評価、ASVS/ATT&CK ID で根拠付け
 
 ---
 
-## 4) 進め方（最短ルート）
-1. **Getting started** を読む → **Learning paths** で **Apprentice 系**から着手。  
-2. **Burp 入門**（Proxy/Repeater/Intruder/Decoder/Comparer）を動画・ドキュメントで把握。  
-3. **代表的な入門ラボ**（例: SQLi ログインバイパス、Path Traversal 基本形、認可回避 など）で、  
-   - **Proxy**で**リクエスト改変** → **Repeater**で**再送** → 必要に応じて **Intruder** を使用、という**基本動線**を体で覚える。  
-4. **中級以降**は **認可（Access control）／ビジネスロジック／キャッシュ中毒／リクエストスマグリング／LLM 攻撃**などに拡大。  
-5. **OAST/Collaborator 必須ラボ**に進むタイミングで **Pro 導入**を検討。  
-6. 到達目安として **BSCP（Burp Suite Certified Practitioner）**受験も選択肢。
+## 具体的な使い方（WSA → WebPT 実務へのブリッジ）
+### A. 学習パスに沿う（最短ルート）
+1. **Server-side vulnerabilities – Apprentice** から開始（基礎〜王道の攻撃面を体系化）  
+2. トピック毎に「解説 → Labs」を往復し、**リクエスト改変の型**（Proxy→Repeater→Intruder）を体得  
+3. **Collaborator/OAST**が関わるテーマ（SSRF/Blind Injection 等）は必ず**通知の見方**まで練習  
+4. 各ラボ終了毎に、下記テンプレで**PT成果物**を1カード化（Gitに蓄積）
 
-出典: Getting started / All labs の各ラボ解説、BSCP ページ
+### B. ラボ→実務テンプレ（最小成果物・抜粋）
+- **Finding 名**（例：IDORによる他者情報閲覧）／**到達境界**（データ種別/権限）  
+- **前提/制約**（認証要否、役割、ツール/拡張機能、レート制御）  
+- **再現手順（最小）**：`/account?id=123` → 124 で PII 露見 → **修正確認**  
+- **PoC**：Burp Repeater スクリーンショット＋編集差分（必要なら cURL 併記）  
+- **リスク評価**：OWASP Risk Rating（可能なら事業影響も添記）  
+- **根拠タグ**：`ASVS v4.x: V*.*.* / WSTG-ID / ATT&CK T#### / WSA Topic`
 
----
-
-## 5) 法的・安全面の前提
-- **WSAのラボは意図的に脆弱で、第三者へ影響が出ないよう分離**。  
-- **外部への任意通信はファイアウォールでブロック**される場合があり、**既定の Collaborator**のみ許容されるラボがある。  
-- **Academyはバグバウンティ対象外**（報奨金の対象外）。  
-- 出典: Blind SSRF（OAST）ラボの注意書き、PortSwigger Bug Bounty／FireBountyの注意書き
-
----
-
-## 6) 最低限の基礎知識（推奨）
-- **HTTP/HTTPS 基礎**（メソッド・ヘッダ・ボディ・クッキー・セッション、HTTP/2 の基本）  
-  - 出典: Burp docs（HTTP/2 basics for Burp users）など
-- **Burp 操作**（Proxy／Repeater／Intruder(CEは制限付)／Decoder／Comparer）  
-  - 出典: Burp Getting started / Video tutorials
+### C. PortSwigger ならではの実務練習
+- **Exploit Server の活用**：反射XSS/SSRF で外部ホストを要する PoC を安全に再現  
+- **Mystery Lab**で“事前情報なし”の偵察〜仮説立案〜検証の反復練習  
+- **Topic横断の連鎖**：**IDOR → CSRF → 帳票DL**、**SSTI → RCE → 内部探索** など**攻撃連鎖**をノート化
 
 ---
 
-## 7) 典型的な「要件チェックリスト」
-**開始前に以下を満たしていればOK**：
-- [ ] PortSwigger **アカウント作成**（ダッシュボードで進捗を確認できる）  
-- [ ] **Burp CE** をインストール（**必要になったら Pro 検討**）  
-- [ ] **Burp の組み込みブラウザ**でラボにアクセスできる（もしくは外部ブラウザをプロキシ設定）  
-- [ ] **学習パス（Apprentice）を1つ選択**（例: Server‑side vulnerabilities）  
-- [ ] ラボ説明に従い、**Proxy → Repeater →（必要に応じ Intruder）** の流れで**Exploit を成立**させる  
-- [ ] **OAST/Collaborator が必要なラボ**に備え、**Pro の試用／導入可否**を検討  
-- [ ] （任意）**BSCP** を学習のマイルストーンに設定
+## よくある詰まりどころ（FAQ）
+- **Community でも始められる？** → 可。まずは Proxy/Repeater を使い、**手動改変の精度**に集中。大量試行や自動化が必要になったら Pro を検討。  
+- **Collaborator は必須？** → **Blind系**の検出・実証に不可欠。ラボでは提供サーバで練習、実務は**プライベート運用**も選択肢。  
+- **ラボの成果を報告に落とすコツは？** → 「**再現手順が10分で追えるか**」を基準に、リクエスト前後の**差分**と**到達境界**を明記。
 
 ---
 
-## 8) 参考（ラボ例）
-- **SQLi: ログインバイパス**（*Use Burp to intercept and modify the login request…*）  
-- **パストラバーサル: 基本形**（`../../../etc/passwd` を使う基本例）  
-- **認可: メソッドベース回避**（HTTPメソッドに依存する認可の欠陥を突く）  
-- 出典: 各トピックの該当ラボ
-
----
-
-## 9) 出典（公式・一次資料中心）
-- **Academy 全般**  
-  - Getting started: <https://portswigger.net/web-security/getting-started>  
-  - All labs: <https://portswigger.net/web-security/all-labs>  
-  - All topics（学習トピック一覧）: <https://portswigger.net/web-security/all-topics>  
-  - Learning paths（学習パス）: <https://portswigger.net/web-security/learning-paths>  
-  - Server‑side vulnerabilities（Apprentice）: <https://portswigger.net/web-security/learning-paths/server-side-vulnerabilities-apprentice>
-- **Burp（導入・機能・要件）**  
-  - Burp Getting started: <https://portswigger.net/burp/documentation/desktop/getting-started>  
-  - System requirements: <https://portswigger.net/burp/documentation/desktop/getting-started/system-requirements>  
-  - Burp’s browser（組み込みブラウザ）: <https://portswigger.net/burp/documentation/desktop/tools/burps-browser>  
-  - 外部ブラウザ設定: <https://portswigger.net/burp/documentation/desktop/external-browser-config>  
-  - CE/Pro 比較（OASTはProの機能と明記）: <https://portswigger.net/burp/communitydownload>
-- **OAST / Collaborator 関連**  
-  - Collaborator 概要: <https://portswigger.net/burp/documentation/desktop/tools/collaborator>  
-  - Collaborator 設定: <https://portswigger.net/burp/documentation/desktop/settings/project/collaborator>  
-  - Blind SSRF（OAST）ラボの注意書き（既定のCollaborator必須）: <https://portswigger.net/web-security/ssrf/blind/lab-out-of-band-detection>  
-  - Burp Community EULA（Collaboratorは Pro/DASTに属する旨）: <https://portswigger.net/burp/eula/community>
-- **ラボ（例）**  
-  - SQLi（login bypass）: <https://portswigger.net/web-security/sql-injection/lab-login-bypass>  
-  - Path Traversal（simple）: <https://portswigger.net/web-security/file-path-traversal/lab-simple>  
-  - Access control（method-based bypass）: <https://portswigger.net/web-security/access-control/lab-method-based-access-control-can-be-circumvented>
-- **法的・安全・運用**  
-  - Blind SSRF（OAST）ラボの「第三者通信ブロック／既定Collaborator必須」注意書き: <https://portswigger.net/web-security/ssrf/blind/lab-out-of-band-detection>  
-  - （参考）PortSwigger Bug Bountyでのアカデミー除外の言及: <https://firebounty.com/68-portswigger-web-security/>
-- **定義・概念（診断 vs PT）**  
-  - NIST SP 800‑115 本文（PDF）: <https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>  
-  - NIST CSRC 用語集（Penetration Testing）: <https://csrc.nist.gov/glossary/term/penetration_testing>
-
-4. ラボは**問題文 → 攻撃条件の把握 → リクエスト改変 → 成功判定（Solved）**の手順で進める。
-
----
-
-**補足**: 本ドキュメントは、PortSwigger公式のガイダンス（WSA・Burp Docs）および NIST 一次資料を中心に要件化しています。運用ポリシーや端末要件は組織事情に合わせて調整してください。
+## 参考（一次情報・公式・安定）
+- Web Security Academy（概要/無料/ラボ）  
+  - https://portswigger.net/web-security  
+  - 学習パス：https://portswigger.net/web-security/learning-paths  
+  - トピック一覧：https://portswigger.net/web-security/all-topics  
+  - Getting started（Burp動画）：https://portswigger.net/web-security/getting-started
+- Burp Suite ドキュメント（機能・Collaborator/OAST）  
+  - 総合ドキュメント：https://portswigger.net/burp/documentation  
+  - Collaborator 概要：https://portswigger.net/burp/documentation/collaborator  
+  - Collaborator（Desktop/手動手順）：https://portswigger.net/burp/documentation/desktop/tools/collaborator  
+  - Typical uses（Blind検知例）：https://portswigger.net/burp/documentation/collaborator/uses  
+  - Private Collaborator Server：https://portswigger.net/burp/documentation/collaborator/server/private
+- OWASP（定義・区別の根拠）  
+  - WSTG（セキュリティテストの定義/目的）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/00-Introduction_and_Objectives/README  
+  - WSTG（Penetration Testing Methodologies/PTES）：https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies  
+  - Vulnerability Scanning（DAST/自動スキャナの説明）：https://owasp.org/www-community/Vulnerability_Scanning_Tools  
+  - OWASP Risk Rating：https://owasp.org/www-community/OWASP_Risk_Rating_Methodology
