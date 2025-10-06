@@ -1,105 +1,155 @@
-# PortSwigger Web Security Academy で Webペネトレーションを始めるための要件  
-*Kedappsec-notes / 01_reference 準拠*
+# 05_PayloadsAllTheThings — Webペネトレーション開始要件と使い方（Kedappsec-notes）
+
+**対象**: Webペネトレーションテスト（WebPT）で **PayloadsAllTheThings（PATT）** を安全かつ効果的に活用するための要件・手順・品質ルールをまとめる。  
+**想定読者**: WebPT担当者／レビュー担当／報告書作成者。
 
 ---
 
-## 目的と立ち位置（WSAの役割）
-**Web Security Academy (WSA)** は PortSwigger が提供する無料のオンライン学習プラットフォームで、最新の研究・ドキュメントと**インタラクティブなラボ**により、手を動かして**エクスプロイト筋**を鍛えることを目的とします。  
-- “学ぶ (Learn)” → “練習する (Practice)” → “試す (Test)” の循環で、**Burp Suite** の実運用スキルと攻撃の再現力を養います。  
-- 学習パス（Learning Paths）により、初学者から実務者まで段階的に到達できます。
+## 1. 位置づけ（何者か・どう使うか）
 
-> 本書は **WSAを「Webペネトレーション（WebPT）」の開始要件に結び付けるための運用指針**です。スキャナ中心の**Web脆弱性診断**とは明確に切り分け、**攻撃連鎖の成立と影響実証**に焦点を当てます。
+- **PATTの立ち位置**: 実務に役立つ *ペイロード＆バイパス* のカタログ。探索済みの攻撃観点（WSTG 等）に対して、**試験入力（payload）を素早く準備**するためのリファレンス。  
+  - 公式: <https://swisskyrepo.github.io/PayloadsAllTheThings/> ／ GitHub: <https://github.com/swisskyrepo/PayloadsAllTheThings>
+- **使い分け（本リポ内の他参照と）**  
+  - **WSTG** …「何をどう検証するか（観点／手順）」を決める。  
+  - **PATT** …決まった観点に対して「**何を入れるか（payload）**」を即用意する。  
+  - **ASVS** …深度・受入基準（DoD）を定義。  
+  - **ATT&CK** …成立した攻撃を行動様式でマッピング（連鎖の説明）。
 
----
-
-## Web脆弱性診断との明確な違い（根拠つき）
-| 観点 | Web脆弱性診断（VA/DAST等） | Webペネトレーション（WebPT） |
-|---|---|---|
-| 目的 | 脆弱性の**存在**と**網羅**の把握 | **攻撃の成立**と**実害/到達範囲**の実証 |
-| 手段 | 自動スキャン＋限定的手動確認 | 手動主体（Burp/手法）＋**攻撃連鎖**の試行 |
-| 基準/定義 | OWASP: DAST（Vulnerability Scanning）は外形から脆弱性を探索する自動手法の総称 | OWASP WSTG/PTES: 事前合意のもとで**脆弱性を突いて侵攻**し、影響を評価 |
-| 成果物 | 検出一覧・設定不備・既知パターン | 再現手順・PoC・証跡・**到達境界**（権限/データ/横展開） |
-| 禁忌 | 破壊/業務影響の高い試験は禁止が標準 | **非破壊の原則**の範囲で、連鎖の成立を可能な限り実証 |
-
-**一次資料（要点）**  
-- OWASP *Web Security Testing Guide* は、Webアプリの**能動的分析**（弱点の発見と検証）を定義（WSTG）  
-- OWASPは**スキャナ**を“Web Application Vulnerability Scanners（DAST）”として別枠で説明（VAとPTを役割分離）  
-- WSTGは**ペネトレーションテスト手法**として PTES 等7フェーズ（Pre-engagement〜Reporting）を参照（PTの本質は**侵攻/実証**）  
+> **重要**: PATTは**一次資料（OWASP/WSTG・標準・ベンダー公式等）で裏取り**して使う。DoS/破壊系は書面合意なしに試さない（PATTの **DISCLAIMER** 参照）。
 
 ---
 
-## 開始要件（技術・運用）
-### 1) アカウント & 環境
-- **PortSwigger アカウント**（無料） … 進捗保存・ラボ利用に必須  
-- **ブラウザ**（WSAラボはクラウド上に個別インスタンスを用意）  
-- **Burp Suite**  
-  - *Community*：手動ツール（Proxy/Repeater 等）中心で学習可能  
-  - *Professional*：**Intruder** 高速化、**スキャナ**、**Collaborator の連携機能**など実務に近い体験  
-- **Collaborator**（OAST）  
-  - ラボでは PortSwigger 提供の**Collaborator サーバ**や**Exploit Server**が用意されることがある  
-  - 実務では**プライベート Collaborator のデプロイ**により検出力を拡張（Blind SSRF/Blind XXE/Out-of-band XSS等）
+## 2. Web脆弱性診断との明確な違い（根拠つき）
 
-### 2) 運用上の前提（非破壊・同意・証跡）
-- **同意された範囲のみ**実施（対象・時間帯・送信レート・データ取り扱い）  
-- **非破壊の原則**：DoS/大量トラフィック/破壊操作は書面許可がない限り禁止  
-- **証跡**：HTTP リクエスト/レスポンス、スクリーンショット、ログ、時刻（TZ）を保存  
-- **報告標準**：OWASP Risk Rating で影響評価、ASVS/ATT&CK ID で根拠付け
+- **Web脆弱性診断（Vulnerability Scanning/Assessment）**  
+  - 目的: 既知の弱点を**幅広く検出・棚卸**する。自動化重視。  
+  - 手段: ネットワーク／アプリの**スキャン**で既知脆弱性やミス設定を特定。結果解釈が必要。  
+  - 根拠: **NIST SP 800-115** 第4章「Vulnerability Scanning」— スキャンはホスト属性と既知脆弱性の識別に有効（アウトデートソフト・パッチ有無・誤設定の把握）と記載（pp. 26–28）。
 
----
+- **Webペネトレーションテスト（Penetration Testing）**  
+  - 目的: **実攻撃**を模倣し、**実際に侵害が成立するか**と**影響範囲**を示す（防御検知能力も含む）。  
+  - 手段: 攻撃者の手口・ツールを用い、**複数脆弱性の組み合わせ**で横展開や権限昇格を狙う。計画・通知・安全対策が必須。  
+  - 根拠: **NIST SP 800-115** 第5.2章「Penetration Testing」— “実世界の攻撃を模倣し、セキュリティ機能の迂回方法を特定する。**実システム・実データに対する実攻撃**を含み得るため**リスクが高い**” 等（p.35–39）。
 
-## 具体的な使い方（WSA → WebPT 実務へのブリッジ）
-### A. 学習パスに沿う（最短ルート）
-1. **Server-side vulnerabilities – Apprentice** から開始（基礎〜王道の攻撃面を体系化）  
-2. トピック毎に「解説 → Labs」を往復し、**リクエスト改変の型**（Proxy→Repeater→Intruder）を体得  
-3. **Collaborator/OAST**が関わるテーマ（SSRF/Blind Injection 等）は必ず**通知の見方**まで練習  
-4. 各ラボ終了毎に、下記テンプレで**PT成果物**を1カード化（Gitに蓄積）
-
-### B. ラボ→実務テンプレ（最小成果物・抜粋）
-- **Finding 名**（例：IDORによる他者情報閲覧）／**到達境界**（データ種別/権限）  
-- **前提/制約**（認証要否、役割、ツール/拡張機能、レート制御）  
-- **再現手順（最小）**：`/account?id=123` → 124 で PII 露見 → **修正確認**  
-- **PoC**：Burp Repeater スクリーンショット＋編集差分（必要なら cURL 併記）  
-- **リスク評価**：OWASP Risk Rating（可能なら事業影響も添記）  
-- **根拠タグ**：`ASVS v4.x: V*.*.* / WSTG-ID / ATT&CK T#### / WSA Topic`
-
-### C. PortSwigger ならではの実務練習
-- **Exploit Server の活用**：反射XSS/SSRF で外部ホストを要する PoC を安全に再現  
-- **Mystery Lab**で“事前情報なし”の偵察〜仮説立案〜検証の反復練習  
-- **Topic横断の連鎖**：**IDOR → CSRF → 帳票DL**、**SSTI → RCE → 内部探索** など**攻撃連鎖**をノート化
+- **補足**: **WSTG** は Webテストの枠組み（観点と手順）を提供し、**PTES** は事前合意・スコープ定義等の**事前準備**を重視（WSTG「Penetration Testing Methodologies」からの参照、PTES Pre-engagement）。
+  - WSTG 最新: <https://owasp.org/www-project-web-security-testing-guide/>  
+  - WSTG「Penetration Testing Methodologies」: <https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies>  
+  - PTES Pre-engagement: <https://www.pentest-standard.org/index.php/Pre-engagement>  
+  - NIST SP 800-115: PDF <https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>
 
 ---
 
-## よくある詰まりどころ（FAQ）
-- **Community でも始められる？** → 可。まずは Proxy/Repeater を使い、**手動改変の精度**に集中。大量試行や自動化が必要になったら Pro を検討。  
-- **Collaborator は必須？** → **Blind系**の検出・実証に不可欠。ラボでは提供サーバで練習、実務は**プライベート運用**も選択肢。  
-- **ラボの成果を報告に落とすコツは？** → 「**再現手順が10分で追えるか**」を基準に、リクエスト前後の**差分**と**到達境界**を明記。
+## 3. 前提・禁止事項（安全・法令遵守）
+
+- **明示的許可のない試験禁止**（PATT **DISCLAIMER**）: 本資料は**教育・研究目的**。**適法かつ権限のある環境のみ**で利用すること。  
+  - PATT DISCLAIMER: <https://swisskyrepo.github.io/PayloadsAllTheThings/DISCLAIMER/>
+- **リスク低減策（NIST SP 800-115）**: 熟練テスター／包括的計画／活動ログ／**営業時間外**の実施／**本番の複製（ステージング）**での実験等を推奨（ES-2）。  
+- **ルール・オブ・エンゲージメント（RoE）**: NIST 付録Bの雛形を参照。**禁止系**（DoS・大量送信・破壊／データ流出）と**停止条件**を明文化。
 
 ---
 
-## 参考（一次情報・公式・安定）
-- Web Security Academy（概要/無料/ラボ）  
-  - https://portswigger.net/web-security  
-  - 学習パス：https://portswigger.net/web-security/learning-paths  
-  - トピック一覧：https://portswigger.net/web-security/all-topics  
-  - Getting started（Burp動画）：https://portswigger.net/web-security/getting-started
-- Burp Suite ドキュメント（機能・Collaborator/OAST）  
-  - 総合ドキュメント：https://portswigger.net/burp/documentation  
-  - Collaborator 概要：https://portswigger.net/burp/documentation/collaborator  
-  - Collaborator（Desktop/手動手順）：https://portswigger.net/burp/documentation/desktop/tools/collaborator  
-  - Typical uses（Blind検知例）：https://portswigger.net/burp/documentation/collaborator/uses  
-  - Private Collaborator Server：https://portswigger.net/burp/documentation/collaborator/server/private
-- OWASP（定義・区別の根拠）  
-  - WSTG（セキュリティテストの定義/目的）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/00-Introduction_and_Objectives/README  
-  - WSTG（Penetration Testing Methodologies/PTES）：https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies  
-  - Vulnerability Scanning（DAST/自動スキャナの説明）：https://owasp.org/www-community/Vulnerability_Scanning_Tools  
-  - OWASP Risk Rating：https://owasp.org/www-community/OWASP_Risk_Rating_Methodology
+## 4. 開始要件（Definition of Ready / DoR）
+
+1) **事前合意（PTES準拠）**  
+   - スコープ：機能/画面/API、テナント、対象環境（優先は**ステージング**）、期間・時間帯、禁止事項。  
+   - アカウント：ロール別（一般/特権/ゲスト）、MFA方針、テストデータ。  
+   - 可用性配慮：レート制限／ジョブ/バッチ時間帯、監視・連絡体制、**緊急停止連絡先**。
+
+2) **証跡・再現性**  
+   - 収集物：**HTTP Req/Res（時刻・トレースID）**、スクリーンショット、Burpプロジェクト、サーバログ抜粋。  
+   - 論点整理：**成立条件／再現手順／影響評価**、既存防御の検知状況。
+
+3) **品質と安全**  
+   - **入力生成は段階的**（低リスク→高リスク）。WAF/RateLimit観測。  
+   - 失敗時ロールバック手順（データ汚染・キュー滞留・キャッシュ汚染の復旧）。
 
 ---
 
-## 付録：実施チェックリスト（抜粋・Kedappsec-notes用）
-- [ ] 合意済みスコープ（対象/時間/禁止事項/影響閾値）を記録  
-- [ ] 学習パスと対象トピックを事前選定（例：SSRF → Blind 系）  
-- [ ] Burp プロジェクト作成／Proxy 設定／証跡保存ディレクトリ作成  
-- [ ] Repeater/Intruder/Collaborator の**動作確認**（DNS解決/通知）  
-- [ ] PoC 作成→**到達境界**の明文化→**修正検証**→レポート反映
+## 5. 具体的な使い方（最短ハンズオン）
 
+### 5.1 典型フロー
+1. **観点を決める（WSTG）**：例）Input Validation（HPP/SQLi/XSS）や SSRF 等。  
+   - 例: WSTG 4.7 Input Validation Testing → <https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README>
+2. **PATTでペイロード収集**：対象技術のページを選び、**最小→強力**の順で準備。  
+   - 例: HPP, SQL Injection, SSRF, Directory Traversal, Encoding & Transformations。  
+3. **Burp Intruder で実行**（Sniper/Cluster Bomb などを選択）。  
+   - Intruder概要: <https://portswigger.net/burp/documentation/desktop/tools/intruder>  
+   - 使い始め: <https://portswigger.net/burp/documentation/desktop/tools/intruder/getting-started>  
+   - 位置指定: <https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/positions>  
+   - 攻撃タイプ: <https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/attack-types>
+4. **観測とチューニング**：レスポンス差分・エラー兆候・リダイレクト・時間差を観測。検証できれば**tamper**（WAF回避／符号化変更）で再試行。  
+5. **連鎖と説明**：成立したら**権限上げ・横展開**を検討し、**ATT&CK**で技術IDを付して報告。
+
+### 5.2 ミニ・レシピ（例）
+
+- **HPP（HTTP Parameter Pollution）**  
+  - PATT: <https://swisskyrepo.github.io/PayloadsAllTheThings/HTTP%20Parameter%20Pollution/>  
+  - WSTG観点: <https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution>  
+  - 手順（概略）:  
+    1) 影響しそうなパラメータを洗い出し（例：`role=`, `redirect=`）。  
+    2) Intruder **Sniper**で同名パラメータの重複を注入（`?role=user&role=admin` など）。  
+    3) **順序**・**位置**・**符号化**（URL/Unicode/双方向）を変化させ差分観測。
+
+- **SQLi ログイン回避**  
+  - PATT Intruder ワードリスト例：Auth_Bypass.txt  
+    - <https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/Intruder/Auth_Bypass.txt>  
+  - 手順（概略）:  
+    1) ログインPOSTの`username`/`password`に位置指定。  
+    2) **Auth_Bypass**リストを設定し Sniper で走査。  
+    3) ステータスコード／長さ／Locationヘッダで成功判定。WAFで阻まれる場合は**tamper**（SQLmapのtamper参考）。
+
+- **SSRF メタデータ検証**  
+  - PATT: <https://swisskyrepo.github.io/PayloadsAllTheThings/Server%20Side%20Request%20Forgery/>  
+  - 手順（概略）:  
+    1) URL入力点を特定し、ローカル/クラウドメタデータ先（`169.254.169.254` 等）を段階的に試行。  
+    2) 内部到達可否の**タイムアウト差**や**ヘッダ挙動**を観測。  
+    3) 許可範囲内で**内部ポート探索**や**ファイル取得**に発展させる。
+
+- **Directory Traversal × Encoding 組合せ**  
+  - PATT: Traversal と **Encoding & Transformations**  
+    - Traversal: <https://swisskyrepo.github.io/PayloadsAllTheThings/Directory%20Traversal/>  
+    - Encoding: <https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20and%20Transformations/>  
+  - 手順（概略）: 二重URLエンコード、Unicode正規化、パス区切り多様化（`..%2f`, `%252e%252e%2f` 等）を順次適用。
+
+> **運用Tips**: Intruderの**payload positions**を最小化し、**レート**を抑制。既知の**危険ペイロード**（大量サイズ・fork爆弾等）は**ステージング限定**。
+
+---
+
+## 6. 成果物と報告（DoD 例）
+- **証跡**：Req/Res（時刻・相関ID）・スクショ・Burpプロジェクト・サーバログ抜粋。  
+- **成立条件**：入力値・前提状態・権限・データ必要性。  
+- **影響評価**：機微情報／認可逸脱／RCE 可能性／二次被害。  
+- **防御状況**：WAF／RateLimit／監査ログの検知有無。  
+- **再現手順**：手順書＋PATTの参照箇所（URL・見出し）。  
+- **連鎖整理**：ATT&CKの戦術・技術ID付与。
+
+---
+
+## 7. 品質ルール（この文書の運用）
+- **根拠の優先度**：OWASP（WSTG/ASVS）＞ NIST SP 800-115／PTES ＞ PortSwigger（Burp） ＞ PATT。  
+- **非破壊の原則**：同意なきDoS/破壊・大量送信禁止。危険ペイロードは**ステージング限定**。  
+- **更新**：PATTページの改訂に追随（特に DISCLAIMER／Methodology）。リンク死活監視。
+
+---
+
+## 参考（一次情報・公式・主要ページ）
+- **PayloadsAllTheThings** 本体：<https://swisskyrepo.github.io/PayloadsAllTheThings/> ／ GitHub：<https://github.com/swisskyrepo/PayloadsAllTheThings>  
+  - DISCLAIMER：<https://swisskyrepo.github.io/PayloadsAllTheThings/DISCLAIMER/>  
+  - HPP：<https://swisskyrepo.github.io/PayloadsAllTheThings/HTTP%20Parameter%20Pollution/>  
+  - SSRF：<https://swisskyrepo.github.io/PayloadsAllTheThings/Server%20Side%20Request%20Forgery/>  
+  - SQLi（Intruder/リスト例）：<https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/SQL%20Injection/Intruder/Auth_Bypass.txt>  
+  - Encoding & Transformations：<https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20and%20Transformations/>
+- **OWASP WSTG**：<https://owasp.org/www-project-web-security-testing-guide/>  
+  - Input Validation Testing：<https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/README>  
+  - HPPテスト：<https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution>
+- **NIST SP 800-115**（テスト計画・RoE・用語定義）：<https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf>  
+- **PTES** Pre-engagement：<https://www.pentest-standard.org/index.php/Pre-engagement>  
+- **PortSwigger（Burp Intruder）**：  
+  - 概要：<https://portswigger.net/burp/documentation/desktop/tools/intruder>  
+  - はじめに：<https://portswigger.net/burp/documentation/desktop/tools/intruder/getting-started>  
+  - ポジション設定：<https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/positions>  
+  - 攻撃タイプ：<https://portswigger.net/burp/documentation/desktop/tools/intruder/configure-attack/attack-types>
+
+---
+
+> **このファイルは Kedappsec-notes 専用の運用ガイド**です。Webペネトレサービス化フォルダの運用方針とは別管理です。
