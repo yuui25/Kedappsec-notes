@@ -13,7 +13,7 @@
 - **[04_PortSwigger_Web_Security_Academy.md](./04_PortSwigger_Web_Security_Academy.md)**：WSAの活用（Burp／ラボ／学習パス）  
 - **[05_PayloadsAllTheThings.md](./05_PayloadsAllTheThings.md)**：PayloadsAllTheThingsの安全な活用と運用ルール  
 - **[06_Hacktricks .md](./06_Hacktricks%20.md)**：HackTricksの実務適用（テクニック集の使いどころ）  
-- **[99_web-pentest_requirements_complete.md](./99_web-pentest_requirements_complete.md)**：統合版（要件サマリと快速チェックリスト）
+- **[99_web-pentest_requirements_complete.md](./99_web-pentest_requirements_complete.md)**：統合版（要件サマリと01~06を使用した具体例）
 
 > **注意**：上記は**Kedappsec-notes専用**の運用文書です。「Webペネトレサービス化」等の別フォルダ運用方針ではありません。
 
