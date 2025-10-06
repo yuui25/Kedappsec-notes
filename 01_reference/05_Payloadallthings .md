@@ -67,15 +67,3 @@ PayloadsAllTheThings を **単なる参照集**としてではなく、実際の
 2. PayloadsAllTheThings（ペイロード例：Reverse Shell 等のチートシート）。  
 3. OWASP Web Security Testing Guide（WSTG） — ペネトレーション手順とテストケースのフレームワーク。  
 4. Hack The Box / Deepstrike / Security vendor articles — 脆弱性診断とペネトレーションの違いを説明する記事（実務上の取り扱いの違い）。
-
----
-
-## 12. 使い方メモ（短い手順）
-1. `git clone https://github.com/swisskyrepo/PayloadsAllTheThings.git`  
-2. ローカルでカテゴリ（例：XSS, SQL Injection, SSRF）を開き、該当するペイロードを選ぶ。  
-3. ステージング環境で Burp Intruder や Repeater を使って逐次投げ、PoC を記録。  
-4. 実運用へ投下する場合は必ず事前許可・影響確認を行う。
-
----
-
-*このファイルは `payloads_pt_requirements.md` としてエクスポートされます。*
