@@ -14,7 +14,7 @@ Webペネトレーション（WebPT）に特化したナレッジ。OWASP/WSTG�
 3) **根拠を示して説明**  
    一次資料（WSTG/ASVS/ATT&CK等）へ**明示リンク**し、判断根拠を残す。
 
-## フォルダ構成（最小）
+## フォルダ構成
 ```
 Kedappsec-notes/
 ├─ 00_meta/                          # 方針・命名規約・注意事項
@@ -32,8 +32,8 @@ Kedappsec-notes/
 │  └─ README.md / idor/ / xss/ / ssrf/ ...
 └─ 05_prompts/                       # 生成/保守用プロンプト
    ├─ README.md
-   ├─ gen/ (add-vuln-card.md / expand-attack-chain.md / build-matrix-entry.md / write-poc-template.md)
-   └─ maintain/ (matrix-consistency-check.md / reference-sync.md / repo-governance.md)
+   ├─ gen/ (add-vuln-card.md / expand-attack-chain.md / build-matrix-entry.md / write-poc-template.md / ...)
+   └─ maintain/ (matrix-consistency-check.md / reference-sync.md / repo-governance.md / ...)
 ```
 
 ## 参考
