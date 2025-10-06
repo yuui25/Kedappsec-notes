@@ -1,135 +1,167 @@
-# HackTricks を用いた Webペネトレーション開始要件（Kedappsec-notes準拠）
+# 99_web-pentest_requirements_complete.md
+**総合版**：Webペネトレーション開始要件（ASVS × WSTG × ATT&CK × PortSwigger WSA × PayloadsAllTheThings × HackTricks）  
+_本書は Kedappsec-notes/01_reference の README に準拠した統合ガイドです。_
 
-> **位置づけ**：HackTricks は「実務テクニック集（入口探索・バイパス手法のカタログ）」として活用する。ASVS/WSTG/ATT&CK と対で使い、**根拠（一次資料）で裏取り**してから実施・報告する。  
-> **対象**：Webアプリ（SPA/SSR 含む、公開API含む）。ネットワーク機器/モバイル/クラウド全体設計は範囲外（必要時は別途）。
-
----
-
-## 1. 立ち位置（添付READMEの方針に沿った使い分け）
-- **HackTricks**：認可回避・ヘッダ悪用・周辺Tipsなど、**入口拡張／バイパス手法**の発想源。  
-- **ASVS**：深度・受入れ基準（DoD）の**要件**決定。  
-- **WSTG**：検証計画・観点の**手順**と証跡化ガイド。  
-- **PayloadsAllTheThings**：HackTricksで得た当たりに対する**具体ペイロード**。  
-- **ATT&CK**：成立した攻撃を**戦術/技術ID**で連鎖整理（報告の説明力向上）。
-
-> 参考：README「役割と使い分け」「推奨参照フロー」に準拠。
+> 位置づけ：ASVS=要件基準／WSTG=検証手順／ATT&CK=攻撃連鎖の説明／WSA=手を動かす訓練／PATT=入力ペイロード集／HackTricks=入口・バイパスの発想源。  
+> 参考：`01_ASVS.md` / `02_WSTG.md` / `03_ATT&CK.md` / `04_PortSwigger_Web_Security_Academy.md` / `05_PayloadsAllTheThings.md` / `06_Hacktricks.md`
 
 ---
 
-## 2. Web脆弱性診断との明確な違い（根拠リンク付き）
-**脆弱性診断（Vulnerability Assessment）**は潜在的弱点の**列挙**寄り（自動化比重高）で、  
-**ペネトレーションテスト**は実際に**攻撃連鎖を成立**させ**影響を実証**する行為（手動比重高）。
-- OWASP WSTG は**“テストは証拠に基づき弱点を検証”**する旨を定義（＝手順と証跡重視）。
-- そのうえで**ペンテスト**は PCI DSS など外部基準にも準拠しつつ、**攻撃の成立と影響**を評価対象に含める。
+## 0. 用語と前提（VAとWebPTの違い）
+**Web脆弱性診断（VA）**は既知弱点の**列挙・検証**が目的（自動スキャン比重大）。  
+**Webペネトレーションテスト（WebPT）**は**実攻撃の成立**と**連鎖**・**影響**を**合意範囲内**で実証する行為。
 
-**実務上の線引き（本ドキュメントでの扱い）**
-- 診断：観点網羅＋弱点列挙（WSTGの観点と再現手順）。
-- WebPT：HackTricks/PA‑TT を用い、**認可回避・迂回・連鎖**を試み、**ビジネス影響（機密閲覧／特権化／任意操作など）**を**証跡**で示す。
+- NIST SP 800-115（Vulnerability Scanning / Penetration Testing）  
+  https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf
+- OWASP Web Security Testing Guide（テスト手順の標準）  
+  https://owasp.org/www-project-web-security-testing-guide/latest/
+- ASVS（検証の**要件基準**、L1/L2/L3）  
+  https://owasp.org/www-project-application-security-verification-standard/
 
----
-
-## 3. 着手前要件（Start Conditions / DoD）
-**3.1 合意とスコープ**
-- 許可文書：対象ドメイン/環境（本番 or ステージング）、禁止事項（DoS/大量送信/資源枯渇）、時間帯、窓口。
-- 認証情報：アカウント種別（ロール）、APIキー/クライアント証明書などの扱い。
-- 成果物：①サマリ ②詳細結果 ③再現手順 ④証跡（Req/Res・ログ・スクショ） ⑤改善提案。
-
-**3.2 技術的前提**
-- プロキシ/Burp（手動改変・ログ保存）、低侵襲モード（レート制御/インターバル）、安全なワードリスト管理。
-- ステージングで**破壊的試験は先行検証**、本番は**合意内・最小限**のみ。
-
-**3.3 DoD（受入れ基準）**
-- 影響の**再現可能なPoC**と**証跡**が揃い、ASVS/WSTG/ATT&CKを**根拠付け**として引用。
-- 誤検知/過度推測がないこと（一次資料リンクで裏取り済み）。
+> 本書は **非破壊の原則**（DoS/大量送信/破壊操作は事前書面合意がない限り実施不可）に従います。
 
 ---
 
-## 4. HackTricksの具体的な使い方（入口を広げ、連鎖させる）
-
-> 最短フロー：**HackTricks で入口候補 → PA‑TTで投入値 → WSTG手順で検証 → 成立したら ATT&CK で連鎖可視化**。
-
-### 4.1 入口探索（発想出し）
-- **Web Vulnerabilities Methodology**（チェックリスト）で**見落とし削減**。  
-  例：プロキシ層悪用（Hop-by-hop/Caching/Request Smuggling/H2C）、反射値の利用（CSTI/SSTI/SSRF/Prototype Pollution → XSS）。
-- **403/401 Bypass**：パス正規化・大文字小文字・末尾スラッシュ・ヘッダ（`X-Original-URL` 等）・メソッドオーバーライドを素振り。
-- **ヘッダ/ルーティング系**：Host Header Injection、CORS不備、HTTP Parameter Pollution（HPP）、HTTP Request Smuggling。
-
-### 4.2 クイック試行（Burp/HTTP操作の型）
-- **Host header**：`Host` 差し替え＋`X-Forwarded-Host` 併用→リダイレクト/リンク生成/キャッシュ挙動を観察。  
-- **CORS**：`Origin` 任意/`null`、`Access-Control-Allow-*` の組合せを観察（資格情報付き）。  
-- **HPP**：同名パラメータ二重化・配列化（`a=1&a=2` / `a[]=1&a[]=2` / JSONボディ重複）。  
-- **Req Smuggling**：`CL`/`TE` 競合、`Transfer-Encoding` 変種（前段/後段の解釈差）。  
-- **認可回避**：パス崩し、`..;`/末尾`/`、メソッド変更（`GET`→`POST`/`OPTIONS`）、ベアラトークン位置ずらし。
-
-### 4.3 連鎖の作り方（例）
-- **SSRF → クラウド/メタデータ → 認証情報抽出 → 内部面API操作**  
-- **HPP → ACLバイパス／認可抜け**（バックエンドのマージ仕様差を突く）  
-- **Host Header → リセットリンク奪取**／**キャッシュ汚染** → 認証フロー乗っ取り  
-- **Req Smuggling → WAF前段すり抜け → 機微API直接叩き**
-
-> それぞれ、**一次資料（下記リンク）で裏取り**してから証跡を取得。
+## 1. 役割と使い分け（総覧）
+| リファレンス | 立ち位置 | 使いどころ | 主要アウトプット | 注意点 |
+|---|---|---|---|---|
+| **ASVS** | セキュリティ**要件**の標準 | 深度（L1/L2/L3）と受入基準（DoD）を決める | 要件IDリスト・DoD・調達要件 | 手順ではない（WSTGと対で使う） |
+| **WSTG** | テスト**手順/観点**の標準 | 計画〜実施〜報告の骨子 | 観点チェック・再現手順・証跡設計 | そのままでは過剰。対象に合わせて取捨選択 |
+| **ATT&CK** | 攻撃者**行動様式**の辞典 | 侵入〜横展開〜影響の**連鎖説明** | 戦術/技術IDマッピング・データソース | PoC集ではない（“説明力”の強化） |
+| **PortSwigger WSA** | ラボ&Burpドキュメント | 手を動かして**Exploit筋**を鍛える | ラボ成果→PoC化→報告粒度訓練 | 一部は Collaborator 等が必要 |
+| **PayloadsAllTheThings (PATT)** | **ペイロード**&バイパス集 | 決めた観点に**何を入れるか** | Intruder向けリスト・バイパス | 破壊的/重負荷はステージング限定 |
+| **HackTricks** | **入口・迂回**テク集 | 見落とし削減と発想出し | 403/401 bypass・HPP・HRS など | 一次資料（OWASP/公式）で裏取り前提 |
 
 ---
 
-## 5. 証跡と報告（品質ルール）
-- すべての実験は **Req/Resの原文**、**ヘッダ/ボディ差分**、**時刻と対象**を紐付けて保存。
-- 影響は**ビジネス文脈で定量化**（例：個人情報X件閲覧、不正送金の可能性、横展開難易度）。
-- リスク評価は **OWASP Risk Rating** を基本とし、顧客スキーマ（CVSS/独自）に合わせて併記。
-- **非破壊の原則**：可用性へ影響が出る操作は**事前合意**がある場合のみ、**時間帯/回数**を管理。
+## 2. 使用順序・標準フロー（README準拠）
+### Phase 0 — **Pre‑engagement（合意）**
+- **目的/範囲/禁止事項/時間帯**、**アカウントとMFA**、**証跡方針**（Req/Res・スクショ・ログ保存）を合意（WSTG/PTES）。
+- **ASVSレベル**（既定は L2、機微・規制強なら L3）と**DoD**を明記（ASVS v5 要件IDで）。
+
+### Phase 1 — **Plan（設計）**
+- **ASVS要件ID**をスコープに落とし込む（例：認証・セッション・アクセス制御・入力検証 等）。
+- **WSTG 4章**から適用観点を選び、**除外理由**も明記。証跡テンプレを準備。
+
+### Phase 2 — **Find Entry（入口を広げる）**
+- **HackTricks**で入口候補（Host Header/CORS/HPP/Request Smuggling/403バイパス等）をブレスト。
+- 候補ごとに **WSTG の該当節**を紐づけ、**PATT**で試験入力（payload）を即準備。
+
+### Phase 3 — **Run（検証/実証）**
+- **Burp**（Proxy→Repeater→Intruder）で**低リスク→高リスク**の順に実施。  
+- **証跡**：各試行を**ASVS要件ID／WSTGテスト名**でタグ付け、Req/Resと時刻・相関IDを保存。
+
+### Phase 4 — **Chain（連鎖を説明）**
+- 成立箇所を**ATT&CK**戦術/技術IDでマッピング（Navigatorレイヤ推奨）。  
+- 例：`TA0043 Recon → TA0001 T1190（Public-Facing App攻撃） → T1539（セッションCookie窃取） → T1078（有効アカウント再利用）`。
+
+### Phase 5 — **Report & Retest（報告/再試験）**
+- **エグゼクティブサマリ**＋**発見一覧**（リスク/影響/再現/PoC/証跡/参照ID）。
+- **DoD判定**：採用レベルの**必須要件**が満たされたか。未達は**修正後再試験**。
 
 ---
 
-## 6. 参考リンク（根拠／一次資料中心）
-### HackTricks（公式/本体・Web系）
-- HackTricks Index（ローカル実行手順含む）：https://book.hacktricks.wiki/en/index.html  
-- Web Vulnerabilities Methodology（チェックリスト）：https://blog.1nf1n1ty.team/hacktricks/pentesting-web/web-vulnerabilities-methodology  
-- 403/401 Bypass：https://angelica.gitbook.io/hacktricks/network-services-pentesting/pentesting-web/403-and-401-bypasses  
-- Parameter Pollution（HPP）：https://angelica.gitbook.io/hacktricks/pentesting-web/parameter-pollution  
+## 3. 具体的な実施例（手順つき）
+### 例A：**IDOR → 横展開（閲覧→更新）**
+1. **入口当て**（HackTricks）：ID/参照値の直接操作、403/401 bypassの素振り。  
+2. **観点/手順**（WSTG）：`4.5.4 Testing for Insecure Direct Object References` に沿って、閲覧→更新→削除の最小PoCを作成。  
+3. **ペイロード**（PATT）：ID/配列/JSONパスの差し替え、HPP（`id=100&id=101`）も試す。  
+4. **連鎖**（ATT&CK）：`TA0001 T1190`（公開アプリ悪用）として初期到達→`Privilege Escalation`相当の**垂直/水平昇格**を整理。  
+5. **要件/判定**（ASVS）：アクセス制御要件IDの**未達**を記録、修正後に再テスト。
 
-### OWASP / PortSwigger（裏取り・手順）
-- WSTG 総論（最新/安定）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/00-Introduction_and_Objectives/README  
-- Penetration Testing Methodologies（WSTG）：https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/1-Penetration_Testing_Methodologies  
-- Identify Application Entry Points（WSTG）：https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/06-Identify_Application_Entry_Points  
-- OWASP Risk Rating：https://owasp.org/www-community/OWASP_Risk_Rating_Methodology  
-- Host Header：https://portswigger.net/web-security/host-header/exploiting  
-- CORS 基礎/誤設定：https://portswigger.net/web-security/cors  
-- HTTP Request Smuggling：https://portswigger.net/web-security/request-smuggling/exploiting  
+### 例B：**SSRF → メタデータ → 認証情報抽出**
+1. **入口**（HackTricks）：URL受け取り機能（インポート/画像取得）を列挙。  
+2. **観点**（WSTG）：SSRFのテスト節に従い内部到達の兆候（タイムアウト差/エラー）を観測。  
+3. **ペイロード**（PATT）：`169.254.169.254` 等の段階的試行、スキーム/ヘッダ/リダイレクトの変種。  
+4. **連鎖**（ATT&CK）：`T1190`→`Credential Access`系（取得トークンで**内部API**操作）。  
+5. **報告**：**非破壊**の範囲で**最小実証**（例：限定キーの表示）に留め、**是正案**を添付。
 
-### SSRF（補助）
-- SSRF 基礎（thehacker.recipes）：https://www.thehacker.recipes/web/inputs/ssrf/
+### 例C：**HPP → 認可回避**
+1. **入口**（HackTricks）：同名パラメータや配列化を試す。  
+2. **観点**（WSTG）：`4.7.4 Testing for HTTP Parameter Pollution`。  
+3. **ペイロード**（PATT）：順序/位置/符号化（URL/Unicode/二重）を変化させ比較。  
+4. **連鎖**：ACL評価系の後段マージ仕様差を突き**管理UI露出**→**操作**へ。
 
-> **注**：HackTricksの記事はミラー/翻訳が複数あるため、**リンク先の構成が変わる場合あり**。不達時はトップ（book.hacktricks.wiki）から検索。
+> いずれも **証跡化**（Req/Res 原文＋差分／スクショ／時刻／関連ログ）と **参照ID（ASVS/WSTG/ATT&CK）**の付記を必須とする。
 
 ---
 
-## 7. 付録：実行テンプレ（Burp Repeater素振り）
+## 4. DoD（受入基準）とチェックリスト
+**DoD例（貼って使う）**
 ```
-# Host Header
-GET /reset HTTP/1.1
-Host: evil.example.com
-X-Forwarded-Host: evil.example.com
-
-# CORS（資格情報有）
-GET /api/me HTTP/1.1
-Origin: null
-Cookie: session=...
-# → レスポンスの ACAO/ACAC を確認
-
-# HPP（同名パラメータ）
-GET /admin?role=user&role=admin HTTP/1.1
-
-# Request Smuggling（CL.TE 素振り——ステージング限定）
-POST / HTTP/1.1
-Transfer-Encoding: chunked
-Content-Length: 4
-
-0
-
-GET /admin HTTP/1.1
-Host: target
+準拠標準：OWASP ASVS v5.0.0
+検証レベル：L2（合意によりL3/L1へ変更可）
+スコープ：/auth, /admin, /api/*（ロール：user/admin）
+判定：スコープに属するASVS必須要件IDがすべて「満たす」
+未達：修正後に再検証（WebPTのPoC再実行を含む）
+証跡：Req/Res・スクショ・ログ・Burpプロジェクト（相関ID/時刻）
 ```
+
+**実施前チェック**
+- [ ] 合意：目的/範囲/禁止/時間帯/窓口/MFA/証跡
+- [ ] 深度：ASVSレベルと**要件IDリスト**（対象外は理由明記）
+- [ ] 観点：WSTG 4章からの**適用観点表**と証跡テンプレ
+- [ ] 安全：**非破壊**／負荷上限／レート制御／緊急停止手順
+
+**実施後チェック**
+- [ ] 重大発見は**再現手順＋最小PoC**＋**参照ID**を付記
+- [ ] **ATT&CKマップ**（戦術/技術ID、データソース、検知可否）を更新
+- [ ] **DoD判定**と**再試験方針**を明記
+
 ---
 
-### ライセンス/運用ノート
-- 本ファイルは Kedappsec-notes の**参考実装**であり、実施は常に**契約・合意書**に従うこと。
-- 記載の技法は**教育・防御目的**の範囲でのみ使用し、第三者の権利を侵害しないこと。
+## 5. 成果物テンプレ
+### 5.1 発見一覧（最小粒度）
+| タイトル | リスク | 影響 | 再現手順（要約） | PoC/証跡 | 参照ID（ASVS/WSTG/ATT&CK） | 推奨対策 |
+|---|---|---|---|---|---|---|
+
+### 5.2 要件×証跡トレーサビリティ
+| ASVS要件ID | 章/要約 | WSTGテスト | 結果 | 証跡リンク |
+|---|---|---|---|---|
+
+### 5.3 ATT&CK 連鎖シート
+| Step | Tactic/Technique | 目的 | PoC/条件 | 期待ログ/実観測 | 検知可否 | 影響 |
+|---|---|---|---|---|---|---|
+
+---
+
+## 6. 安全・法令遵守
+- **書面許可のない試験は禁止**（PATT DISCLAIMERも参照）。
+- **ステージング優先**／本番は**最小限**。可用性・データ保護を最優先。
+- **データ衛生**：個人情報等は**マスキング**し、**削除期限**を設定。
+
+---
+
+## 7. 参考（一次資料リンク：安定版）
+- **ASVS**（プロジェクトページ / v5）  
+  https://owasp.org/www-project-application-security-verification-standard/  
+  https://github.com/OWASP/ASVS
+- **WSTG**（Latest / Testing Framework / 4章カテゴリ）  
+  https://owasp.org/www-project-web-security-testing-guide/latest/  
+  https://owasp.org/www-project-web-security-testing-guide/latest/3-The_OWASP_Testing_Framework/0-The_Web_Security_Testing_Framework  
+  https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/
+- **MITRE ATT&CK**（Top / Navigator / Data Sources）  
+  https://attack.mitre.org/  
+  https://mitre-attack.github.io/attack-navigator/  
+  https://attack.mitre.org/datasources/DS0015/
+- **PortSwigger Web Security Academy / Burp**（Learn / Labs / Intruder / Collaborator）  
+  https://portswigger.net/web-security  
+  https://portswigger.net/burp/documentation/desktop/tools/intruder  
+  https://portswigger.net/burp/documentation/collaborator
+- **PayloadsAllTheThings**（本体 / DISCLAIMER / 代表項目）  
+  https://swisskyrepo.github.io/PayloadsAllTheThings/  
+  https://swisskyrepo.github.io/PayloadsAllTheThings/DISCLAIMER/  
+  HPP: https://swisskyrepo.github.io/PayloadsAllTheThings/HTTP%20Parameter%20Pollution/  
+  SSRF: https://swisskyrepo.github.io/PayloadsAllTheThings/Server%20Side%20Request%20Forgery/
+- **HackTricks**（Index / Web Methodology / 403/401 Bypass / HPP / HRS）  
+  https://book.hacktricks.wiki/en/index.html  
+  https://blog.1nf1n1ty.team/hacktricks/pentesting-web/web-vulnerabilities-methodology  
+  https://angelica.gitbook.io/hacktricks/network-services-pentesting/pentesting-web/403-and-401-bypasses  
+  https://angelica.gitbook.io/hacktricks/pentesting-web/parameter-pollution  
+  https://portswigger.net/web-security/request-smuggling/exploiting
+
+---
+
+### 備考
+- 本書は Kedappsec-notes **READMEの「推奨参照フロー」**に完全準拠しています。  
+- 以降の更新では各一次資料の改訂に追随し、リンク健全性を定期点検してください。
