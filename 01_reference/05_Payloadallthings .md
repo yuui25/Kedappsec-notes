@@ -1,4 +1,4 @@
-# PayloadsAllTheThings で Web ペネトレーションを始めるための要件
+# PayloadsAllTheThingsに基づく Webペネトレーション開始要件
 
 ## 1. 概要
 **PayloadsAllTheThings** は、Web アプリケーションセキュリティ向けのペイロードとバイパス集（ペイロードリスト）で、ペンテスト／CTF／バグバウンティの現場でよく参照されます。実用的なペイロード、各種脆弱性ごとの例、Burp 用の Intruder ファイルなどが揃っています。  
