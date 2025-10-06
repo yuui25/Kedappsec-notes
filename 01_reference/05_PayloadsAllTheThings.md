@@ -108,7 +108,7 @@
 - **Directory Traversal × Encoding 組合せ**  
   - PATT: Traversal と **Encoding & Transformations**  
     - Traversal: <https://swisskyrepo.github.io/PayloadsAllTheThings/Directory%20Traversal/>  
-    - Encoding: <https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20and%20Transformations/>  
+    - Encoding: <https://swisskyrepo.github.io/PayloadsAllTheThings/Encoding%20Transformations/>  
   - 手順（概略）: 二重URLエンコード、Unicode正規化、パス区切り多様化（`..%2f`, `%252e%252e%2f` 等）を順次適用。
 
 > **運用Tips**: Intruderの**payload positions**を最小化し、**レート**を抑制。既知の**危険ペイロード**（大量サイズ・fork爆弾等）は**ステージング限定**。
