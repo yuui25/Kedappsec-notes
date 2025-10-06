@@ -23,7 +23,7 @@ Kedappsec-notes/
 │  ├─ index.md
 │  ├─ wstg.md / asvs.md / attack-mitre.md / hacktricks.md / payloadsallthethings.md / ...
 ├─ 02_chains/                        # 攻撃連鎖（入口→横展開→到達点→影響→対策）
-│  └─ YYYYMMDD-<short>-v1.md
+│  └─ <short>.md
 ├─ 03_matrices/                      # 脆弱性×技術スタック×Web機能の入口マトリクス
 │  ├─ attack_by_function.md
 │  ├─ attack_by_stack.md
