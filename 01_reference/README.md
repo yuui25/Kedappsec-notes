@@ -11,7 +11,7 @@
 - **[02_WSTG.md](./02_WSTG.md)**：WSTGに基づくWebPT開始要件（検証手順／前提合意／プロセス）  
 - **[03_ATT&CK.md](./03_ATT&CK.md)**：MITRE ATT&CK準拠の攻撃連鎖マッピングと成果物要件  
 - **[04_PortSwigger_Web_Security_Academy.md](./04_PortSwigger_Web_Security_Academy.md)**：WSAの活用（Burp／ラボ／学習パス）  
-- **[05_Payloadallthethings .md](./05_Payloadallthethings%20.md)**：PayloadsAllTheThingsの安全な活用と運用ルール  
+- **[05_Payloadallthethings .md](./05_PayloadsAllTheThings.md)**：PayloadsAllTheThingsの安全な活用と運用ルール  
 - **[06_Hacktricks .md](./06_Hacktricks%20.md)**：HackTricksの実務適用（テクニック集の使いどころ）  
 - **[99_web-pentest_requirements_complete.md](./99_web-pentest_requirements_complete.md)**：統合版（要件サマリと快速チェックリスト）
 
