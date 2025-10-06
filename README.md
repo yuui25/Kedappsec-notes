@@ -28,7 +28,7 @@ Kedappsec-notes/
 │  ├─ attack_by_function.md
 │  ├─ attack_by_stack.md
 │  └─ stack_by_function.md
-├─ 04_poc/                           # PoC 置き場（安全配慮・ステージング限定）
+├─ 04_poc/                           # PoC 置き場
 │  └─ README.md / idor/ / xss/ / ssrf/ ...
 └─ 05_prompts/                       # 生成/保守用プロンプト
    ├─ README.md
