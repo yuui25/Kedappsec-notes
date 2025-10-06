@@ -1,78 +1,120 @@
-
 # MITRE ATT&CKに基づく Webペネトレーション開始要件
 
-> 目的：**攻撃者の行動様式（ATT&CK）に沿って、実際に“侵入可能か・どこまで到達できるか”を実証**する。  
-> 対比：**脆弱性診断＝“あり得る欠陥の列挙”**、**Webペネ＝“実際の侵入経路と影響（連鎖）を実証”**。NIST SP800-115も“評価（VA）”と“侵入テスト（PT）”を区別して定義している。
+---
+
+## 1. 目的と立ち位置（何者か）
+MITRE ATT&CKは**攻撃者の行動様式（戦術・技術）**を体系化した知識ベース。Webペネトレーション（WebPT）では、**「どの行動をどこまで再現できたか」を戦術/技術IDで可視化**し、侵入経路・連鎖・検知/証跡を説明するために用いる。  
+- 公式: https://attack.mitre.org/  
+- Get Started: https://attack.mitre.org/resources/  
+- ATT&CK Navigator: https://mitre-attack.github.io/attack-navigator/
+
+**本ドキュメントの役割**：WSTG/ASVSと並走しながら、WebPTの**攻撃連鎖の根拠付け**・**成果物の粒度**を定義すること。
 
 ---
 
-## 1) 事前合意（Rules of Engagement / スコープ）
-- **対象と深度**：Webアプリ（SPA/SSR/SaaS含む）。“初期侵入→権限昇格→横移動→影響”まで、**攻撃連鎖の実証**を目的に設定。  
-- **禁止事項**：DoS/データ破壊/大量送信などの**高リスク手法は除外 or 模擬**。  
-- **環境情報・アカウント**：テスト用/検証用の**有効アカウント（一般/管理）**、メール受信手段、2FAの扱い（本番or模擬）を合意。  
-- **監査証跡**：アプリ/リバプロ/IdP/メール/サーバの**ログ保全**、セッションIDの取り扱い手順。  
-- **安全装置**：緊急停止連絡系、時間帯、IP許可、レート制御の設定。  
-- **成果物**：**ATT&CKマッピング付き**の攻撃経路図、再現手順、PoC、ログ・キャプチャ、是正策と**優先度**。  
+## 2. Web脆弱性診断（VA）との明確な区別
+- **VA**：脆弱性の**列挙・検証**（スキャン＋手動検証）。報告の“単位”は*個別の弱点*。  
+  - 参考（NIST SP 800-115）: https://csrc.nist.gov/pubs/sp/800/115/final
+- **WebPT**：攻撃者の**行動連鎖**で*目的達成可能性*を示す。**初期侵入→横展開→影響**までを、ATT&CKの**戦術/技術ID**でマッピングし、検知可能性/証跡を評価。
+
+> **単位の違い**：VA＝脆弱性、WebPT＝攻撃経路（戦術→技術の連鎖）。
 
 ---
 
-## 2) アプローチ（ATT&CKタクティクスに沿った最小セット）
+## 3. 開始要件
+1) **前提合意**  
+   - テスト環境の優先（本番は**非破壊・最小限**）。DoS/大量送信は禁止（書面許可がある場合を除く）。  
+   - スコープ（ドメイン/機能/API/クラウド面：SaaS/IdP/IaaS）と**禁止事項**、観測・ロギング方針を確定。
+2) **基準の明示**  
+   - **戦術/技術ID**で記録（例: `TA0001 / T1190`）。  
+   - ASVSで深度（L1/L2/L3）やDoDを決め、WSTGで検証観点を設計（相互参照は別紙）。
+3) **証跡設計（先に決める）**  
+   - どの**データソース**で何を残すか（例：Application Log / DS0015）。  
+   - 依頼者側の監査ログ、WAF/CDN、IdP、APMの取得方法。
 
-### A. Reconnaissance（偵察）
-- 能動スキャン、被害者情報収集、公開資産の洗い出し。Webペネでは**攻撃面の仮説づくり**に直結。
-
-### B. Resource Development（侵攻準備）
-- フィッシング用ドメイン/送信手段、使い捨てアカウント等（必要時）。Webのテストでも準備段階の合意が必要。
-
-### C. Initial Access（初期侵入）
-- **T1190: Exploit Public-Facing Application**（公開Webの脆弱性・設定不備を実利用）  
-- **T1078: Valid Accounts**（正規アカウントの悪用。クラウド/SaaS含む）
-
-### D. Credential Access / Defense Evasion（認証・回避）
-- **T1539: Steal Web Session Cookie**（セッションCookieの窃取→乗っ取り）  
-- **T1550.004: Use Alternate Authentication Material: Web Session Cookie**（盗んだCookieで再認証省略・MFA回避など）
-
-### E. Discovery / Privilege Escalation / Lateral Movement
-- IDOR/強制ブラウジング、テナント越境可否などを**攻撃者行動として実証**。
-
-### F. Impact（影響）
-- データ閲覧/改ざん/機密機能の不正実行など、**ビジネス影響**に結びつく“最終状態”を定義（破壊行為は除外して模擬）。
+> 記録フォーマット：テクニックID／目的／PoC概要／成功条件／ログ項目／検知可否／リスク評価。
 
 ---
 
-## 3) 進め方（チェックリスト）
-- **計画**：対象・非対象、禁止行為、深度、アカウント/MFAの扱い、ログ保全、停止条件、成果物テンプレを**書面合意**（NIST SP 800-115等の枠組みを参照）。  
-- **実施手順（概略）**：  
-  1. 偵察 → 2. 初期侵入（T1190/T1078等） → 3. セッション/認証回避（T1539等） →  
-  4. 権限境界の突破（IDOR等） → 5. 影響実証（最小限） → 6. ログ相関・再現性確認。  
-- **報告**：**ATT&CKマトリクスに重ねた攻撃経路図**、再現手順、是正優先度、診断（VA）との差分を明記。
+## 4. 具体的な使い方（実務手順）
+
+### 4.1 マトリクスを選ぶ（対象に応じて）
+- **Enterprise**（オンプレ/一般Web）：https://attack.mitre.org/techniques/enterprise/  
+- **Cloud/SaaS**（IdP/Office/SaaS/IaaS）：https://attack.mitre.org/matrices/enterprise/cloud/ ・ https://attack.mitre.org/matrices/enterprise/cloud/saas/
+
+### 4.2 Navigatorでレイヤーを作る
+- Hosted版：https://mitre-attack.github.io/attack-navigator/  
+- レイヤー項目（推奨）：`status`（試験済/未着手/不適用）、`impact`（High/Med/Low）、`evidence`（ログ/スクショ/Req-Resリンク）、`notes`（WSTG/ASVS対応）。
+- 目的別にレイヤーを分ける：①**侵入経路**、②**横展開**、③**影響**、④**検知/ログ**。
+
+### 4.3 Web特有の“まず当てる”テクニック（例）
+- **Reconnaissance（TA0043）**  
+  - **T1595 Active Scanning**（.001 IPブロック／.002 脆弱性スキャン／.003 **Wordlist Scanning**＝コンテンツ発見）  
+    - https://attack.mitre.org/techniques/T1595/ ・ https://attack.mitre.org/techniques/T1595/002/ ・ https://attack.mitre.org/techniques/T1595/003/
+- **Initial Access（TA0001）**  
+  - **T1190 Exploit Public-Facing Application**（典型：RCE/SSRF/テンプレ注入）  
+    - https://attack.mitre.org/techniques/T1190/
+- **Credential Access / Defense Evasion**  
+  - **T1539 Steal Web Session Cookie**（セッション奪取）https://attack.mitre.org/techniques/T1539/  
+  - **T1078 Valid Accounts**（クラウド/ローカル/ドメイン）https://attack.mitre.org/techniques/T1078/
+- **Persistence（必要に応じてシミュレート）**  
+  - **T1505.003 Web Shell**（サーバに常駐Webシェル）https://attack.mitre.org/techniques/T1505/003/
+
+### 4.4 ログと検知のマッピング
+- 例：**DS0015 Application Log**（Exploit/例外/500系/権限エラー）→試験ごとに**期待ログ**と**実観測**を突合。  
+  - https://attack.mitre.org/datasources/DS0015/
+
+### 4.5 DoD（Definition of Done）
+- ① Navigatorレイヤーに**試験結果**が反映  
+- ② **攻撃経路図**（戦術→技術の連鎖）と**成功条件/影響**が文章化  
+- ③ **証跡**（Req/Res・スクショ・ログ引用）が揃い、再現手順（WSTG粒度）が付属  
+- ④ ASVS/WSTG/ATT&CKの**参照ID**が全て成果物に明記
 
 ---
 
-## 4) 「Web脆弱性診断」との明確な区別（要点）
-- **目的**：VAは“何が脆弱か”の列挙、Webペネは“どう突破されたか/どこまで行けるか”の実証。  
-- **手法**：VAはツール＋限定的手動、Webペネは手動主体で攻撃連鎖を辿る。  
-- **アウトプット**：VAは所見リスト、Webペネは侵入ストーリー＋影響＋再発防止策。
+## 5. サンプル攻撃連鎖（Webアプリ）
+
+**目的**：一般ユーザ→他ユーザ情報の窃取（権限外閲覧）
+
+1) **TA0043 Recon** → **T1595.003 Wordlist Scanning**：隠しエンドポイント探索  
+2) **TA0001 Initial Access** → **T1190 Exploit Public-Facing App**：認可欠陥＋IDORで他ユーザデータ取得  
+3) **TA0006 Credential Access** → **T1539 Steal Web Session Cookie**：XSS経由でCookie奪取（場合により）  
+4) **TA0005 Defense Evasion** / **TA0003 Persistence** → **T1078 Valid Accounts**（奪取済みトークン/再利用）  
+5) **TA0010 Exfiltration**：API経由で対象データ搬出（最小量・合意内で検証）
+
+> 各手順に**PoC概要**・**成功条件**・**ログ期待/実測**・**影響**を記述。
 
 ---
 
-## 5) 代表的なATT&CK技術（Webコンテキスト）と対応付け例
-- **T1190: Exploit Public-Facing Application** — 認可不備やCSRF保護欠如の悪用。  
-- **T1078 / T1078.004: Valid Accounts** — 貸与アカウントの権限逸脱検証。  
-- **T1539 / T1550.004: Cookie窃取→セッション再利用/MFAバイパス**。  
-- **T1185: Supply Chain Compromise（ブラウザ/拡張含む間接的手法）** なども文脈によって考慮。
+## 6. 成果物テンプレ（貼り付けて使う）
+
+| Step | Tactic/Technique | 目的 | PoC/再現手順（要約） | 成功条件 | 期待ログ/実観測 | 検知可否 | 影響 |
+|---|---|---|---|---|---|---|---|
+| 1 | TA0043 / T1595.003 | 隠し資産発見 | wordlistで`/admin/exports`探索 | 200/302取得 | access_logに`GET /admin/exports` | △ | 低 |
+| 2 | TA0001 / T1190 | 初期侵入 | IDORで他ID指定→レスポンス確認 | 200で他者情報 | app_logに権限例外なし | × | 中 |
+| 3 | TA0006 / T1539 | セッション奪取 | 反射XSSでCookie exfil | Cookie有効で再現 | WAF/JS監査ログ | △ | 高 |
+| 4 | TA0005 / T1078 | 回避/持続 | 奪取認証を再利用 | 再ログイン成功 | IdP/アクセスログ | △ | 高 |
 
 ---
 
-## 付録：実務上の注意点
-- 法的・契約的合意を最優先にすること（実害発生の責任回避）。  
-- 高リスクな手法（DoS、実データ削除等）は模擬で代替し、成果物で**模擬条件**を明記すること。  
-- 証跡（ログ・パケットキャプチャ・スクリーンショット）は時刻同期（NTP）、ハッシュ保存などの運用を明確に。
+## 7. 参考（一次情報）
+- ATT&CK（トップ/概要/ツール）  
+  - Top: https://attack.mitre.org/  
+  - Get Started: https://attack.mitre.org/resources/  
+  - Navigator（Hosted）: https://mitre-attack.github.io/attack-navigator/ ・ Data & Tools: https://attack.mitre.org/resources/attack-data-and-tools/
+- 主要テクニック  
+  - TA0043 Reconnaissance: https://attack.mitre.org/tactics/TA0043/  
+  - T1595 Active Scanning / .002 Vulnerability / .003 Wordlist:  
+    - https://attack.mitre.org/techniques/T1595/ ・ https://attack.mitre.org/techniques/T1595/002/ ・ https://attack.mitre.org/techniques/T1595/003/  
+  - TA0001 Initial Access: https://attack.mitre.org/tactics/TA0001/ ・ T1190 Exploit Public-Facing App: https://attack.mitre.org/techniques/T1190/  
+  - T1539 Steal Web Session Cookie: https://attack.mitre.org/techniques/T1539/  
+  - T1078 Valid Accounts（.001/.002/.003/.004）: https://attack.mitre.org/techniques/T1078/  
+  - T1505.003 Web Shell: https://attack.mitre.org/techniques/T1505/003/  
+  - データソース DS0015 Application Log: https://attack.mitre.org/datasources/DS0015/
+- 定義・区別（VAとPT）  
+  - NIST SP 800-115: https://csrc.nist.gov/pubs/sp/800/115/final
 
 ---
 
-## 参考・一次資料（主な参照先）
-- MITRE ATT&CK（Enterprise） — https://attack.mitre.org  
-- NIST Special Publication 800-115 — https://csrc.nist.gov/publications/detail/sp/800-115/final  
-- OWASP Web Security Testing Guide (WSTG) — https://owasp.org/www-project-web-security-testing-guide/latest/  
-- OWASP ASVS（参考） — https://owasp.org/www-project-application-security-verification-standard/  
+### 運用メモ
+- 本書は**一次資料中心**・**非破壊原則**・**ID明記**の品質ルールに従う（ASVS/WSTG/ATT&CKの参照IDを成果物へ）。
