@@ -4,7 +4,7 @@
 01_reference（ASVS / WSTG / MITRE ATT&CK / PortSwigger WSA / PayloadsAllTheThings / HackTricks）を根拠に、**入口→横展開→到達点→検知→是正**を最短距離で示す。
 
 - add-chain-card.md : 新規カード作成プロンプト
-- collect-chain-card-input.md : **add-chain-card.md**新規カードに入れる情報提案プロンプト
+- collect-chain-card-input.md : `add-chain-card.md`に入れる情報提案プロンプト
 ---
 
 ## 1. 命名規約（ファイル名）
