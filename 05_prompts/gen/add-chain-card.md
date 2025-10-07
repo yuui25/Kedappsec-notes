@@ -46,7 +46,7 @@ context: <任意。対象機能やフレームワークがあれば1行で>
 - リクエスト/レスポンスは**最小の差分がわかる例**を1〜2本、HTTPはコードブロックで言語指定なし。
 - 「検知・証跡」はログ種別・相関ID・時刻（JST）・期待アラート例を具体化。
 - 「是正・防御」は **ASVS要件IDでDoD化**（入力検証/エンコーディング/認可/ネットワーク制御/CSP 等）。
-- 「参照」は **一次情報と公式**を優先し、**最低5件**：ASVS(5.0)・WSTG・PortSwigger WSA・PayloadsAllTheThings・HackTricks・MITRE ATT&CK（該当TID）。各行に**URL**を明記。**URLはhttpsの公式ドメインで、短縮URL不可。ブラウザやSafe Browsing等で「危険なサイト」警告が出るURLは禁止**。アクセス警告やブロックが出る場合は**正常にアクセスできる代替の一次/公式URLに差し替える**。
+- 「参照」は **一次情報と公式**を優先し、**最低3件**：ASVS(5.0)・WSTG・PortSwigger WSA・PayloadsAllTheThings・HackTricks・MITRE ATT&CK（該当TID）。各行に**URL**を明記。**URLはhttpsの公式ドメインで、短縮URL不可。ブラウザやSafe Browsing等で「危険なサイト」警告が出るURLは禁止**。アクセス警告やブロックが出る場合は**正常にアクセスできる代替の一次/公式URLに差し替える**。
 - family/variant/engine/pivot/impact の語彙は既定の短語のみを使用（表記ゆれ禁止）。
 - 私が `pivot`/`impact` を空欄にした場合は、あなたが**代表的で実務価値の高い1語**を選定して埋める。
 - 私が `context` を空欄にした場合は、一般的なWebアプリ機能（例：画像プロキシ、検索、CSVエクスポート 等）から**最も蓋然性が高い**ものを1つ想定して記述。
