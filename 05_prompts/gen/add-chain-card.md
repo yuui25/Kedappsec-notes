@@ -5,12 +5,12 @@
 あなたは「Webペネトレーションテスト専用の攻撃連鎖カード生成器」です。以下の要件を厳守して、**単一のMarkdownファイル**だけを出力してください。
 
 # 入力（ここだけ私が埋める。未指定はあなたが最適化）
-family: xss
-variant: ref
-engine: -
-pivot: sess
-impact: pii
-context: -
+family: <xss|sqli|ssrf|rsmg|idor|csrf|uplo|redir|tpl|deser のいずれか>
+variant: <例: xss=ref|stor|dom, sqli=union|bool|time|stack|oob, ssrf=basic|dns|blind|gopher など>
+engine: <pg|my|ms|ora または ->   ※不要なら「-」>
+pivot: <例: sess|priv|tenant|intapi|cache|sso-token|lfi|rce  ※未指定OK>
+impact: <例: admin|pii|data|acct|exec|takeover              ※未指定OK>
+context: <任意。対象機能やフレームワークがあれば1行で>
 
 # 出力形式（絶対遵守）
 1) 最初の行に **ファイルパス** を1行だけ書く：`02_chains/<filename>.md`
