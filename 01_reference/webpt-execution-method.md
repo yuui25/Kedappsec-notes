@@ -1,6 +1,6 @@
 01_reference/20251007-webpt-execution-method-v1.md
 
-# Webペネトレーションテスト実施方法（契約後〜報告までの実務ガイド）
+# Webペネトレーションテスト実施方法
 > **対象**：Webペネトレーションテスト（WebPT）専用の進め方。**Web脆弱性診断（VA）とは明確に区別**し、一次情報（ASVS/WSTG/NIST/PTES/ATT&CK/WSA/PATT）へ**項目ごと**に参照URL（フルパス）を付す。
 
 ---
@@ -12,16 +12,14 @@
 
 **参照URL（一次情報）**  
 - NIST SP800-115（計画/試験/証跡）: https://csrc.nist.gov/pubs/sp/800/115/final  
-  Path: `/pubs/sp/800/115/final`  
 - PTES（7フェーズ、Pre-engagement）: https://pentest-standard.readthedocs.io/en/latest/preengagement_interactions.html  
-  Path: `/en/latest/preengagement_interactions.html`
 
 ---
 
 ## 1. 契約締結直後：Pre-engagement（ヒアリング/合意書の具体）
 **目的**：**何をどこまで**実施して良いかを**書面で固定**。ヒアリングシートを往復し、DoD・禁止事項・安全装置・ログ連携を確定。
 
-**ヒアリングシート（最小セット・コピペ可）**
+**ヒアリングシート（最小セット）**
 ```
 [対象] ドメイン/URL/API/テナント、環境（本番/ステージング）
 [時間] 実施期間/時間帯、ピーク/バッチの考慮、メンテ窓
@@ -35,9 +33,7 @@
 
 **参照URL（一次情報）**  
 - PTES Pre-engagement: https://pentest-standard.readthedocs.io/en/latest/preengagement_interactions.html  
-  Path: `/en/latest/preengagement_interactions.html`  
 - NIST SP800-115（計画・合意の重視）: https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf  
-  Path: `/nistpubs/legacy/sp/nistspecialpublication800-115.pdf`
 
 ---
 
@@ -47,29 +43,22 @@
 
 **参照URL**  
 - OWASP ASVS プロジェクトTOP: https://owasp.org/www-project-application-security-verification-standard/  
-  Path: `/www-project-application-security-verification-standard/`  
 - ASVS v5（最新情報）: https://owasp.org/www-project-application-security-verification-standard/migrated_content  
-  Path: `/www-project-application-security-verification-standard/migrated_content`
 
 ### 2.2 手順＝**WSTGの章節にマッピング**
 - 情報収集〜APIまで、**どのWSTG節を適用/除外するか**を列挙して合意。
 
 **参照URL**  
 - WSTG TOP: https://owasp.org/www-project-web-security-testing-guide/  
-  Path: `/www-project-web-security-testing-guide/`  
 - WSTG 最新版インデックス: https://owasp.org/www-project-web-security-testing-guide/latest/  
-  Path: `/www-project-web-security-testing-guide/latest/`
 
 ### 2.3 連鎖＝**ATT&CK IDで“攻撃の説明力”を付与**
 - 例：**T1190（公開アプリ悪用）→ T1539（セッションCookie窃取）** と段階記録。報告書に戦術/技術IDを付与。
 
 **参照URL**  
 - ATT&CK T1190: https://attack.mitre.org/techniques/T1190/  
-  Path: `/techniques/T1190/`  
 - ATT&CK T1539: https://attack.mitre.org/techniques/T1539/  
-  Path: `/techniques/T1539/`  
 - ATT&CK データソース DS0015（Application Log）: https://attack.mitre.org/datasources/DS0015/  
-  Path: `/datasources/DS0015/`
 
 ---
 
@@ -80,40 +69,32 @@
 
 **参照URL**  
 - WSTG（全体導入/手法）: https://owasp.org/www-project-web-security-testing-guide/latest/  
-  Path: `/www-project-web-security-testing-guide/latest/`  
 - ATT&CK DS0015: https://attack.mitre.org/datasources/DS0015/  
-  Path: `/datasources/DS0015/`
 
 ### 3.2 代表的シナリオ（**WebPTは“連鎖”を作る**）
 1) **認証/セッション**：弱いロックアウト→MFAフロー確認→セッション固定/使い回し→**Cookie奪取（T1539）**到達で連鎖記録。  
    **参照**：WSTG 認証群（4.3系/4.5系 など最新構成を適用）、ATT&CK T1539。  
-   - T1539: https://attack.mitre.org/techniques/T1539/（Path: `/techniques/T1539/`）
+   - T1539: https://attack.mitre.org/techniques/T1539/
 
 2) **認可/IDOR**：ID直書き→**閲覧→更新→削除**の順に影響拡大を最小PoCで確認。  
    **参照**：WSTG Authorization Testing（ID一覧）。  
    - WSTG Authorization（README）: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/README  
-     Path: `/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/README`
 
 3) **入力検証→横展開**：  
    - **HPP（同名パラメータ）**でマージ仕様差を突く→**ACL回避**へ派生。  
    - **SQLi**は読み取り→更新→認証回避→二次攻撃の順に段階化。  
    **参照**：  
    - WSTG HPP: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution  
-     Path: `/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution`
 
 4) **配置/運用の抜け**：**HTTP Methods** の誤許可（`OPTIONS/PUT/DELETE`等）→横展開。  
    **参照**：  
    - WSTG Test HTTP Methods: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods  
-     Path: `/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods`
 
 5) **API/SSRF**：外部URL入力点から**メタデータ/内部面**到達の可否を段階化（Blind系は**Collaborator**）。  
    **参照**：  
    - PortSwigger Collaborator 概要: https://portswigger.net/burp/documentation/collaborator  
-     Path: `/burp/documentation/collaborator`  
    - Collaborator 入門: https://portswigger.net/burp/documentation/desktop/tools/collaborator/getting-started  
-     Path: `/burp/documentation/desktop/tools/collaborator/getting-started`  
    - Web Security Academy（API/SSRF系ラボ）: https://portswigger.net/web-security/all-labs  
-     Path: `/web-security/all-labs`
 
 ### 3.3 手技（ツールとペイロードの使い分け）
 - **WSA**でBurpの**Proxy/Repeater/Intruder/Collaborator**を実戦練習→実務適用。  
@@ -121,11 +102,8 @@
 
 **参照URL**  
 - Web Security Academy TOP: https://portswigger.net/web-security  
-  Path: `/web-security`  
 - PayloadsAllTheThings（GitHub）: https://github.com/swisskyrepo/PayloadsAllTheThings  
-  Path: `/swisskyrepo/PayloadsAllTheThings`  
 - PayloadsAllTheThings（Web版）: https://swisskyrepo.github.io/PayloadsAllTheThings/  
-  Path: `/PayloadsAllTheThings/`
 
 ---
 
@@ -136,9 +114,7 @@
 
 **参照URL**  
 - NIST SP800-115（試験ログ/影響管理/再現性）: https://csrc.nist.gov/pubs/sp/800/115/final  
-  Path: `/pubs/sp/800/115/final`  
 - ATT&CK DS0015: https://attack.mitre.org/datasources/DS0015/  
-  Path: `/datasources/DS0015/`
 
 ---
 
@@ -148,9 +124,7 @@
 
 **参照URL**  
 - PTES（事前取決め）: https://pentest-standard.readthedocs.io/en/latest/preengagement_interactions.html  
-  Path: `/en/latest/preengagement_interactions.html`  
 - NIST SP800-115（リスク管理）: https://nvlpubs.nist.gov/nistpubs/legacy/sp/nistspecialpublication800-115.pdf  
-  Path: `/nistpubs/legacy/sp/nistspecialpublication800-115.pdf`
 
 ---
 
@@ -171,10 +145,10 @@
 **4) DoD判定表**：ASVSレベルの必須要件に対する達成/未達と再検証条件。
 
 **参照URL**  
-- ATT&CK T1190: https://attack.mitre.org/techniques/T1190/（Path: `/techniques/T1190/`）  
-- ATT&CK T1539: https://attack.mitre.org/techniques/T1539/（Path: `/techniques/T1539/`）  
-- ASVS TOP: https://owasp.org/www-project-application-security-verification-standard/（Path: `/www-project-application-security-verification-standard/`）  
-- WSTG 最新: https://owasp.org/www-project-web-security-testing-guide/latest/（Path: `/www-project-web-security-testing-guide/latest/`）
+- ATT&CK T1190: https://attack.mitre.org/techniques/T1190/
+- ATT&CK T1539: https://attack.mitre.org/techniques/T1539/
+- ASVS TOP: https://owasp.org/www-project-application-security-verification-standard/
+- WSTG 最新: https://owasp.org/www-project-web-security-testing-guide/latest/
 
 ---
 
@@ -184,7 +158,6 @@
 
 **参照URL**  
 - ASVS v5: https://owasp.org/www-project-application-security-verification-standard/migrated_content  
-  Path: `/www-project-application-security-verification-standard/migrated_content`
 
 ---
 
@@ -192,7 +165,7 @@
 > **注意**：非破壊かつ最小の差分確認に限定。業務データには触れない。
 
 ```http
-# HPP 素振り（同名パラメータのマージ差分）
+# HPP（同名パラメータのマージ差分）
 GET /admin?role=user&role=admin HTTP/1.1
 Host: target.example
 
@@ -206,9 +179,7 @@ OPTIONS /api/admin HTTP/1.1
 
 **参照URL**  
 - WSTG HPP: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution  
-  Path: `/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution`  
 - WSTG Test HTTP Methods: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods  
-  Path: `/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods`
 
 ---
 
@@ -217,9 +188,7 @@ OPTIONS /api/admin HTTP/1.1
 
 **参照URL**  
 - Web Security Academy（All Labs）: https://portswigger.net/web-security/all-labs  
-  Path: `/web-security/all-labs`  
 - Web Security Academy（Learning Paths）: https://portswigger.net/web-security/learning-paths  
-  Path: `/web-security/learning-paths`
 
 ---
 
