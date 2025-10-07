@@ -20,7 +20,7 @@
 | session（セッション管理） | Cookie属性欠落、トークン再利用、XSS経由のセッショントークン窃取 | `Set-Cookie`属性、トークンのライフサイクル、XSS注入点 | user | sess→priv | srv:nginx, cache, cors | [xss-ref-sess-pii](../02_chains/xss-ref-sess-pii.md) | 検索: `xss session hijack token` |
 | account（プロフィール/会員） | IDOR | 連番ID/UUID推測、所有者チェック欠落、Graph差分 | user | idor→priv→admin | fw:flask, api:rest | [idor-basic-priv-admin](../02_chains/idor-basic-priv-admin.md) | 検索: `idor account privilege escalation` |
 | file-viewer（ファイル閲覧） | Path Traversal（LFI） | `../`・URL/Unicode二重エンコード、basename/realpath不備 | user | path→lfi→data | srv:apache, srv:nginx | [path-basic-lfi-data](../02_chains/path-basic-lfi-data.md) | 検索: `path traversal lfi file-viewer` |
-| file-upload（アップロード） | Content-Type偽装、拡張子/マジック不一致、Polyglot | 拡張子/マジック/CT三点照合の欠落、画像処理系の呼出し | user | upload→file-viewer→path→rce | fw:express, srv:nginx, stor:s3 | — | 検索: `file upload bypass polyglot rce` |
+| file-upload（アップロード） | CT偽装, 拡張子/マジック不一致, Polyglot, **SVGスクリプト**, **Exif注入** | 三点照合欠落, 画像処理呼出し, **サムネ生成** | user | upload→file-viewer→path→rce | fw:express, srv:nginx, stor:s3 | [upload-basic-rce](../02_chains/upload-basic-rce.md#入口) | 検索: `file upload bypass polyglot rce ssti exif` |
 | search（検索） | XSS（反射/DOM）、SQLi/HPP | ハイライト/ソート/フィルタ、`q`/`sort`/`filters[]` | anonymous | xss→sess / sqli→data | cache, cors, hpp | — | 検索: `search xss dom hpp sqli` |
 | api-rest（JSON/REST） | IDOR, Mass Assignment, BOLA | `/me` vs `/users/{id}` 差、スキーマの盲信、隠しパラメータ | user | idor→priv / mass→priv | api:rest, auth:oidc | — | 検索: `rest idor bola mass assignment` |
 | api-graphql | AuthZ欠落、Field/Depth制御不備、情報過多 | `__schema`露出、深/広クエリ、ownerチェック位置 | user | info→priv / abuse→dos | api:graphql | — | 検索: `graphql introspection authz depth` |
