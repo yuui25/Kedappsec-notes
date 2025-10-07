@@ -73,10 +73,10 @@ Host: target.example
 5) 成果物：再現手順・ログ断片・スクリーンショット（機微は`****`でマスク）をカードに添付。  
 
 ## 参照
-1. OWASP ASVS 5.0（File paths & traversal 対策の要件群）: https://github.com/OWASP/ASVS/releases/download/v5.0.0/OWASP_Application_Security_Verification_Standard_5.0.0-en.pdf  
-2. OWASP WSTG — Testing for Path Traversal: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Path_Traversal  
-3. OWASP WSTG — Testing for Local File Inclusion: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/12-Testing_for_Local_File_Inclusion  
+1. OWASP ASVS 5.0 — File Storage（V5.3.2・パストラバーサル/LFI対策）: https://cornucopia.owasp.org/taxonomy/asvs-5.0/05-file-handling/03-file-storage
+2. OWASP WSTG — Testing Directory Traversal File Include: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/01-Testing_Directory_Traversal_File_Include  
+3. OWASP WSTG — Testing for File Inclusion: https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11.1-Testing_for_File_Inclusion  
 4. PortSwigger Web Security Academy — File path traversal: https://portswigger.net/web-security/file-path-traversal  
 5. PayloadsAllTheThings — Directory Traversal: https://github.com/swisskyrepo/PayloadsAllTheThings/tree/master/Directory%20Traversal  
-6. HackTricks — File Inclusion (LFI): https://book.hacktricks.xyz/pentesting-web/file-inclusion  
+6. HackTricks — File Inclusion/Path traversal: https://angelica.gitbook.io/hacktricks/pentesting-web/file-inclusion
 7. MITRE ATT&CK — T1190 Exploit Public-Facing Application: https://attack.mitre.org/techniques/T1190/
