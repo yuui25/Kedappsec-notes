@@ -167,7 +167,7 @@ rsmg-clte-auth-bypass-admin.md   # CL/TE解釈差
 - MITRE ATT&CK: https://attack.mitre.org/  
 - PortSwigger Web Security Academy: https://portswigger.net/web-security  
 - PayloadsAllTheThings: https://github.com/swisskyrepo/PayloadsAllTheThings  
-- HackTricks: https://book.hacktricks.xyz/
+- HackTricks: https://angelica.gitbook.io/hacktricks
 
 ---
 
