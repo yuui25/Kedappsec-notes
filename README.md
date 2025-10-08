@@ -52,6 +52,6 @@
 3. MITRE ATT&CK – https://attack.mitre.org/  
 4. PortSwigger Web Security Academy – https://portswigger.net/web-security  
 5. PayloadsAllTheThings – https://github.com/swisskyrepo/PayloadsAllTheThings  
-6. HackTricks – https://book.hacktricks.xyz/
+6. HackTricks – https://angelica.gitbook.io/hacktricks
 
 ---
