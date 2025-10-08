@@ -2,39 +2,47 @@
 Webペネトレーション（WebPT）に特化したナレッジ。OWASP/WSTG・ASVS・MITRE ATT&CK 等の一次資料を核に、攻撃の入口から連鎖（横展開）までを実務向けに整理する。**(予定)**
 
 ## 目的とスコープ
-- **目的**：脆弱性診断の結果や限られた初期情報から、WebPTの**次アクション**を素早く導くための参照集を作る。
-- **対象**：Webアプリ。  
-- **非対象**：ネットワーク機器・インフラ構成・モバイルバックエンド・WAF/IdP連携・サブドメイン全探索 等。
+- **診断の結果/初期情報から「次アクション」を即決**（どこを深掘るか、何を試すか）
+- **攻撃連鎖（Chain Card）で横展開を設計**（証跡・根拠つきで再現可能）
+- **一次資料で裏取り**（WSTG/ASVS/ATT&CK等への明示リンク）
+**対象**：Webアプリ
 
-## 使い方（ユースケース）
-1) **診断→PTへの踏み込み**  
-   例：「IDOR検出→対象機能×スタックから横展開仮説→最小安全PoC→影響評価→対策案」  
-2) **URLだけ渡された初動**  
-   例：「機能ごとマトリクス→入口候補→典型連鎖→必要証跡チェック」  
-3) **根拠を示して説明**  
-   一次資料（WSTG/ASVS/ATT&CK等）へ**明示リンク**し、判断根拠を残す。
+## 使い方
+1. **全体像**を掴む → [`01_reference/00_webpt-integrated-flow.md`](01_reference/00_webpt-integrated-flow.md)  
+2. **連鎖カードの作法**を知る → [`02_chains/README.md`](02_chains/README.md)  
+3. **入口候補を洗い出す** → [`03_matrices/attack_by_function.md`](03_matrices/attack_by_function.md)  
+4. **各脆弱性について読む/追加する** → [`02_chains/`](02_chains/)  
+5. **根拠を付す** → ASVS/WSTG/ATT&CK などを該当IDで紐づけ
 
 ## フォルダ構成
-```
-Kedappsec-notes/
-├─ 00_meta/                          # 方針・命名規約・注意事項
-│  └─ README.md
-├─ 01_reference/                     # 一次資料の要点と使い分け
-│  ├─ index.md
-│  ├─ wstg.md / asvs.md / attack-mitre.md / hacktricks.md / payloadsallthethings.md / ...
-├─ 02_chains/                        # 攻撃連鎖（入口→横展開→到達点→影響→対策）
-│  └─ <short>.md
-├─ 03_matrices/                      # 脆弱性×技術スタック×Web機能の入口マトリクス
-│  ├─ attack_by_function.md
-│  ├─ attack_by_stack.md
-│  └─ stack_by_function.md
-├─ 04_poc/                           # PoC 置き場
-│  └─ README.md / idor/ / xss/ / ssrf/ ...
-└─ 05_prompts/                       # 生成/保守用プロンプト
-   ├─ README.md
-   ├─ gen/ (add-vuln-card.md / expand-attack-chain.md / build-matrix-entry.md / write-poc-template.md / ...)
-   └─ maintain/ (matrix-consistency-check.md / reference-sync.md / repo-governance.md / ...)
-```
+## フォルダ別ガイド
+
+### 00_meta（運用方針・注意事項）
+- [`00_meta/README.md`](00_meta/README.md)：命名規約・非破壊原則・参照ルール  
+- `00_meta/archive/`：旧文書の保管  
+
+### 01_reference（一次資料の要点と使い分け）
+- **入口**：[`01_reference/README.md`](01_reference/README.md)  
+
+### 02_chains（攻撃連鎖カード）
+- **運用ガイド**：[`README.md`](02_chains/README.md) / **候補**：[`カード追加候補リスト.md`](02_chains/カード追加候補リスト.md)  
+- **公開中カード（抜粋）**  
+  - IDOR：[`IDOR/idor-basic-priv-admin.md`](02_chains/IDOR/idor-basic-priv-admin.md)  
+  - Path Traversal：[`Path Traversal/path-basic-lfi-data.md`](02_chains/Path%20Traversal/path-basic-lfi-data.md)  
+  - SSRF：[`SSRF/ssrf-meta-intapi-data.md`](02_chains/SSRF/ssrf-meta-intapi-data.md)  
+  - XSS：[`XSS/xss-ref-sess-pii.md`](02_chains/XSS/xss-ref-sess-pii.md)
+
+### 03_matrices（入口マトリクス）
+- 機能→攻撃の入口：[`attack_by_function.md`](03_matrices/attack_by_function.md)
+
+### 05_prompts（生成・保守プロンプト）
+- 生成：[`gen/add-chain-card.md`](05_prompts/gen/add-chain-card.md) / [`gen/collect-chain-card-input.md`](05_prompts/gen/collect-chain-card-input.md)  
+- 保守：[`maintain/update-attack_by_function-from-card.md`](05_prompts/maintain/update-attack_by_function-from-card.md)
+
+## 導線
+1. このREADME → 目的と構成を把握  
+2. [`01_reference/00_webpt-integrated-flow.md`](01_reference/00_webpt-integrated-flow.md) → 進め方の型  
+3. [`02_chains/README.md`](02_chains/README.md) → カードで連鎖の読み方を理解
 
 ## 参考
 1. OWASP Web Security Testing Guide (WSTG) – https://owasp.org/www-project-web-security-testing-guide/latest/  
