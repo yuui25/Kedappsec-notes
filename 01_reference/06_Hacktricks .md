@@ -80,7 +80,7 @@
 
 ## 6. 参考リンク（根拠／一次資料中心）
 ### HackTricks（公式/本体・Web系）
-- HackTricks Index（ローカル実行手順含む）：https://book.hacktricks.wiki/en/index.html  
+- HackTricks Index（ローカル実行手順含む）：https://angelica.gitbook.io/hacktricks 
 - Web Vulnerabilities Methodology（チェックリスト）：https://blog.1nf1n1ty.team/hacktricks/pentesting-web/web-vulnerabilities-methodology  
 - 403/401 Bypass：https://angelica.gitbook.io/hacktricks/network-services-pentesting/pentesting-web/403-and-401-bypasses  
 - Parameter Pollution（HPP）：https://angelica.gitbook.io/hacktricks/pentesting-web/parameter-pollution  
