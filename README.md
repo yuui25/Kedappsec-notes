@@ -9,7 +9,7 @@
 - **診断の結果/初期情報から「次アクション」を即決**（どこを深掘るか、何を試すか）
 - **攻撃連鎖（Chain Card）で横展開を設計**（証跡・根拠つきで再現可能）
 - **一次資料で裏取り**（WSTG/ASVS/ATT&CK等への明示リンク）
-**対象**：Webアプリ
+> **対象**：Webアプリ
 
 ## 使い方
 1. **全体像**を掴む → [`01_reference/00_webpt-integrated-flow.md`](01_reference/00_webpt-integrated-flow.md)  
