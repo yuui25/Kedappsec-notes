@@ -124,4 +124,4 @@ Phase 5  Report & Retest（報告/再試験） →  エビデンス整備、DoD�
 5. **PayloadsAllTheThings（GitHub）**  
    https://github.com/swisskyrepo/PayloadsAllTheThings
 6. **HackTricks（Methodology & Web）**  
-   https://book.hacktricks.xyz/
+   https://angelica.gitbook.io/hacktricks
