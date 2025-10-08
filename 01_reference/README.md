@@ -74,4 +74,4 @@
 - MITRE ATT&CK: https://attack.mitre.org/  
 - PortSwigger Web Security Academy: https://portswigger.net/web-security  
 - PayloadsAllTheThings: https://swisskyrepo.github.io/PayloadsAllTheThings/  
-- HackTricks: https://book.hacktricks.xyz/
+- HackTricks: https://angelica.gitbook.io/hacktricks
