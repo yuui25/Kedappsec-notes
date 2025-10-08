@@ -19,7 +19,6 @@
 5. **根拠を付す** → ASVS/WSTG/ATT&CK などを該当IDで紐づけ
 
 ## フォルダ別ガイド
-```
 ### 00_meta（運用方針・注意事項）
 - [`00_meta/README.md`](00_meta/README.md)：命名規約・非破壊原則・参照ルール  
 - `00_meta/archive/`：旧文書の保管  
@@ -41,7 +40,7 @@
 ### 05_prompts（生成・保守プロンプト）
 - 生成：[`gen/add-chain-card.md`](05_prompts/gen/add-chain-card.md) / [`gen/collect-chain-card-input.md`](05_prompts/gen/collect-chain-card-input.md)  
 - 保守：[`maintain/update-attack_by_function-from-card.md`](05_prompts/maintain/update-attack_by_function-from-card.md)
-```
+
 ## 導線
 1. このREADME → 目的と構成を把握  
 2. [`01_reference/00_webpt-integrated-flow.md`](01_reference/00_webpt-integrated-flow.md) → 進め方の型  
