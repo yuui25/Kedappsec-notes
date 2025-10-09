@@ -9,7 +9,7 @@
 - **HSTSの有効化**  
   ASVS: v5.0.0-3.4.1 → WSTG: [Testing for HTTP Strict Transport Security (HSTS)](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/07-Test_HTTP_Strict_Transport_Security)
 - **CORSの許可元固定**  
-  ASVS: v5.0.0-3.4.2 → WSTG: [Testing Cross-Origin Resource Sharing (CORS)](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/13-Testing_Cross_Origin_Resource_Sharing)
+  ASVS: v5.0.0-3.4.2 → WSTG: [Testing Cross-Origin Resource Sharing (CORS)](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/07-Testing_Cross_Origin_Resource_Sharing)
 - **コンテンツ種別の整合（`Content-Type` と実体の一致 / `nosniff`）**  
   ASVS: v5.0.0-4.1.1 → WSTG: [Testing for Browser Storage and MIME Sniffing](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/08-Testing_for_Browser_Storage_and_MIME_Sniffing)
 - **CSRFの基礎対策（Origin/トークン/メソッド）**  
