@@ -1,3 +1,12 @@
+# ASVS(v5.0)-WSTG mapping
+- 本サマリは ASVS v5.0 の V1〜V17 を前提資料として、Webペネトレーションテスト（WebPT）で実施・判定しやすい検査観点を抽出し、個別要件の扱い（対応//範囲外）を整理および対応するWSTGを示したもの。
+- 範囲外は主に「設計/運用/文書レビュー中心」「構成監査のみで実挙動からは検証困難」などを理由とする。
+- 記載内容はChatGPTによって作成しているため、使用時は要確認。
+
+## 対象URL
+- [ASVS](https://github.com/owasp-ja/asvs-ja/tree/master/5.0/ja)
+- [WSTG](https://owasp.org/www-project-web-security-testing-guide/)
+---
 ## V1.1 エンコーディングおよびサニタイゼーションアーキテクチャ
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的な攻撃例 | 精査方法(検出とする理由) |
