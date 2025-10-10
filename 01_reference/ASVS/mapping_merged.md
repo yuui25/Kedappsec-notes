@@ -426,7 +426,7 @@
 
 ## V8.1 認可ドキュメント
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V8.1.1 | L1 | 機能/データ基盤のアクセス制御ルールを文書化 | 範囲外 | 仕様・権限定義の提示依頼 | - | - | - |
 | V8.1.2 | L2 | フィールドレベル（読/書）制御を文書化 | 範囲外 | 更新/参照APIの項目別ルール確認 | - | - | - |
@@ -437,7 +437,7 @@
 
 ## V8.2 一般的な認可設計
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V8.2.1 | L1 | 機能レベルは明示パーミッション必須 | 対応可 | UI/API機能の直接呼出しで拒否確認 | [WSTG-ATHZ-02](https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/05-Authorization_Testing/02-Testing_for_Bypassing_Authorization_Schema) | 非管理ユーザが `/admin/users` を直接呼び出し、ユーザ作成/削除を試行 | 権限別アカウントで機能直叩きし、UI非経由でも200系で成功するなら権限制御不備として検出 |
 | V8.2.2 | L1 | データ固有アクセスは明示パーミッション（IDOR/BOLA対策） | 対応可 | 他者ID/他テナントIDでの取得/更新試験 | [WSTG-ATHZ-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/04-Testing_for_Insecure_Direct_Object_References) | `/api/orders/124` に他人の注文IDを指定して参照/更新が可能か確認 | 自アカウント以外のIDへ置換してレスポンス/更新成功ならIDOR/BOLAとして検出 |
@@ -448,7 +448,7 @@
 
 ## V8.3 操作レベルの認可
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V8.3.1 | L1 | 認可は信頼できるサーバ層で適用（クライアント依存しない） | 対応可 | JS保護無効化時でも拒否継続を確認 | [WSTG-ATHZ-02](https://owasp.org/www-project-web-security-testing-guide/v42/4-Web_Application_Security_Testing/05-Authorization_Testing/02-Testing_for_Bypassing_Authorization_Schema) | DevToolsでフロントの権限チェック無効化後に直接APIを叩き機能実行 | フロント無効化/改変でもサーバが許容（200系）するなら認可がCS依存として検出 |
 | V8.3.2 | L3 | ルール変更は即時反映。不可なら検知/ロールバック等の緩和 | 対応可 | 役割変更後の権限即時性を確認 | [WSTG-SESS-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens) | ロール降格後も旧JWTの`role=admin`で管理APIが有効（トークン失効/検証不備） | 役割変更後に旧トークンで高権限が継続利用できれば即時反映不備として検出 |
@@ -458,7 +458,7 @@
 
 ## V8.4 他の認可の考慮
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V8.4.1 | L2 | マルチテナントのクロステナント隔離 | 対応可 | テナントID切替/汚染試験 | [WSTG-APIT-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/12-API_Testing/02-API_Broken_Object_Level_Authorization) | `X-Tenant-ID`/URLパスのテナント識別子を他社値へ置換してデータ取得 | テナント識別子改変で他社データ取得/操作が可能ならBOLA（クロステナント）として検出 |
 | V8.4.2 | L3 | 管理UIは多層防御（継続的ID検証/端末態勢/リスク分析）で保護 | 対応可 | ネットワークのみ依存でないか確認 | [WSTG-ATHZ-03](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/03-Testing_for_Privilege_Escalation) | 一般ユーザがURL直打ち/機能連鎖で管理画面機能へ昇格 | ロール不一致のまま管理操作が成立すれば権限昇格として検出 |
@@ -540,7 +540,7 @@
 
 ## V10.5 OIDC クライアント
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V10.5.1 | L2 | IDトークンのリプレイ防止（`nonce`突合） | 対応可 | 認可ReqとIDTの`nonce`一致確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | 以前のログインで取得した`id_token`を別セッションに提示し、`nonce`未検証でログイン成立 | `nonce`不一致/欠落の`id_token`を用いて認証が成立するかを確認（成立すればリプレイ耐性不備を検出） |
 | V10.5.2 | L2 | ユーザ一意識別は再割当不可な`sub`で | 対応可 | IdP切替時の衝突検出 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | 同じメールだが異なるIdPで発行された`id_token`を用い、`email`ベース照合で他人アカウントにリンク | `iss+sub`ではなく`email`等で同一視して誤関連付けできるかを確認（可能なら一意識別不備を検出） |
@@ -552,7 +552,7 @@
 
 ## V10.6 OpenID プロバイダ
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V10.6.1 | L2 | 許容レスポンス：`code`/`ciba`/`id_token`/`id_token code`のみ | 対応可 | 暗黙的`token`不許可確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | `response_type=token`（implicit）でアクセストークンが直接発行される | 非許可`response_type`指定でトークンが発行/処理継続されないかを確認（発行されれば検出） |
 | V10.6.2 | L2 | 強制ログアウトのDoS緩和（確認取得/`id_token_hint`検証） | 対応可 | 認可済みRPのみ処理 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | 攻撃者が`end_session_endpoint`へ他人のRPを装ってリクエストし、広範な強制ログアウトを誘発 | `id_token_hint`の署名/`aud`/`iss`検証とユーザ確認プロンプトの有無、レート制限を確認（欠如なら検出） |
@@ -561,7 +561,7 @@
 
 ## V10.7 同意管理
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V10.7.1 | L2 | 各認可要求でユーザ同意の保証（不明なクライアントは必ず同意） | 対応可 | 同意画面スキップ有無と条件確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | 初回アクセスの未知クライアントで同意画面無しにトークン発行（サイレント同意） | クライアント登録状態/同意履歴なしで`prompt=none`等が通るかを確認（通れば検出） |
 | V10.7.2 | L2 | 同意画面に範囲/RS/認可詳細/有効期間を明示 | 対応可 | 表示内容と発行内容の整合性検証 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | 画面では`read`のみ表示だが、実際は`read write`のトークンが発行 | 同意画面表示のスコープと発行トークンのスコープ/`authorization_details`を比較し乖離があれば検出 |
@@ -571,7 +571,7 @@
 
 ## V11.1 暗号インベントリとドキュメント
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.1.1 | L2 | 鍵管理ポリシー文書化（NIST SP 800-57整合・過剰共有禁止） | 対応可 | ポリシー/手順・運用証跡の取得、サンプル鍵の配布範囲確認 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | 共有シークレットがリポジトリに埋め込まれ流出し、署名鍵の使い回しによりトークン偽造 | 実運用で用いられるアルゴ/鍵長/モードの棚卸しと、弱アルゴやハードコード鍵の有無を確認（検出時は方針不備の根拠） |
 | V11.1.2 | L2 | 暗号インベントリ（鍵/証明書/アルゴリズム/利用範囲）維持 | 対応可 | 資産台帳/証明書一覧・キーマップの収集・差分監査 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | 期限切れ証明書やRSA1024/RC4等の弱設定が残存しダウングレード・盗聴を許容 | インベントリと実サーバ/コードの突合で弱アルゴ/短鍵長/失効証明書を特定（整合不一致を検出理由とする） |
@@ -582,7 +582,7 @@
 
 ## V11.2 安全な暗号の実装
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.2.1 | L2 | 業界検証済み実装（ライブラリ/ハードウェア）を使用 | 対応可 | 依存ライブラリ/バージョン確認、FIPS対応可否の確認 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | 自前AESのパディング不備から復号/署名偽造 | 使用暗号ライブラリ/モードの確認と既知脆弱実装の排除（独自実装や非推奨API使用を発見した時点で検出） |
 | V11.2.2 | L2 | 暗号の敏捷性（アルゴリズム/鍵更新/再暗号化が可能） | 対応可 | 設定でアルゴリズム切替可否、ロールオーバーテスト | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | SHA-1固定や3DES固定での継続運用により衝突・既知攻撃の温存 | 切替・ローテ不可の構成を確認し、旧アルゴからの移行不能を根拠として検出 |
@@ -594,7 +594,7 @@
 
 ## V11.3 暗号アルゴリズム
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.3.1 | L1 | 安全でないモード/パディング（ECB, PKCS#1 v1.5等）不使用 | 対応可 | 暗号設定/コード検査、サンプル暗号文生成 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | ECB利用で画像や定型データのパターン露出 | 暗号設定/暗号文性質（ブロック繰返し）を確認し、危険モード/パディングの使用を特定して検出 |
 | V11.3.2 | L1 | 承認済み暗号/モード（例：AES-GCM）のみ使用 | 対応可 | 実運用設定・TLS/CMS/JWEのアルゴ確認 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | RC4/3DES等の採用による既知弱点の悪用 | 実応答/メタデータからアルゴ/モードを抽出し、非推奨アルゴの使用を検出 |
@@ -606,7 +606,7 @@
 
 ## V11.4 ハッシュ化とハッシュベース関数
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.4.1 | L1 | 暗号用途は承認済みハッシュのみ（MD5等禁止） | 対応可 | 依存関数/署名スキームの確認 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | MD5/SHA-1署名の衝突作成で検証バイパス | 使用ハッシュ種を特定し非推奨/衝突既知の採用を検出 |
 | V11.4.2 | L2 | パスワード保管は承認済みKDF＋適正パラメータ | 対応可 | ハッシュ方式/コスト設定検証、GPU耐性評価 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | SHA-256単発やソルト無しによりレインボーテーブルで復元 | KDF種別/ソルト/反復/メモリ設定の確認で不適切な保管を検出 |
@@ -617,7 +617,7 @@
 
 ## V11.5 乱数値
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.5.1 | L2 | 推測不能値はCSPRNGで≥128-bitエントロピー | 対応可 | トークン/IV/nonce/コード生成源の確認 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | `java.util.Random`等で生成したトークンが予測・再現されセッション奪取 | 連続生成値の分布/相関と生成源（CSPRNG/非CSPRNG）を確認し予測可能性を根拠に検出 |
 | V11.5.2 | L3 | 高負荷時でも安全に機能する乱数生成設計 | 範囲外 | ベンチ/障害時の劣化観測 | - | - | - |
@@ -626,7 +626,7 @@
 
 ## V11.6 公開鍵暗号
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.6.1 | L2 | 鍵生成/署名は承認済みアルゴと安全な実装 | 対応可 | 生成手順/鍵品質/乱数評価 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | 低エントロピーで生成したRSA鍵や脆弱曲線ECDSAにより署名偽造 | 鍵長/公開パラメータ/曲線の妥当性を確認し弱設定を検出 |
 | V11.6.2 | L3 | 安全な鍵交換（DH/ECDH）と安全パラメータ | 対応可 | パラメータ/曲線/群サイズの検証 | [WSTG-CRYP-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/04-Testing_for_Weak_Encryption) | 小さなDH群や再利用パラメータで離散対数攻撃が実用化 | 使用群/曲線/鍵長を抽出し既知安全閾値未満を検出 |
@@ -635,7 +635,7 @@
 
 ## V11.7 使用中のデータの暗号化
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V11.7.1 | L3 | フルメモリ暗号化で使用中データを保護 | 範囲外 | プラットフォーム/インフラ仕様確認 | - | - | - |
 | V11.7.2 | L3 | 最小化と迅速再暗号化（露出時間短縮） | 対応可 | 平文滞留の計測・スナップショット確認 | [WSTG-ATHN-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses) | ログアウト直後でもブラウザの戻る操作で機密ページの平文が閲覧可能 | 応答ヘッダ（Cache-Control/Pragma/Expires）と履歴/キャッシュ再現で残存表示を確認し、無効化不備を検出 |
@@ -645,7 +645,7 @@
 
 ## V12.1 一般的な TLS セキュリティガイダンス
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V12.1.1 | L1 | TLS1.2/1.3のみ許可し最新を優先 | 対応可 | サーバ/LBのプロトコル一覧・スキャンで検証 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | ダウングレード強要でTLS1.0/SSLv3に接続して盗聴 | スキャン/ハンドシェイクで<1.2が交渉可能かを確認（許容なら検出） |
 | V12.1.2 | L2 | 推奨暗号スイートのみ・強力なスイート優先（L3は前方秘匿性必須） | 対応可 | Cipher設定と実測ハンドシェイク確認 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | RC4/3DESやRSAキー交換のみへネゴシエーションして盗聴/復号 | 実際に弱スイートが選択可能か・PFS無しが採用されるかを確認（可能なら検出） |
@@ -655,14 +655,14 @@
 
 ## V12.2 外部向けサービスとの HTTPS 通信
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V12.2.1 | L1 | すべての外部HTTP接続でTLSを強制・フォールバック禁止 | 対応可 | HTTP→HTTPS強制/HSTS/リダイレクト検証 | [WSTG-CRYP-03](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/03-Testing_for_Sensitive_Information_Sent_via_Unencrypted_Channels) | HTTPで資格情報/セッションIDをスニッフィング | HTTP直アクセスが成功/リダイレクト不備/HSTS欠如を確認（成立なら検出） |
 | V12.2.2 | L1 | 公的に信頼できる証明書を使用 | 対応可 | 証明書チェーン/SAN/有効期限確認 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | 自己署名/不正CN/SAN不一致証明書でMITM | チェーン/ホスト名/期限/KeyUsageの検証を行い、検証失敗証明書で接続が成立すれば検出 |
 
 ## V12.3 一般的なサービス間通信セキュリティ
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V12.3.1 | L2 | すべてのイン/アウトバウンド接続でTLS等を使用し平文/ダウングレード不可 | 対応可 | SSH/DB/メッセージ基盤/管理系の暗号化確認 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | 内部API/DB接続を平文で盗聴/改竄 | 内部通信でTLS未使用/降格許容を確認（許容なら検出） |
 | V12.3.2 | L2 | TLSクライアントはサーバ証明書を検証 | 対応可 | ピンニング/信頼ストア/ホスト名検証 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | 内部HTTPクライアントが自己署名MITMプロキシを受容 | 内部リクエストで不正証明書/ホスト名不一致を受理するか検証（受理なら検出） |
@@ -674,7 +674,7 @@
 
 ## V13.1 構成ドキュメント
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V13.1.1 | L2 | すべての外部/内部通信先を文書化 | 対応可 | エンドポイント台帳・環境差分の入手と突合 | [WSTG-INFO-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/10-Map_Application_Architecture) | 未文書の外部APIやバックエンド接続経路が露出しSSRF/越境到達に悪用 | 文書と実観測の差分から未登録のエンドポイント・到達経路を特定（リンク解析・強制ブラウジング） |
 | V13.1.2 | L3 | 接続上限・到達時の挙動(フォールバック/リカバリ)定義 | 範囲外 | 疑似高負荷で接続枯渇を再現し挙動確認 | [WSTG-CONF-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration) | Keep-Alive大量保持や遅延応答で接続枯渇を誘発しフォールバック誤作動 | 低強度の同時接続/遅延でサーバのタイムアウト/再試行/遮断動作が文書と一致しないことを観測 |
@@ -683,7 +683,7 @@
 
 ## V13.2 バックエンド通信構成
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V13.2.1 | L2 | サービス間は個別ID/短期トークン/証明書で相互認証 | 対応可 | mTLS/JWT検証/STS短期発行の確認 | [WSTG-SESS-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens) | 共有APIキー固定や長寿命JWTを第三者が流用 | 署名不正/`exp`,`aud`,`iss`不一致のトークンで拒否されること、短寿命/ローテ有無を確認 |
 | V13.2.2 | L2 | バックエンドは最小権限アカウントで実行 | 対応可 | RBAC/DB権限/OS権限レビュー | [WSTG-CONF-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration) | 読み取り専用想定のDBユーザで更新/DDLが実行可能 | 機能を通じた最小操作で更新系が通るかを確認（権限逸脱の兆候） |
@@ -694,7 +694,7 @@
 
 ## V13.3 シークレット管理
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V13.3.1 | L2 | Vault等で安全に生成/保管/AC/廃棄(コード同梱禁止) | 対応可 | リポジトリ露出検査・ランタイム取得経路確認 | [WSTG-CONF-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage) | 誤公開S3/Blobバケットや公開リンクから資格情報が取得可能 | ストレージのACL/リスト可否/直参照を検証し機微情報の露出有無を確認 |
 | V13.3.2 | L2 | シークレットへのアクセスは最小権限 | 対応可 | Vaultポリシー/監査ログの検証 | [WSTG-CONF-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage) | 読み取り不要なロールでシークレット取得が可能 | 低権限トークン/ロールでの取得試行が許容されるかを確認 |
@@ -703,7 +703,7 @@
 
 ## V13.4 意図しない情報漏洩
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :---: | :--- | :--- |
 | V13.4.1 | L1 | .git/.svn等のメタデータ非公開 | 対応可 | 既知パス列挙/誤公開検査 | [WSTG-INFO-03](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/03-Review_Webserver_Metafiles_for_Information_Leakage) | `.git/HEAD` や `.svn/entries` の露出でソース取得 | 既知メタパスへのアクセスで取得可否を確認（レスポンスコード/内容を検証） |
 | V13.4.2 | L2 | 本番でデバッグ無効 | 対応可 | ヘッダ/フラグ/スタックトレース確認 | [WSTG-ERRH-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling) | 例外時に詳細スタック/設定値が露出 | 異常入力でエラーページを発生させ詳細出力の有無を確認 |
@@ -717,14 +717,14 @@
 
 ## V14.1 データ保護ドキュメント
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
 | V14.1.1 | L2 | 機密データの特定・分類（Base64/JWT含む） | 対応可 | データフロー図/DBスキーマ/APIレスポンスから機密項目棚卸 | [WSTG-INFO-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/10-Map_Application_Architecture) | JWTや個人情報がURL/Referer/ログに流出 | 画面/API/ログを横断してデータ流路をマッピングし、機密値がURL・ログ・バックアップ等に現れる箇所を特定 |
 | V14.1.2 | L2 | 保護要件（暗号/完全性/保持/ログ/DB暗号/プライバシー）の文書化 | 対応可 | 要件トレーサビリティ確認・サンプル設定の実地検証 | [WSTG-CONF-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Testing_for_Application_Platform_Configuration) | 弱TLS/不適切ログ設定により平文で機密が送受信・記録 | 環境の暗号設定・ログ/監査設定を確認し、要件と実装の乖離（弱い暗号スイート、機密のログ出力等）を検出 |
 
 ## V14.2 一般的なデータ保護
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
 | V14.2.1 | L1 | 機密値をURL/クエリに入れない | 対応可 | プロキシ/サーバログでURLパラメータ検査 | [WSTG-SESS-04](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/04-Testing_for_Exposed_Session_Variables) | セッションID/トークン/PIIをGETクエリに含め、Referer/ログ経由で漏洩 | プロキシでリクエストURLとRefererを観測、機密値がクエリ文字列に存在するかを確認 |
 | V14.2.2 | L2 | サーバ側キャッシュ/ロードバランサでの機密データ保持抑止 | 対応可 | Cache-Control/ヘッダ/一時ファイルの痕跡確認 | [WSTG-ATHN-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses) | `Cache-Control: no-store` 不備で機密画面がブラウザ/中間でキャッシュ | 機密レスポンスのキャッシュ関連ヘッダ/実挙動（戻る操作・再訪問時の再取得）を確認 |
@@ -737,7 +737,7 @@
 
 ## V14.3 クライアントサイドのデータ保護
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
 | V14.3.1 | L1 | セッション終了時のクライアントストレージ/DOMの認証情報クリア | 対応可 | ログアウト後のストレージ/メモリ観測 | [WSTG-CLNT-12](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/12-Testing_Browser_Storage) | ログアウト後も`localStorage`にアクセストークンが残存し再利用 | ログアウト後にストレージ/DOMの残留データを確認し、再認証なしでAPIが呼べるか検証 |
 | V14.3.2 | L2 | 機密データのブラウザキャッシュ防止ヘッダ | 対応可 | Cache-Control: no-store 等の有効性確認 | [WSTG-ATHN-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses) | 戻るボタンで機密ページが再表示/キャッシュ命中 | 機密レスポンスのキャッシュ関連ヘッダと履歴操作時の再取得挙動を確認 |
@@ -834,14 +834,14 @@
 
 ## V17.1 TURN サーバ
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :--: | :--: | :-- | :--: | :-- | :--: | :-- | :-- |
 | V17.1.1 | L2 | TURNの到達先を予約/特別用途IPへ禁止（IPv4/IPv6） | 対応可 | STUN/TURN設定取得→任意宛先中継試行、特殊レンジ(127.0.0.0/8, RFC1918, 169.254/16, ::1/128 等)への中継可否を検証 | [WSTG-INPV-19](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_Server-Side_Request_Forgery) | TURNを介して 169.254.169.254 などのメタデータや内網へ到達（オープンリレー/SSRF化） | TURN Allocate/Permission作成後に特殊レンジ宛のSend/Dataを試行し拒否されることを確認 |
 | V17.1.2 | L3 | 多数ポート確保でも枯渇しないレート制御/割当制限 | 範囲外 | 大量アロケート/チャネルBind連続実施で資源枯渇・他ユーザ影響を観測 | [WSTG-BUSL-07](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse) | TURN Allocate/ChannelBind を高頻度連打しリレー資源を枯渇させるDoS | 連続Allocate/Bindで失敗率・遅延・上限適用を計測し制限/レート制御の有無を確認 |
 
 ## V17.2 メディア
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :--: | :--: | :-- | :--: | :-- | :--: | :-- | :-- |
 | V17.2.1 | L2 | DTLS証明書鍵の管理/保護をポリシー化 | 対応可 | キーマテリアル格納先/ローテーション/アクセス権の確認 | [WSTG-CONF-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration) | 流出したDTLS秘密鍵で中間者/なりすまし | 鍵保管場所/権限/ローテ運用を確認し、鍵の再利用・過剰共有・平文配置の痕跡を特定 |
 | V17.2.2 | L2 | 承認済みDTLS暗号/DTLS-SRTP保護プロファイルの採用 | 対応可 | サーバのCipher一覧/プロファイルを握手から確認 | [WSTG-CRYP-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security) | 弱い/非推奨DTLS暗号でのネゴシエーション | パケットキャプチャでDTLSハンドシェイクの暗号スイート/プロファイルを確認し弱設定を検出 |
@@ -854,7 +854,7 @@
 
 ## V17.3 シグナリング
 
-| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) |
 | :--: | :--: | :-- | :--: | :-- | :--: | :-- | :-- |
 | V17.3.1 | L2 | フラッド下でも正当メッセージ処理継続（レート制限） | 対応可 | 信号面DoS(Offer/Answer/ICE更新乱発)下で成功率/遅延計測 | [WSTG-CLNT-08](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/08-Testing_WebSockets) | WebSocketシグナリングでOffer/ICE更新を高頻度連投しセッション確立を阻害 | シグナリングの連投で成功率/応答遅延/拒否応答を計測し、レート制御やキュー分離を確認 |
 | V17.3.2 | L2 | 不正シグナリング入力でも可用性維持（堅牢化） | 対応可 | 異常長/型不整合/境界値/Fuzz投入→クラッシュ/リーク有無 | [WSTG-CLNT-08](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/08-Testing_WebSockets) | 巨大/壊れたJSON/未定義Typeのシグナリングを送信してクラッシュ/例外を誘発 | WebSocket/HTTPシグナリングに対しフェイロードFuzzを実施し、サービス継続性とエラー処理を確認 |
