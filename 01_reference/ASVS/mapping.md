@@ -641,3 +641,220 @@
 | V11.7.2 | L3 | 最小化と迅速再暗号化（露出時間短縮） | 部分対応 | 平文滞留の計測・スナップショット確認 | キャッシュ/ログも対象 | WSTG-ATHN-06 | ログアウト直後でもブラウザの戻る操作で機密ページの平文が閲覧可能 | 応答ヘッダ（Cache-Control/Pragma/Expires）と履歴/キャッシュ再現で残存表示を確認し、無効化不備を検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses |
 
 
+# V12 安全な通信
+
+## V12.1 一般的な TLS セキュリティガイダンス
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V12.1.1 | L1 | TLS1.2/1.3のみ許可し最新を優先 | 対応可 | サーバ/LBのプロトコル一覧・スキャンで検証 | 旧TLS/SSL無効化 | WSTG-CRYP-01 | ダウングレード強要でTLS1.0/SSLv3に接続して盗聴 | スキャン/ハンドシェイクで<1.2が交渉可能かを確認（許容なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.1.2 | L2 | 推奨暗号スイートのみ・強力なスイート優先（L3は前方秘匿性必須） | 部分対応 | Cipher設定と実測ハンドシェイク確認 | ECDHE系優先 | WSTG-CRYP-01 | RC4/3DESやRSAキー交換のみへネゴシエーションして盗聴/復号 | 実際に弱スイートが選択可能か・PFS無しが採用されるかを確認（可能なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.1.3 | L2 | mTLSのクライアント証明書を信頼鎖で厳格検証 | 未対応 | CRL/OCSP/ポリシーOID検証 | 認証/認可に利用可 | WSTG-CRYP-01 | 自己署名/失効済みクライアント証明書でmTLS通過 | 失効/失効応答/信頼鎖/KeyUsage/OIDを満たさない証明書で接続し受理されれば検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.1.4 | L3 | OCSP Stapling等で失効確認を有効化 | 未対応 | サーバ設定・中間CA対応確認 | ソフト/ハードフェイル方針 | WSTG-CRYP-01 | 失効済みサーバ証明書でもStapling無しで受理 | ハンドシェイクにOCSPレスポンス有無/有効性が載るか確認し、失効を検出できない構成なら検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.1.5 | L3 | ECH有効化でSNI等メタデータ秘匿 | 未対応 | 対応CDN/実装の検証 | クライアント互換性に留意 | WSTG-CRYP-01 | 受動盗聴者にClientHelloのSNIが露出し内部FQDNが特定される | ClientHelloに平文SNIが含まれる/ech拡張無しを確認（露出あれば検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+
+## V12.2 外部向けサービスとの HTTPS 通信
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V12.2.1 | L1 | すべての外部HTTP接続でTLSを強制・フォールバック禁止 | 対応可 | HTTP→HTTPS強制/HSTS/リダイレクト検証 | 平文API禁止 | WSTG-CRYP-03 | HTTPで資格情報/セッションIDをスニッフィング | HTTP直アクセスが成功/リダイレクト不備/HSTS欠如を確認（成立なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/03-Testing_for_Sensitive_Information_Sent_via_Unencrypted_Channels |
+| V12.2.2 | L1 | 公的に信頼できる証明書を使用 | 対応可 | 証明書チェーン/SAN/有効期限確認 | ワイルドカードは厳格管理 | WSTG-CRYP-01 | 自己署名/不正CN/SAN不一致証明書でMITM | チェーン/ホスト名/期限/KeyUsageの検証を行い、検証失敗証明書で接続が成立すれば検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+
+## V12.3 一般的なサービス間通信セキュリティ
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V12.3.1 | L2 | すべてのイン/アウトバウンド接続でTLS等を使用し平文/ダウングレード不可 | 部分対応 | SSH/DB/メッセージ基盤/管理系の暗号化確認 | レガシープロトコル遮断 | WSTG-CRYP-01 | 内部API/DB接続を平文で盗聴/改竄 | 内部通信でTLS未使用/降格許容を確認（許容なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.3.2 | L2 | TLSクライアントはサーバ証明書を検証 | 対応可 | ピンニング/信頼ストア/ホスト名検証 | MITM耐性強化 | WSTG-CRYP-01 | 内部HTTPクライアントが自己署名MITMプロキシを受容 | 内部リクエストで不正証明書/ホスト名不一致を受理するか検証（受理なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.3.3 | L2 | 内部HTTPサービス間もTLS等で暗号化しフォールバック禁止 | 部分対応 | サービスディスカバリ/Ingress設定確認 | Pod内/ノード間も対象 | WSTG-CRYP-03 | サービス間HTTPを傍受して機密データ取得 | 内部HTTPが許容/降格可能かを確認（可能なら検出） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/03-Testing_for_Sensitive_Information_Sent_via_Unencrypted_Channels |
+| V12.3.4 | L2 | 内部TLSは信頼できる証明書（社内CA/自己署名は許可リスト化） | 対応可 | 受信側のTrust設定・ローテーション確認 | mTLS併用推奨 | WSTG-CRYP-01 | 期限切れ/未信頼CAの証明書を受容してMITM成立 | 内部TrustStore/ピンニング/証明書期限検証を行い、不正チェーン受理なら検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V12.3.5 | L3 | サービス間は強力な相互認証（mTLS/PoP等）とリプレイ耐性 | 未対応 | サービスメッシュ/証明書管理の検証 | ID連携・短寿命証明書 | WSTG-CRYP-01 | ベアラー資格情報を奪取して別クライアントから再送し成功 | mTLS/送信者拘束の不在を確認し、盗取資格のリプレイが成功すれば検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+
+# V13 構成
+
+## V13.1 構成ドキュメント
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V13.1.1 | L2 | すべての外部/内部通信先を文書化 | 対応可 | エンドポイント台帳・環境差分の入手と突合 | 動的設定(環境変数/SSM)も範囲 | WSTG-INFO-10 | 未文書の外部APIやバックエンド接続経路が露出しSSRF/越境到達に悪用 | 文書と実観測の差分から未登録のエンドポイント・到達経路を特定（リンク解析・強制ブラウジング） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/10-Map_Application_Architecture |
+| V13.1.2 | L3 | 接続上限・到達時の挙動(フォールバック/リカバリ)定義 | 未対応 | 疑似高負荷で接続枯渇を再現し挙動確認 | 連鎖DoS回避が狙い | WSTG-CONF-02 | Keep-Alive大量保持や遅延応答で接続枯渇を誘発しフォールバック誤作動 | 低強度の同時接続/遅延でサーバのタイムアウト/再試行/遮断動作が文書と一致しないことを観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V13.1.3 | L3 | リソース管理(解放/タイムアウト/再試行方針)を文書化 | 部分対応 | タイムアウト/リトライ設定の実測・コード確認 | 同期HTTPは短いTO・再試行抑制 | WSTG-CONF-02 | 再試行過多や過長タイムアウトによりリソース占有が継続 | 実通信で応答時間・再送回数を計測し、設計値/文書との差異を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V13.1.4 | L3 | 重要シークレットとローテーション計画を文書化 | 未対応 | Vault運用文書/証跡確認 | 影響範囲と緊急ロールオーバー手順 | WSTG-CONF-04 | 古いバックアップ/無参照ファイルから秘密鍵・APIキーが露出 | 公開/配置ディレクトリの残骸・バックアップを列挙し機微情報の混入を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information |
+
+## V13.2 バックエンド通信構成
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V13.2.1 | L2 | サービス間は個別ID/短期トークン/証明書で相互認証 | 部分対応 | mTLS/JWT検証/STS短期発行の確認 | 共有アカウント/APIキー固定を排除 | WSTG-SESS-10 | 共有APIキー固定や長寿命JWTを第三者が流用 | 署名不正/`exp`,`aud`,`iss`不一致のトークンで拒否されること、短寿命/ローテ有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens |
+| V13.2.2 | L2 | バックエンドは最小権限アカウントで実行 | 対応可 | RBAC/DB権限/OS権限レビュー | 特権実行の痕跡検出 | WSTG-CONF-02 | 読み取り専用想定のDBユーザで更新/DDLが実行可能 | 機能を通じた最小操作で更新系が通るかを確認（権限逸脱の兆候） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V13.2.3 | L2 | デフォルトクレデンシャル不使用 | 対応可 | 既定ID/パスの総当たり確認 | 初期セットアップの残骸検査 | WSTG-AUTHN-02 | `admin/admin` 等の既定認証情報でログイン成功 | 代表的な既定組合せで認証通過の有無を確認（ロック/警告も観測） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/02-Testing_for_Default_Credentials |
+| V13.2.4 | L2 | 外部到達の許可リスト化(送信/読込/FS) | 部分対応 | egress FW/アウトバウンドACL検証 | DNS/HTTPプロキシ経路も対象 | WSTG-INPV-19 | メタデータエンドポイントや内部HTTPへの到達（SSRF横展開） | サーバ側からの外部/内部宛リクエスト試行でブロック/許可の実挙動を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_Server-Side_Request_Forgery |
+| V13.2.5 | L2 | Web/アプリサーバの送信先を許可リスト化 | 部分対応 | サーバ側の送信制御/SELinux/AppArmor確認 | SSRF被害面の縮小 | WSTG-INPV-19 | 任意ホスト指定で内部DNS/HTTP資産へ到達 | SSRF系エンドポイントに対し内部/外部宛の疎通可否を観測し制御の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_Server-Side_Request_Forgery |
+| V13.2.6 | L3 | 接続並列数/TO/再試行/上限時挙動を構成通り実装 | 未対応 | Chaos/限界試験でドキュメント通りか検証 | バックオフ/ジャitter必須 | WSTG-CONF-02 | タイムアウト未設定/再試行過多で復旧遅延や連鎖障害 | 軽度の同時接続・遅延で再試行/遮断/復旧の各挙動が仕様と一致するかを計測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+
+## V13.3 シークレット管理
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V13.3.1 | L2 | Vault等で安全に生成/保管/AC/廃棄(コード同梱禁止) | 部分対応 | リポジトリ露出検査・ランタイム取得経路確認 | L3はHSM等ハード支援 | WSTG-CONF-11 | 誤公開S3/Blobバケットや公開リンクから資格情報が取得可能 | ストレージのACL/リスト可否/直参照を検証し機微情報の露出有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage |
+| V13.3.2 | L2 | シークレットへのアクセスは最小権限 | 対応可 | Vaultポリシー/監査ログの検証 | 認可境界のテスト | WSTG-CONF-11 | 読み取り不要なロールでシークレット取得が可能 | 低権限トークン/ロールでの取得試行が許容されるかを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage |
+| V13.3.3 | L3 | すべての暗号操作は隔離モジュールで実施 | 未対応 | 署名/復号の実行場所トレース | 鍵マテリアルの外部流出防止 | WSTG-CONF-02 | アプリプロセス内で鍵素材が平文展開され取得される | 実行時の設定/プロセス境界を確認し鍵取扱いがプラットフォーム分離かを検証 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V13.3.4 | L3 | 文書化された失効/ローテーションを実運用 | 未対応 | 有効期限/自動ローテーション実証 | ランブック整備 | WSTG-CONF-11 | 失効されていない古いキー/トークンが依然有効 | 期限切れ後/ローテ後の旧資格情報でアクセス不可になることを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/11-Test_Cloud_Storage |
+
+## V13.4 意図しない情報漏洩
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :---: | :--- | :--- | :--- |
+| V13.4.1 | L1 | .git/.svn等のメタデータ非公開 | 対応可 | 既知パス列挙/誤公開検査 | デプロイ時除外 | WSTG-INFO-03 | `.git/HEAD` や `.svn/entries` の露出でソース取得 | 既知メタパスへのアクセスで取得可否を確認（レスポンスコード/内容を検証） | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/03-Review_Webserver_Metafiles_for_Information_Leakage |
+| V13.4.2 | L2 | 本番でデバッグ無効 | 対応可 | ヘッダ/フラグ/スタックトレース確認 | DEBUG/TRACE出力禁止 | WSTG-ERRH-01 | 例外時に詳細スタック/設定値が露出 | 異常入力でエラーページを発生させ詳細出力の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+| V13.4.3 | L2 | ディレクトリリスティング無効 | 対応可 | 典型パスで列挙可否確認 | Webサーバ設定 | WSTG-CONF-09 | `/assets/` 等への直アクセスでリストが表示 | 既知ディレクトリ直参照でリスト表示/403/404の挙動を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/09-Test_File_Permission |
+| V13.4.4 | L2 | HTTP TRACE 無効 | 対応可 | TRACEメソッド試験 | CORSと併発注意 | WSTG-CONF-06 | TRACE許可によりXSTでCookie/ヘッダ反射 | `TRACE` 要求に対する応答コード/ボディで有効/無効を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/06-Test_HTTP_Methods |
+| V13.4.5 | L2 | ドキュメント/監視エンドポイント非公開 | 部分対応 | /swagger,/actuator等の公開範囲確認 | 認証/CGNAT内限定 | WSTG-CONF-05 | 認証なしの `/swagger` や `/actuator` から内部情報取得 | 既知管理UI/監視エンドポイントへの直接アクセスで認可要否/情報量を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/05-Enumerate_Infrastructure_and_Application_Admin_Interfaces |
+| V13.4.6 | L3 | バックエンド詳細バージョン非表示 | 部分対応 | バナー/ヘッダ/エラー文言確認 | 情報連鎖の芽を摘む | WSTG-INFO-02 | `Server:` などのバナーから種別/版数が露出 | レスポンスヘッダ/デフォルトエラーページの表記から指紋が取得できるか確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/02-Fingerprint_Web_Server |
+| V13.4.7 | L3 | 処理対象拡張子を許可リスト化 | 未対応 | 任意拡張子のアップロード/配信実験 | ソース/設定漏洩抑止 | WSTG-CONF-03 | `.php/.jsp` を画像名に偽装して実行/解釈される | 拡張子・MIMEの整合を崩したファイルでアップロード/配信時の取り扱いを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/03-Test_File_Extensions_Handling_for_Sensitive_Information |
+
+# V14 データ保護
+
+## V14.1 データ保護ドキュメント
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
+| V14.1.1 | L2 | 機密データの特定・分類（Base64/JWT含む） | 対応可 | データフロー図/DBスキーマ/APIレスポンスから機密項目棚卸 | 規制要件に合わせ分類 | WSTG-INFO-10 | JWTや個人情報がURL/Referer/ログに流出 | 画面/API/ログを横断してデータ流路をマッピングし、機密値がURL・ログ・バックアップ等に現れる箇所を特定 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/10-Map_Application_Architecture |
+| V14.1.2 | L2 | 保護要件（暗号/完全性/保持/ログ/DB暗号/プライバシー）の文書化 | 部分対応 | 要件トレーサビリティ確認・サンプル設定の実地検証 | テーブル単位の保持/マスキング方針 | WSTG-CONF-02 | 弱TLS/不適切ログ設定により平文で機密が送受信・記録 | 環境の暗号設定・ログ/監査設定を確認し、要件と実装の乖離（弱い暗号スイート、機密のログ出力等）を検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Testing_for_Application_Platform_Configuration |
+
+## V14.2 一般的なデータ保護
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
+| V14.2.1 | L1 | 機密値をURL/クエリに入れない | 対応可 | プロキシ/サーバログでURLパラメータ検査 | APIキー/トークン検出 | WSTG-SESS-04 | セッションID/トークン/PIIをGETクエリに含め、Referer/ログ経由で漏洩 | プロキシでリクエストURLとRefererを観測、機密値がクエリ文字列に存在するかを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/04-Testing_for_Exposed_Session_Variables |
+| V14.2.2 | L2 | サーバ側キャッシュ/ロードバランサでの機密データ保持抑止 | 部分対応 | Cache-Control/ヘッダ/一時ファイルの痕跡確認 | 使用後削除の確認 | WSTG-ATHN-06 | `Cache-Control: no-store` 不備で機密画面がブラウザ/中間でキャッシュ | 機密レスポンスのキャッシュ関連ヘッダ/実挙動（戻る操作・再訪問時の再取得）を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses |
+| V14.2.3 | L2 | 機密データを第三者トラッカーへ送信禁止 | 対応可 | CSP/Requestミラーで送信先解析 | SDK/タグ監査 | WSTG-INFO-05 | 分析タグへメールやユーザIDが自動送信 | DevTools/プロキシで外部ドメインへのリクエストとペイロードを確認し、機密項目の外送を検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/05-Review_Web_Page_Content_for_Information_Leakage |
+| V14.2.4 | L2 | 分類に応じたコントロールを実装（暗号/ログ/PET等） | 部分対応 | 設定と実装の差分評価 | データ毎に適用確認 | WSTG-CONF-02 | 高分類データが平文ログ/監視基盤へ送信 | 代表トランザクションを実行し、ログ/転送経路の設定が分類に応じた制御になっているかを突合 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Testing_for_Application_Platform_Configuration |
+| V14.2.5 | L3 | Web Cache Deception耐性（適正キャッシュ/404/302） | 未対応 | キャッシュ鍵ずらし/偽拡張子での侵入試験 | 動的機密は非キャッシュ | WSTG-CONF-13 | `/account` を `account.css` などに偽装し機密ページを共有キャッシュに保存 | パス混乱ペイロードで匿名アクセス時に機密が返る/キャッシュ命中するかを検証 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/13-Test_for_Path_Confusion |
+| V14.2.6 | L3 | 機密データの最小化・UIマスキング | 部分対応 | APIペイロード/画面表示の露出点検 | 全桁表示は明示操作時のみ | WSTG-INFO-05 | クレジットカード/個人番号が画面/APIで全桁表示 | 画面・APIレスポンスのフィールドを確認し、不要情報・全桁表示・伏字欠如を検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/05-Review_Web_Page_Content_for_Information_Leakage |
+| V14.2.7 | L3 | 保持期間に基づく自動削除 | 未対応 | スケジュール削除/法定保持の整合確認 | バックアップも対象 | WSTG-CONF-04 | 期限超過のバックアップ/エクスポートが公開領域に残置 | 既知拡張子（.bak/.zip等）の列挙と最終更新日の確認で残置データを検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information |
+| V14.2.8 | L3 | アップロードファイルのメタデータから機密削除 | 未対応 | EXIF/Officeメタの除去確認 | 同意時のみ保持可 | WSTG-INFO-05 | 画像EXIFにGPS/端末情報、Officeに著者/組織名が残存 | 保存後にダウンロードしメタ情報を解析、機密メタが残る場合は不備と判定 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/05-Review_Web_Page_Content_for_Information_Leakage |
+
+## V14.3 クライアントサイドのデータ保護
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- | :--- | :--- |
+| V14.3.1 | L1 | セッション終了時のクライアントストレージ/DOMの認証情報クリア | 対応可 | ログアウト後のストレージ/メモリ観測 | Clear-Site-Data併用 | WSTG-CLNT-12 | ログアウト後も`localStorage`にアクセストークンが残存し再利用 | ログアウト後にストレージ/DOMの残留データを確認し、再認証なしでAPIが呼べるか検証 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/12-Testing_Browser_Storage |
+| V14.3.2 | L2 | 機密データのブラウザキャッシュ防止ヘッダ | 対応可 | Cache-Control: no-store 等の有効性確認 | 中間キャッシュも想定 | WSTG-ATHN-06 | 戻るボタンで機密ページが再表示/キャッシュ命中 | 機密レスポンスのキャッシュ関連ヘッダと履歴操作時の再取得挙動を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/06-Testing_for_Browser_Cache_Weaknesses |
+| V14.3.3 | L2 | ブラウザストレージへ機密格納禁止（セッショントークン除く） | 部分対応 | local/session/IndexedDB/Cookieを動的点検 | 暗号化済でも原則NG | WSTG-CLNT-12 | `localStorage`やIndexedDBにPII/トークンを保存しXSSで窃取 | DevToolsのApplicationパネル/スクリプトで格納を確認し、窃取→API利用の可否でリスク確証 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/12-Testing_Browser_Storage |
+
+# V15 セキュアコーディングとアーキテクチャ
+
+## V15.1 セキュアコーディングとアーキテクチャドキュメント
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応WSTG番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象WSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V15.1.1 | L1 | 脆弱なサードパーティの修復SLAを文書化 | 部分対応 | 依存関係CVEと修復実績の突合 | クリティカルは緊急、他はリスク別SLA | WSTG-INFO-08 | 既知脆弱ライブラリ（例：古いログ集約ライブラリ）悪用によるRCE/情報漏えい | フレームワーク指紋と版数の特定→CVE照合→安全環境で挙動再現の有無 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/08-Fingerprint_Web_Application_Framework |
+| V15.1.2 | L2 | SBOM/信頼リポジトリからの取得 | 対応可 | SBOM提出・署名/出所検証 | 依存関係の完全性確認 | WSTG-CONF-02 | 依存攪乱（typosquatting）や供給元なりすましにより悪性パッケージ取得 | 取得元URL/署名/lockファイルの一貫性確認、ビルドログから出所追跡 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V15.1.3 | L2 | 高負荷/重処理の特定と防御方針 | 部分対応 | 負荷機能のDOS耐性テスト | キュー化/並列上限/非同期化 | WSTG-BUSL-05 | 高コスト検索やエクスポートの連続呼び出しで枯渇/遅延誘発 | 制限回数超過や短時間多発で拒否/遅延/アラートの有無を観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/05-Test_Number_Of_Times_A_Function_Can_Be_Used_Limits |
+| V15.1.4 | L3 | リスクのあるコンポーネントを明示 | 未対応 | 使途・影響範囲の棚卸 | メンテ不十分/EOL等を明記 | WSTG-INFO-08 | EOLコンポーネントからの既知脆弱性悪用 | 指紋→EOL/脆弱性一覧照合→影響資産の抽出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/08-Fingerprint_Web_Application_Framework |
+| V15.1.5 | L3 | 危険な機能の使用箇所を明示 | 未対応 | 逆シリアライズ/動的実行等の洗出し | 追加統制の前提資料 | WSTG-INPV-11 | サーバサイドの評価関数/テンプレート式を悪用したコード実行 | コード/テンプレ式/ペイロード投入で挙動変化（無害化環境）を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/11-Testing_for_Code_Injection |
+
+## V15.2 セキュリティアーキテクチャと依存関係
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応WSTG番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象WSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V15.2.1 | L1 | 修復SLA違反の依存を本番に含めない | 部分対応 | 既知脆弱版の有無チェック | 例外はリスク承認要 | WSTG-CONF-02 | 脆弱版依存の残存により既知RCE/情報漏えい | SBOM/manifestと実行環境を照合し脆弱版の存在と露出面を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V15.2.2 | L2 | 重処理による可用性喪失対策を実装 | 部分対応 | レート制限/バルク操作検証 | 仕様と実装の一致確認 | WSTG-BUSL-07 | バルク更新/連続予約で資源占有し他ユーザを阻害 | 軽負荷の範囲でレート上げ→拒否/バックオフ/隔離の有無観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+| V15.2.3 | L2 | 本番に不要物(テスト/サンプル)除外 | 対応可 | ルート/静的配下探索 | デプロイ設定レビュー | WSTG-CONF-04 | バックアップやサンプルの露出からソース/秘密情報漏えい | 既知パス列挙で`.bak/.old/backup`やサンプルの直参照可否を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/04-Review_Old_Backup_and_Unreferenced_Files_for_Sensitive_Information |
+| V15.2.4 | L3 | 想定リポジトリのみ取り込み(依存攪乱対策) | 未対応 | 依存解決ログ/lockの検証 | 名前乗っ取り/typosquatting | WSTG-CONF-02 | 悪性ネーム空間からの依存混入で任意コード実行 | lock/署名/レジストリURLの許可リスト照合と差分検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V15.2.5 | L3 | 危険/リスク部位をサンドボックス等で隔離 | 未対応 | 権限分離/ネット分離の実証 | container/seccomp/AppArmor 等 | WSTG-CONF-09 | 権限分離不備でWeb経由に内部ファイル/鍵へ到達 | 実効ユーザ/ファイル権限/実行権検証で越権アクセスの可否確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/09-Test_File_Permission |
+
+## V15.3 防御的コーディング
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応WSTG番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象WSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V15.3.1 | L1 | 必要フィールドのみ返却(最小化) | 部分対応 | APIレスポンス差分/過剰情報検出 | データ最小化 | WSTG-INFO-05 | 個人情報や内部ID/フラグが不要に露出 | 画面/APIレスを収集し想定最小セットとの差分で漏えい検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/01-Information_Gathering/05-Review_Web_Page_Content_for_Information_Leakage |
+| V15.3.2 | L2 | バックエンドの外部URL追従を抑止 | 対応可 | 自動リダイレクト無効の検証 | SSRF連鎖抑止 | WSTG-INPV-19 | リダイレクト/画像取得の自動追従で内網/メタデータに到達 | 内部アドレス/メタデータURLを指定し到達可否・外向き通信の制限確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_SSRF |
+| V15.3.3 | L2 | マスアサインメント防御(許可リスト) | 部分対応 | 更新可能フィールドの強制検証 | フレームワーク設定確認 | WSTG-INPV-20 | `role`/`isAdmin`/`price`等の不許可フィールド上書き | 隠し/未表示フィールドを送信し更新反映の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/20-Testing_for_Mass_Assignment |
+| V15.3.4 | L2 | 信頼できるヘッダでクライアントIPを扱う | 部分対応 | X-Forwarded-For 等の信頼境界確認 | ログ/レート制限の根拠統一 | WSTG-INPV-16 | X-Forwarded-For偽装でレート制限/監査を回避 | 代理配下でヘッダ改変しアプリが採用/上書きするかを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/16-Testing_for_HTTP_Incoming_Requests |
+| V15.3.5 | L2 | 型安全/厳密比較で型混同を回避 | 未対応 | 静的解析/ユニットで型検証 | 言語特性に依存 | WSTG-BUSL-01 | `"0e12345"`等の型変換/緩い比較を悪用した検証回避 | 数値/文字列混在や境界ケース入力で比較誤りの再現を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/01-Test_Business_Logic_Data_Validation |
+| V15.3.6 | L2 | JSのプロトタイプ汚染対策(Map/Set等) | 未対応 | 悪性__proto__/constructor注入試験 | 依存ライブラリも対象 | WSTG-CLNT-02 | JSON経由の`__proto__`注入で既定オブジェクトを汚染し任意挙動 | `__proto__`/`constructor`を含む入力でオブジェクト状態/実行経路の変化を観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/02-Testing_for_JavaScript_Execution |
+| V15.3.7 | L2 | HTTPパラメータ汚染防御 | 未対応 | 同名キー混在/多値処理の検証 | ソース別優先規則の定義 | WSTG-INPV-04 | `a=1&a=2`/区切り混在でサーバ解釈差を悪用しバリデーション回避 | 同名/配列/区切りの組合せ送信でサーバ側の実際の解釈と検証差を特定 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/04-Testing_for_HTTP_Parameter_Pollution |
+
+## V15.4 安全な同時並行性
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応WSTG番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象WSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V15.4.1 | L3 | 共有資源はスレッドセーフ型＋同期で保護 | 未対応 | 競合状態の動的検出/負荷試験 | ロック/セマフォ適用状況 | WSTG-BUSL-05 | 同時購入/予約を多重送信し在庫二重確保 | 並列リクエストで重複確保/整合性破綻の再現有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/05-Test_Number_Of_Times_A_Function_Can_Be_Used_Limits |
+| V15.4.2 | L3 | TOCTOUを避ける原子的操作 | 未対応 | ファイル/権限チェックの原子性検証 | OS/DBの原子API利用 | WSTG-BUSL-04 | 検査→使用の間に状態変更してバイパス（価格/権限/在庫） | 時間差/並列で検査-使用の窓を突き整合崩しの再現を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/04-Test_for_Process_Timing |
+| V15.4.3 | L3 | ロック秩序/タイムアウトでデッドロック回避 | 未対応 | ロックグラフ/タイムアウト検証 | ロックは責任境界内に限定 | WSTG-BUSL-04 | 相互待ちが発生する順序で要求を投入しサービス停止を誘発 | 相互待ちパターンを模した連続投入で停止/遅延の再現を観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/04-Test_for_Process_Timing |
+| V15.4.4 | L3 | 公平な資源配分(スレッドプール等) | 未対応 | 枯渇/飢餓の検出と緩和確認 | 優先度逆転対策 | WSTG-BUSL-07 | 低コスト要求を大量投入してスレッドプールを占有し他処理を飢餓化 | 負荷を段階的に増やし優先度/キュー制御で公平性が保てているか観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+
+# V16 セキュリティログ記録とエラー処理
+
+## V16.1 セキュリティログ記録ドキュメント
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTGの番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V16.1.1 | L2 | 収集イベント/形式/保存/閲覧権限/保存期間を網羅したログインベントリを文書化 | 部分対応 | 設計資料と実装ログの突合、抜け項目の確認 | 監査証跡の前提。各層の責任者明記が望ましい | WSTG-ERRH-01 | 例外時に詳細情報が露出し攻撃の足掛かり（内部パス/スタック等） | 例外を誘発してレスポンス/ログの露出内容を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+
+## V16.2 一般的なログ記録
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTGの番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V16.2.1 | L2 | 各ログに「いつ/どこ/誰/何」を含む必須メタデータ | 部分対応 | 実ログのサンプリング確認（actor, action, object, origin 等） | 解析可能性の担保 | WSTG-ERRH-01 | 不正操作後に主体/対象が特定できず追跡不能 | 代表機能で成功/失敗の操作を行い、ログ項目の有無と一貫性を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+| V16.2.2 | L2 | タイムソース同期とUTC/明示TZでの記録 | 未対応 | 複数ホストの時刻ずれ/タイムゾーン混在検出 | SIEM相関精度に直結 | WSTG-ERRH-01 | タイムスタンプ不整合で攻撃の連鎖が隠蔽 | 複数ノードで同一イベントを発生させ時刻整合を点検 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+| V16.2.3 | L2 | 文書化した対象のみを保存/送信（シャドーログ禁止） | 対応可 | 設計→実運用の差分検出 | データ最小化/漏洩抑止 | WSTG-CONF-02 | 未管理ログ出力先に機密が保存され漏洩 | プラットフォーム/アプリ設定を確認し想定外のログ出力を探索 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V16.2.4 | L2 | 共通のログ形式に正規化（プロセッサで可読・相関可能） | 部分対応 | 形式不一致/欠損フィールドの検出 | JSON/CEF等へ統一 | WSTG-CONF-02 | 形式ばらつきにより検知回避や相関失敗 | 複数コンポーネントのログを収集し必須フィールド/形式の一致を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V16.2.5 | L2 | 機密データは非記録/マスク/ハッシュ等、保護レベル準拠 | 部分対応 | トークン/PIIの露出スキャン | マスキング規則の例外管理必須 | WSTG-ERRH-01 | アクセストークンやカード番号が平文でログ出力 | テスト取引で機密値を含む操作を行いログ露出の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+
+## V16.3 セキュリティイベント
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTGの番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V16.3.1 | L2 | 認証の成功/失敗と要素種別を記録 | 対応可 | 認証試行→ログ内容の突合 | ATO検知の基礎 | WSTG-ATHN-03 | ブルートフォース/クレデンシャルスタッフィングの痕跡把握不能 | 連続失敗→成功のシナリオを実行し、失敗回数/要素種別の記録有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/03-Testing_for_Weak_Lock_Out_Mechanism |
+| V16.3.2 | L2 | 認可失敗を記録（L3は全認可判定の記録） | 部分対応 | IDOR/BOLA試験時のログ有無確認 | 機密値は記録しない | WSTG-ATHZ-02 | 権限外アクセス試行を検知できず不正取得が継続 | 他者ID/他テナントIDでのアクセスを行い拒否ログの有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/02-Testing_for_Bypassing_Authorization_Schema |
+| V16.3.3 | L2 | セキュリティ制御バイパス試行（入力/業務ロジック/自動化）を記録 | 未対応 | WAF/アプリ側検知イベントの有無 | ルールセットの網羅性 | WSTG-BUSL-07 | フロー省略/順序変更/頻度超過の悪用が未検知 | 仕様外操作（回数超過/順序スキップ）を実施し検知・記録の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+| V16.3.4 | L2 | 予期しないエラーや制御障害（例：TLS失敗）を記録 | 部分対応 | エラー誘発→ログ追跡 | 可観測性と復旧短縮 | WSTG-ERRH-01 | 外部依存障害時に原因不明で復旧遅延 | 外部接続失敗/タイムアウトを故意発生させ、適切なエラー記録を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+
+## V16.4 ログ保護
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTGの番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V16.4.1 | L2 | ログインジェクション防止（適切エンコード） | 部分対応 | 改行/制御文字/テンプレ挿入の挙動確認 | SIEM誤認・回避対策 | WSTG-INPV-16 | `CRLF`混入でログ行を偽装・改竄 | `\r\n`/ヘッダ改変を含む入力を送り、ログ汚染可否を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/16-Testing_for_HTTP_Incoming_Requests |
+| V16.4.2 | L2 | ログのアクセス制御/改竄不可（WORM等） | 未対応 | 改竄耐性/権限分離の検証 | 署名/ハッシュ鎖も有効 | WSTG-CONF-09 | 権限過多によりログの削除/改竄 | サーバ/ファイル権限とローテーション先の権限設定を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/09-Test_File_Permission |
+| V16.4.3 | L2 | 侵害分離のため外部の分離基盤へ安全転送 | 対応可 | 転送経路の暗号化/再送制御確認 | 片方向転送/最小権限 | WSTG-CRYP-01 | 盗聴可能な平文転送でログ漏洩 | 送信経路のTLS有効性/証明書検証とダウングレード不可を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+
+## V16.5 エラー処理
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTGの番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :-- | :-- | :-- | :-- |
+| V16.5.1 | L2 | 例外時は一般メッセージのみを返し内部情報を秘匿 | 部分対応 | 例外誘発→レスポンス/ログの情報露出確認 | スタック/SQL等の秘匿 | WSTG-ERRH-01 | 例外画面にスタックやSQL断片が表示され攻撃に悪用 | 想定外入力/障害を発生させ、ユーザ向け応答の情報量とログ側詳細分離を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/01-Testing_for_Improper_Error_Handling |
+| V16.5.2 | L2 | 外部依存障害でも安全に継続（CB/デグレード） | 未対応 | 依存先ダウン時の挙動評価 | 安全側に倒す設計 | WSTG-BUSL-04 | 外部API停止で処理が不整合/誤結果で継続 | 依存系を遮断しタイムアウト/代替ルート/一貫したエラー応答を確認 | https://owasp.org/www-project-web-security-testing-guide/stable/4-Web_Application_Security_Testing/10-Business_Logic_Testing/04-Test_for_Process_Timing |
+| V16.5.3 | L2 | フェイルオープン防止（検証失敗時に処理中止） | 対応可 | バリデーション強制失敗→取引不成立確認 | 取引整合性の担保 | WSTG-BUSL-01 | 不正入力時に検証をスキップし処理が成立 | 極端/矛盾入力で業務検証が強制停止するかを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/01-Test_Business_Logic_Data_Validation |
+| V16.5.4 | L3 | 最終手段ハンドラで未処理例外を捕捉・記録 | 未対応 | プロセス落ち/未捕捉例外のテスト | 言語特性に応じた代替要 | WSTG-ERRH-02 | 未捕捉例外でプロセスが落ち情報も記録されない | クラッシュを誘発しスタックトレース/例外記録の有無と機密露出の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/08-Error_Handling/02-Testing_for_Stack_Traces |
+
+# V17 WebRTC
+
+## V17.1 TURN サーバ
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :--: | :-- | :-- | :-- |
+| V17.1.1 | L2 | TURNの到達先を予約/特別用途IPへ禁止（IPv4/IPv6） | 対応可 | STUN/TURN設定取得→任意宛先中継試行、特殊レンジ(127.0.0.0/8, RFC1918, 169.254/16, ::1/128 等)への中継可否を検証 | オープンリレー悪用/SSRF横展開の抑止 | WSTG-INPV-19 | TURNを介して 169.254.169.254 などのメタデータや内網へ到達（オープンリレー/SSRF化） | TURN Allocate/Permission作成後に特殊レンジ宛のSend/Dataを試行し拒否されることを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/19-Testing_for_Server-Side_Request_Forgery |
+| V17.1.2 | L3 | 多数ポート確保でも枯渇しないレート制御/割当制限 | 未対応 | 大量アロケート/チャネルBind連続実施で資源枯渇・他ユーザ影響を観測 | 帯域/ポート上限・同時セッション上限の実測が必要 | WSTG-BUSL-07 | TURN Allocate/ChannelBind を高頻度連打しリレー資源を枯渇させるDoS | 連続Allocate/Bindで失敗率・遅延・上限適用を計測し制限/レート制御の有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+
+## V17.2 メディア
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :--: | :-- | :-- | :-- |
+| V17.2.1 | L2 | DTLS証明書鍵の管理/保護をポリシー化 | 部分対応 | キーマテリアル格納先/ローテーション/アクセス権の確認 | 鍵流出時は全セッション危殆化 | WSTG-CONF-02 | 流出したDTLS秘密鍵で中間者/なりすまし | 鍵保管場所/権限/ローテ運用を確認し、鍵の再利用・過剰共有・平文配置の痕跡を特定 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/02-Configuration_and_Deployment_Management_Testing/02-Test_Application_Platform_Configuration |
+| V17.2.2 | L2 | 承認済みDTLS暗号/DTLS-SRTP保護プロファイルの採用 | 対応可 | サーバのCipher一覧/プロファイルを握手から確認 | 非推奨スイート無効化必須 | WSTG-CRYP-01 | 弱い/非推奨DTLS暗号でのネゴシエーション | パケットキャプチャでDTLSハンドシェイクの暗号スイート/プロファイルを確認し弱設定を検出 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V17.2.3 | L2 | SRTP認証必須化でRTPインジェクション/DoS防止 | 部分対応 | 改竄RTP注入を試行し再生拒否/警告を確認 | SRTP認証タグ検証が鍵 | WSTG-CRYP-01 | 認証なし/無効タグのSRTPを混入して音声/映像を乗っ取り | 異常タグ/改竄パケット投入時に破棄されること、復号/再生されないことを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V17.2.4 | L2 | 不正SRTPパケット混入時も処理継続（耐性） | 未対応 | フォーマット不正/リプレイ/古いシーケンス投入の影響評価 | ドロップ/隔離/メトリクス必須 | WSTG-BUSL-07 | 異常長/壊れたSRTPを連投し受信側をクラッシュ/ハング | 形式/順序を崩したSRTPを投入しクラッシュ/過負荷・回復性の有無を観測 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+| V17.2.5 | L3 | 正規大量SRTPでもサービス継続（フラッド耐性） | 未対応 | 送信側を正規でスパイク→遅延/ドロップ/CPU飽和観測 | レート制御/優先度制御 | WSTG-BUSL-07 | 正常な高ビットレート/多ストリームでの輻輳により品質劣化 | 正規トラフィック増大時のドロップ率・遅延・スループットを計測し制御有無を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+| V17.2.6 | L3 | DTLS “ClientHello” Race Condition 脆弱性非影響 | 未対応 | 既知PoC/同時ハンドシェイク競合試験 | ベンダ通告/設定で軽減可 | WSTG-CRYP-01 | 同時ClientHello多重送信でハンドシェイク競合→例外/DoS | 複数同時ハンドシェイクを発生させ、異常終了/再試行/保護実装の挙動を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+| V17.2.7 | L3 | 大量SRTP時も録画機構が継続 | 未対応 | レコーディング有効時の負荷試験→ファイル整合性確認 | I/Oボトルネック検証 | WSTG-BUSL-07 | 高負荷通話＋録画同時で録画欠損/停止 | 負荷下で録画ファイルの連続性/欠損を検証し可用性を評価 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/10-Business_Logic_Testing/07-Test_Defenses_Against_Application_Misuse |
+| V17.2.8 | L3 | DTLS証明書とSRTPフィンガープリント照合/不一致で切断 | 対応可 | SDPのa=fingerprint と実証明書の一致検証→改竄時の切断確認 | MITM/偽中継の排除 | WSTG-CRYP-01 | SDPの`a=fingerprint`を改竄しMITMで異なる証明書を提示 | 改竄SDPで接続し、フィンガープリント不一致時に切断/拒否されることを確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/09-Testing_for_Weak_Cryptography/01-Testing_for_Weak_Transport_Layer_Security |
+
+## V17.3 シグナリング
+
+| 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | 備考 | 対応するWSTG の番号 | 具体的な攻撃例 | 精査方法(検出とする理由) | 対象のWSTGリンク |
+| :--: | :--: | :-- | :--: | :-- | :-- | :--: | :-- | :-- | :-- |
+| V17.3.1 | L2 | フラッド下でも正当メッセージ処理継続（レート制限） | 部分対応 | 信号面DoS(Offer/Answer/ICE更新乱発)下で成功率/遅延計測 | 優先度/キュー隔離が有効 | WSTG-CLNT-08 | WebSocketシグナリングでOffer/ICE更新を高頻度連投しセッション確立を阻害 | シグナリングの連投で成功率/応答遅延/拒否応答を計測し、レート制御やキュー分離を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/08-Testing_WebSockets |
+| V17.3.2 | L2 | 不正シグナリング入力でも可用性維持（堅牢化） | 部分対応 | 異常長/型不整合/境界値/Fuzz投入→クラッシュ/リーク有無 | 入力検証/例外処理/監視連携 | WSTG-CLNT-08 | 巨大/壊れたJSON/未定義Typeのシグナリングを送信してクラッシュ/例外を誘発 | WebSocket/HTTPシグナリングに対しフェイロードFuzzを実施し、サービス継続性とエラー処理を確認 | https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/11-Client-side_Testing/08-Testing_WebSockets |
