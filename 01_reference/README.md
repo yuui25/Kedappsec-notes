@@ -1,77 +1,63 @@
-# 目次と参照指針
+# README
 
-このフォルダは、Webペネトレーション（WebPT）を**一次資料中心**で実施・説明するための基準書庫です。  
-「何を基準に」「どう使い分けるか」を明確にし、以降のチェーン設計・PoC・報告書作成の**根拠**を揃えます。  
-※ 本フォルダは **Kedappsec-notes 専用**の運用文書です。
+このフォルダは、Webペネトレーションテスト（WebPT）を**一次情報中心**で実施・説明するための“根拠集”です。現行の5文書の役割・使いどころ・読み順を明確化し、以降のチェイン作成（02_chains）、マトリクス整備（03_matrices）に接続します。
 
 ---
 
-## 収録ドキュメント（本リポ内）
+## 現在の構成（2025-10 時点）
 
-- **[00_webpt-integrated-flow.md](./00_webpt-integrated-flow.md)**：WebPT実施フローの**統合版**（順序・運用の“型”）  
-- **[01_ASVS.md](./01_ASVS.md)**：ASVSに基づく要件基準（深度/DoD/受入れ基準）  
-- **[02_WSTG.md](./02_WSTG.md)**：WSTGに基づく検証観点・設計（Testing Framework）  
-- **[03_ATT&CK.md](./03_ATT&CK.md)**：MITRE ATT&CKでの攻撃連鎖マッピング（戦術/技術/データソース）  
-- **[04_PortSwigger_Web_Security_Academy.md](./04_PortSwigger_Web_Security_Academy.md)**：WSA活用（Burpの型／ラボ→PoC）  
-- **[05_PayloadsAllTheThings.md](./05_PayloadsAllTheThings.md)**：PayloadsAllTheThingsの安全な活用（入力・バイパス）  
-- **[06_Hacktricks .md](./06_Hacktricks%20.md)**：HackTricksの実務適用（入口拡張／迂回手段の発想）
+- **01_webpt-reference-quick-guide.md**  
+  各一次情報／標準／教材の**「これは何か」「使いどころ」「具体的な使い方」**を簡潔比較。ASVS・WSTG・NIST SP800-115・PTES・OSSTMM・ATT&CK・CAPEC・CWE・NVD/CVE・CVSS・WSA・Cheat Sheets・Top10・PATT・HackTricks・MDN を俯瞰。  
+  使いどころ：全体像の提示／合意形成の前提合わせ、関係者教育の最初の一歩。
 
-> 旧文書（例：`00_webpt-execution-method.md`、`99_web-pentest_requirements_complete.md`）はアーカイブ済み。
+- **02_mapping_merged.md**  
+  **ASVS v5.0 → WSTG マッピング**を起点に、各要件ごとに「具体的な攻撃例」「精査方法（検出理由）」「参照リンク」を併記した**実務テーブル集**。WebPTの**試験設計／DoD明確化**に直結します（範囲外の扱い理由も明記）。  
+  使いどころ：スコープ確定、試験観点の洗い出し、レポートの根拠づけ。
 
----
+- **03_web-pentest-providers.md**  
+  国内外の**WebPT提供企業**を収集。多くの企業が**VA（脆弱性診断）とPTを別メニュー**で提示している事例をリンクで示します。  
+  使いどころ：社内外ステークホルダ向けの**期待値調整／ベンチマーク**。
 
-## 役割と使い分け（要点サマリ）
+- **04_public-web-pentest-reports.md**  
+  **実査ベースの公開PTレポート**（Cure53, ROS ほか）と、匿名サンプル/アグリゲータへのリンク集。**成果物の粒度（再現手順・影響評価・是正提言）**を合わせる参考に。  
+  使いどころ：報告書の**構成・深度のキャリブレーション**、社内テンプレ見直し。
 
-| リファレンス | 立ち位置（何者か） | 使いどころ（いつ） | 典型アウトプット / 連携 | 注意点 |
-|---|---|---|---|---|
-| **Integrated Flow** | 実施**順序の定型** | 着手前〜実施中の全フェーズで参照 | 進め方・証跡・報告の型 | 個別詳細は各一次資料で裏取り |
-| **ASVS** | セキュリティ**要件**の標準 | 深度（L1/L2/L3）と**DoD**決定時 | Issue/DoDに**要件ID**を付す | 「手順」ではない。WSTGと対で使用 |
-| **WSTG** | テスト**観点/手順**の標準 | スコープ確定後の**検証設計** | 観点表／再現手順骨子 | 環境に合わせて取捨選択 |
-| **ATT&CK** | 攻撃者**行動様式**の辞典 | 侵入〜横展開〜影響の**連鎖整理** | 経路図へ**戦術/技術ID** | 目的は“マッピング”。PoC集ではない |
-| **WSA** | ハンズオン**ラボ**＋Burp Docs | 手技の**再現訓練**と型作り | Repeater/Intruder差分 | 一部機能はPro前提（Collaboratorなど） |
-| **PATT** | 実践**ペイロード集** | 手法仮説後の**試験入力** | Wordlist/バイパス例 | **ステージング優先**、本番は合意内 |
-| **HackTricks** | 実務**テクニック集** | 入口探索や**迂回手段**の発想出し | 認可回避/ヘッダ悪用/Tips | 記述広範。**一次資料で裏取り**必須 |
+- **05_service-catalog.md**  
+  事業視点の**1ページ・サービスカタログ**。VA/PT（L1〜L3）・TLPT/Red/Purple・レビュー/コード/クラウド・運用/IR・ガバナンスまで、**目的／範囲／成果物／準拠**を要約。契約前の**RoE（合意事項）**も明記。  
+  使いどころ：顧客説明・見積り・契約前合意の**定型**として活用。
 
 ---
 
-## 推奨参照フロー（最短ルート）
+## 推奨の読み順（最短ルート）
 
-1. **Integrated Flow**（`00_webpt-integrated-flow.md`）を常時参照して全体の道筋を確認  
-2. **ASVSで深度/DoDを決める** → 合意文書へ要件IDで明記  
-3. **WSTGで検証計画**（前提合意／禁止事項／PoC方針）を作る  
-4. **HackTricks**で入口の当たりを広げ、**PATT**で具体ペイロードを用意  
-5. 必要に応じて**WSAラボ**で手元再現→Burp操作の型を整える  
-6. 成立箇所を**ATT&CK**で連鎖化し、報告書に**技術ID**と**データソース**を添付
+1. **サービスの枠組みを決める**：`05_service-catalog.md`  
+2. **根拠体系を共有する**：`01_webpt-reference-quick-guide.md`  
+3. **試験観点を具体化する**：`02_mapping_merged.md`（ASVS→WSTG、攻撃例・精査方法つき）  
+4. **期待値と成果物の粒度を合わせる**：`03_web-pentest-providers.md` → `04_public-web-pentest-reports.md`
 
 ---
 
-## 品質ルール（このフォルダの運用）
+## 運用ルール（更新・品質）
 
-- **根拠の優先度**：OWASP（ASVS/WSTG） ＞ MITRE（ATT&CK） ＞ NIST/PTES/PortSwigger ＞ HackTricks ＞ PayloadsAllTheThings  
-- **表記ルール**：ASVS要件は `vX.Y.Z-A.B.C`、ATT&CKは `T####(.###)` を厳守  
-- **非破壊の原則**：DoS/大量送信/破壊系は**書面許可なき限り禁止**  
-- **PoC方針**：**ステージング検証**を基本／本番は**最小限・合意内**。証跡（Req/Res原文・ログ・スクショ）必須  
-- **更新運用**：各ファイル末尾の「参考」を**最新安定版**へ追随（リンク切れ点検を定例化）
-
----
-
-## こんな時どれを見る？（クイックガイド）
-
-- **まず全体の型を掴みたい** → `00_webpt-integrated-flow.md`  
-- **深度や合格基準（DoD）を決めたい** → `01_ASVS.md`  
-- **検証の段取りと前提合意を整えたい** → `02_WSTG.md`  
-- **“どこまで行けたか”を説明したい** → `03_ATT&CK.md`  
-- **Burpの型と手の感覚を養いたい** → `04_PortSwigger_Web_Security_Academy.md`  
-- **試すべき入力やバイパス案が欲しい** → `05_PayloadsAllTheThings.md`  
-- **入口や迂回のアイデアを広げたい** → `06_Hacktricks .md`
+- **一次情報優先**：ASVS/WSTG/ATT&CK/NIST 等の更新を定例点検。リンク切れは都度修正。  
+- **範囲の明確化**：`02_mapping_merged.md` の「範囲外」理由に準拠し、**設計/運用のみで検証困難な項目**はWebPT対象外として明記。  
+- **非破壊の原則**：本番環境は合意範囲・最小限で検証。DoS/大量送信等は原則禁止（RoE準拠）。  
+- **再利用性**：`04_public-web-pentest-reports.md` の構成/深度を**報告テンプレ**に反映。`03_web-pentest-providers.md` は**期待値調整**の引用定番とする。
 
 ---
 
-## 参考（一次情報・公式）
+## 用語の手早い区別（VA と PT）
 
-- OWASP ASVS: https://owasp.org/www-project-application-security-verification-standard/  
-- OWASP WSTG: https://owasp.org/www-project-web-security-testing-guide/latest/  
-- MITRE ATT&CK: https://attack.mitre.org/  
-- PortSwigger Web Security Academy: https://portswigger.net/web-security  
-- PayloadsAllTheThings: https://swisskyrepo.github.io/PayloadsAllTheThings/  
-- HackTricks: https://angelica.gitbook.io/hacktricks
+| 区分 | 目的 | 手段 | 成果物の核 |
+|---|---|---|---|
+| **VA（脆弱性診断）** | 既知脆弱性の**網羅検出** | スキャン＋定型手動 | 発見一覧・優先度・再現要旨 |
+| **PT（ペネトレーション）** | **到達可能性**と**実害**の検証 | 手動チェイン・横展開 | PoC（Req/Res/スクショ）・影響評価・是正計画 |
+
+---
+
+## 関連フォルダとの接続
+
+- **02_chains**：`02_mapping_merged.md` の観点→**攻撃連鎖カード**化（入口／横展開／到達点／対策）。  
+- **03_matrices**：Web機能×技術スタック×脆弱性の**入口マトリクス**に反映。  
+
+---
