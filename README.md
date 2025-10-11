@@ -46,12 +46,10 @@
 2. [`01_reference/00_webpt-integrated-flow.md`](01_reference/00_webpt-integrated-flow.md) → 進め方の型  
 3. [`02_chains/README.md`](02_chains/README.md) → カードで連鎖の読み方を理解
 
-## 参考
-1. OWASP Web Security Testing Guide (WSTG) – https://owasp.org/www-project-web-security-testing-guide/latest/  
-2. OWASP ASVS – https://owasp.org/www-project-application-security-verification-standard/  
-3. MITRE ATT&CK – https://attack.mitre.org/  
-4. PortSwigger Web Security Academy – https://portswigger.net/web-security  
-5. PayloadsAllTheThings – https://github.com/swisskyrepo/PayloadsAllTheThings  
-6. HackTricks – https://angelica.gitbook.io/hacktricks
+##  注意事項
+> このリポジトリは個人が学習・研究目的で作成したものであり、所属企業・団体とは無関係です。
+> 記載内容は主にOWASP ASVS、WSTG、MITRE ATT&CKなどの公開情報を整理・引用したもので、
+> 一部はChatGPTを用いて生成しています。内容の正確性や適用性については各自で検証が必要です。
+
 
 ---
