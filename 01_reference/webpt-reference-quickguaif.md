@@ -1,4 +1,4 @@
-# Webペネトレーションテストで役立つ一次情報・標準・教材の要点整理
+# 次情報・標準・教材の要点整理
 
 ## クイック比較表
 | サイト | 種別 | 主要用途 | 粒度 | 公式 | 備考 |
@@ -6,21 +6,21 @@
 | OWASP ASVS | 標準 | セキュ要件定義/受入基準/DoD | 要件 | [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) | v5.0.0（2025年時点） |
 | OWASP WSTG | 手順 | テスト設計/実施の具体手順 | テストケース | [OWASP WSTG](https://owasp.org/www-project-web-security-testing-guide/latest/) | Living Doc（最新版） |
 | NIST SP 800-115 | 手順 | 計画/合意/報告/品質管理の方法論 | 手順・プロセス | [NIST SP 800-115](https://csrc.nist.gov/pubs/sp/800/115/final) | 2008 Final（現行） |
-| PTES | 手順 | 実務の各フェーズ標準化 | フェーズ/手順 | https://www.pentest-standard.org/ | 技術ガイド有 |
-| OSSTMM | 標準 | 測定重視のテスト方法論/指標 | 測定・ルール | https://www.isecom.org/OSSTMM.3.pdf | v3（2010） |
-| MITRE ATT&CK | カタログ | 脅威起点のTTPマッピング | 戦術・技術 | https://attack.mitre.org/matrices/ | v17.1（2025-04） |
-| MITRE CAPEC | カタログ | 攻撃パターン起点の設計/試験 | パターン | https://capec.mitre.org/ | List v3.9 |
-| MITRE CWE | カタログ | 弱点分類/報告の正規化 | 弱点タイプ | https://cwe.mitre.org/ | List v4.18 |
-| NVD | カタログ | CVE詳細/影響/依存関係確認 | CVE/メトリクス | https://nvd.nist.gov/ | 米政府DB |
-| CVE Program | 仕様 | 脆弱性IDの付番/参照 | 識別子 | https://www.cve.org/ | 公式ID体系 |
-| CVSS v4.0 (FIRST) | 仕様 | 影響評価/優先度判断 | 評価指標 | https://www.first.org/cvss/v4-0/ | v4.0（仕様公開） |
-| PortSwigger WSA | 教材 | 実践演習/手順学習 | ラボ/手順 | https://portswigger.net/web-security | 無料ラボ多数 |
-| OWASP Cheat Sheet Series | 教材 | 実装/運用の要点集 | 設計・実装 | https://cheatsheetseries.owasp.org/ | 短く実務直結 |
-| OWASP Top 10 (Web) | 教材 | リスク認知/優先度共有 | リスク分類 | https://owasp.org/Top10/ | 2021 版 |
-| OWASP API Security Top 10 | 教材 | API特化リスク認知 | リスク分類 | https://owasp.org/API-Security/ | 2023 版 |
-| PayloadsAllTheThings | ペイロード集 | 侵入/再現/回避の素材集 | ペイロード/手順 | https://github.com/swisskyrepo/PayloadsAllTheThings | 実例豊富 |
-| HackTricks | 教材 | 攻撃者視点の実務TIPS | 手順・トレードクラフト | https://book.hacktricks.xyz/ | 幅広い網羅 |
-| MDN Web Docs（HTTP/CSP/CORS） | 仕様 | ブラウザ/HTTP挙動の一次根拠 | HTTP仕様/挙動 | https://developer.mozilla.org/ | CORS/CSP/Headers 参照 |
+| PTES | 手順 | 実務の各フェーズ標準化 | フェーズ/手順 | [PTES](http://www.pentest-standard.org/index.php/Main_Page) | 技術ガイド有 |
+| OSSTMM | 標準 | 測定重視のテスト方法論/指標 | 測定・ルール | [OSSTMM](https://www.isecom.org/OSSTMM.3.pdf) | v3（2010） |
+| MITRE ATT&CK | カタログ | 脅威起点のTTPマッピング | 戦術・技術 | [MITRE ATT&CK](https://attack.mitre.org/matrices/) | v17.1（2025-04） |
+| MITRE CAPEC | カタログ | 攻撃パターン起点の設計/試験 | パターン | [MITRE CAPEC](https://capec.mitre.org/) | List v3.9 |
+| MITRE CWE | カタログ | 弱点分類/報告の正規化 | 弱点タイプ | [MITRE CWE](https://cwe.mitre.org/) | List v4.18 |
+| NVD | カタログ | CVE詳細/影響/依存関係確認 | CVE/メトリクス | [NVD](https://nvd.nist.gov/) | 米政府DB |
+| CVE Program | 仕様 | 脆弱性IDの付番/参照 | 識別子 | [CVE Program](https://www.cve.org/) | 公式ID体系 |
+| CVSS v4.0 (FIRST) | 仕様 | 影響評価/優先度判断 | 評価指標 | [CVSS v4.0 (FIRST)](https://www.first.org/cvss/v4-0/) | v4.0（仕様公開） |
+| PortSwigger WSA | 教材 | 実践演習/手順学習 | ラボ/手順 | [PortSwigger WSA](https://portswigger.net/web-security) | 無料ラボ多数 |
+| OWASP Cheat Sheet Series | 教材 | 実装/運用の要点集 | 設計・実装 | [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/) | 短く実務直結 |
+| OWASP Top 10 (Web) | 教材 | リスク認知/優先度共有 | リスク分類 | [OWASP Top 10 (Web)](https://owasp.org/www-project-top-ten/) | 2025 版 |
+| OWASP API Security Top 10 | 教材 | API特化リスク認知 | リスク分類 | [OWASP API Security Top 10](https://owasp.org/API-Security/) | 2023 版 |
+| PayloadsAllTheThings | ペイロード集 | 侵入/再現/回避の素材集 | ペイロード/手順 | [PayloadsAllTheThings](https://github.com/swisskyrepo/PayloadsAllTheThings) | 実例豊富 |
+| HackTricks | 教材 | 攻撃者視点の実務TIPS | 手順・トレードクラフト | [HackTricks](https://book.hacktricks.wiki/) | 幅広い網羅 |
+| MDN Web Docs（HTTP/CSP/CORS） | 仕様 | ブラウザ/HTTP挙動の一次根拠 | HTTP仕様/挙動 | [MDN Web Docs](https://developer.mozilla.org/) | CORS/CSP/Headers 参照 |
 
 ---
 
