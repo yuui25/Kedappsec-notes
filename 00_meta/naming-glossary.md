@@ -66,14 +66,14 @@
 | `cmdi` | `basic` / `blind` / `time` | 標準/出力なし/時間差 |
 | `deser` | `basic` / `gadget` | 既知 Gadget / 一般論（`engine` 併用推奨） |
 | `xxe` | `inband` / `oob` / `blind` | 同帯域 / 帯域外 / 応答なし |
-| `auth` | `weak-pass` / `2fa-bypass` / `reset-abuse` |  |
-| `authz` | `h-priv` / `v-priv` / `policy-bypass` | 水平 / 垂直 / ポリシ迂回 |
+| `auth` | `weak-pass` / `2fa-bypass` / `reset_abuse` |  |
+| `authz` | `h-priv` / `v_priv` / `policy_bypass` | 水平 / 垂直 / ポリシ迂回 |
 | `tpl` | `ssti` / `csti` | テンプレ注入（サーバ/クライアント） |
 | `xss` | `mxss` | Mutation XSS |
 | `sqli` | `dns` | DNS exfil ベース |
 | `ssrf` | `gopher` / `redirect-chain` | 特殊プロトコル／多段リダイレクト |
-| `path` | `symlink` / `zip-slip` | シンボリックリンク/Zip Slip |
-| `http_smuggle` | `cl-te` / `te-cl` | モード差 |
+| `path` | `symlink` / `zip_slip` | シンボリックリンク/Zip Slip |
+| `http_smuggle` | `cl-te` / `te_cl` | モード差 |
 
 ---
 
@@ -90,7 +90,7 @@
 | クラウド | `aws` / `gcp` / `azure` | SSRF→IMDS/権限連鎖差分 |
 | コンテナ/オーケストレータ | `docker` / `k8s` | ソケット到達/K8s API 連鎖 |
 | メッセージ基盤 | `kafka` / `rabbitmq` | SSRF/認証迂回での到達差分 |
-| 監視/メタデータ | `imds-v1` / `imds-v2` | AWS IMDS バージョン差 |
+| 監視/メタデータ | `imds_v1` / `imds-v2` | AWS IMDS バージョン差 |
 | SSO/ID基盤 | `keycloak` / `okta` / `auth0` | OAuth/OIDC 実装差分 |
 
 > **注意**：`engine` は乱用しない。**同じ PoC で概ね再現できる**なら省略。
