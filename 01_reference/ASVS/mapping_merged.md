@@ -394,10 +394,10 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V7.2.1 | L1 | セッショントークン検証は信頼できるバックエンドで実施 | 対応可 | トークン改変/期限切れ時の応答確認 | [WSTG-SESS-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens) | JWTの`alg=none`/RS256→HS256ダウングレード、`exp`改ざん | 署名無効化/期限超過JWTを送信し受理されたら検出 |
-| V7.2.2 | L1 | 静的キーではなく動的な自己完結/リファレンストークンを使用 | 対応可 | APIキー固定の有無を確認 | [WSTG-SESS-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/01-Testing_for_Session_Management_Schema) | 予測可能/長寿命の固定トークン（連番/時刻ベース）悪用 | トークンのランダム性/更新有無を確認し推測・再利用が成立すれば検出 |
-| V7.2.3 | L1 | 参照トークンはCSPRNGで≥128bitエントロピー | 対応可 | 推測/列挙耐性の簡易評価 | [WSTG-SESS-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/01-Testing_for_Session_Management_Schema) | 短いセッションIDを部分ブルートフォースで一致させる | サンプル収集→エントロピー推定→部分総当たりで衝突/推測成立を確認 |
-| V7.2.4 | L1 | 認証/再認証時にトークン再発行＋旧トークン失効 | 対応可 | ログイン直後のトークンローテ確認 | [WSTG-SESS-03](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/03-Testing_for_Session_Fixation) | ログイン前付与のセッションIDがログイン後も有効（固定化） | 事前にID固定→ログイン→旧IDで認可済み操作が可能なら検出 |
+| V7.2.1 | L1 | セッショントークン検証は信頼できるバックエンドで実施 | 対応可 | トークン改変/期限切れ時の応答確認 | [WSTG-SESS-10](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/10-Testing_JSON_Web_Tokens)/[PortSwigger WSA](https://portswigger.net/web-security/jwt)/[PayloadsAllTheThings](https://swisskyrepo.github.io/PayloadsAllTheThings/JSON%20Web%20Token/)/[HackTricks](https://blog.1nf1n1ty.team/hacktricks/pentesting-web/hacking-jwt-json-web-tokens)/[CWE-347](https://cwe.mitre.org/data/definitions/347.html) | JWTの`alg=none`/RS256→HS256ダウングレード、`exp`改ざん | 署名無効化/期限超過JWTを送信し受理されたら検出 |
+| V7.2.2 | L1 | 静的キーではなく動的な自己完結/リファレンストークンを使用 | 対応可 | APIキー固定の有無を確認 | [WSTG-SESS-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/01-Testing_for_Session_Management_Schema)/[PortSwigger WSA](https://portswigger.net/web-security/authentication/other-mechanisms)/[CWE-330](https://cwe.mitre.org/data/definitions/330.html) | 予測可能/長寿命の固定トークン（連番/時刻ベース）悪用 | トークンのランダム性/更新有無を確認し推測・再利用が成立すれば検出 |
+| V7.2.3 | L1 | 参照トークンはCSPRNGで≥128bitエントロピー | 対応可 | 推測/列挙耐性の簡易評価 | [WSTG-SESS-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/01-Testing_for_Session_Management_Schema)/[PortSwigger WSA](https://portswigger.net/web-security/authentication/other-mechanisms)/[CWE-331](https://cwe.mitre.org/data/definitions/331.html) | 短いセッションIDを部分ブルートフォースで一致させる | サンプル収集→エントロピー推定→部分総当たりで衝突/推測成立を確認 |
+| V7.2.4 | L1 | 認証/再認証時にトークン再発行＋旧トークン失効 | 対応可 | ログイン直後のトークンローテ確認 | [WSTG-SESS-03](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/03-Testing_for_Session_Fixation)/[PortSwigger WSA](https://portswigger.net/web-security/dom-based/cookie-manipulation)/[CWE-384](https://cwe.mitre.org/data/definitions/384.html) | ログイン前付与のセッションIDがログイン後も有効（固定化） | 事前にID固定→ログイン→旧IDで認可済み操作が可能なら検出 |
 
 ---
 
@@ -405,8 +405,9 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V7.3.1 | L2 | 非アクティブタイムアウトで再認証を強制 | 対応可 | 放置後操作での再ログイン要求確認 | [WSTG-SESS-07](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/07-Testing_Session_Timeout) | 長時間放置後に認可操作が継続可能 | 既定無操作時間超過後に保護資源へアクセスし再認証要求が無ければ検出 |
-| V7.3.2 | L2 | 絶対最大存続期間で再認証を強制 | 対応可 | 長時間連続利用時の期限切れ確認 | [WSTG-SESS-07](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/07-Testing_Session_Timeout) | 絶対有効期限超過後もセッション継続 | 長時間の継続アクセス/再開で失効せず操作可能なら検出 |
+| V7.3.1 | L2 | 非アクティブタイムアウトで再認証を強制 | 対応可 | 放置後操作での再ログイン要求確認 | [WSTG-SESS-07](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/07-Testing_Session_Timeout)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | 長時間放置後に認可操作が継続可能 | 既定無操作時間超過後に保護資源へアクセスし再認証要求が無ければ検出 |
+| V7.3.2 | L2 | 絶対最大存続期間で再認証を強制 | 対応可 | 長時間連続利用時の期限切れ確認 | [WSTG-SESS-07](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/07-Testing_Session_Timeout)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | 絶対有効期限超過後もセッション継続 | 長時間の継続アクセス/再開で失効せず操作可能なら検出 |
+
 
 ---
 
@@ -414,11 +415,11 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V7.4.1 | L1 | 終了後のセッション再利用を禁止（参照/自己完結型に応じた失効方式） | 対応可 | ログアウト後のAPI/画面アクセスが無効か確認 | [WSTG-SESS-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/06-Testing_for_Logout_Functionality) | ログアウト後に旧Cookieを再設定して再利用 | Cookie退避→ログアウト→旧Cookie復元で保護資源にアクセスできれば検出 |
-| V7.4.2 | L1 | アカウント無効/削除時は全アクティブセッションを終了 | 対応可 | 権限剝奪後の継続利用可否検証 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions) | 管理側でアカウント無効化後も別端末のセッションが生存 | 他端末でログイン維持→管理側で無効化→操作継続可なら検出 |
-| V7.4.3 | L2 | 認証要素更新後に他端末含む全セッション終了のオプション提供 | 対応可 | PW/MFA変更直後の他端末強制ログアウト確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions) | パスワード変更後も他端末で操作継続可能 | 資格情報更新→他端末のセッション継続を確認し終了できなければ検出 |
-| V7.4.4 | L2 | すべての保護ページで明確なログアウト導線 | 対応可 | 目立つ位置/1クリック到達確認 | [WSTG-SESS-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/06-Testing_for_Logout_Functionality) | ログアウト導線が見当たらず放置セッションが残存 | 全ページでのログアウトUI有無/反応を確認し不備あれば検出 |
-| V7.4.5 | L2 | 管理者が個別/全体のセッション終了を実行可能 | 対応可 | 管理UI/APIの存在・監査ログ確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions) | 侵害端末のセッションを管理側で強制終了できない | 管理UIから特定/全セッション終了操作が行えない/反映されないなら検出 |
+| V7.4.1 | L1 | 終了後のセッション再利用を禁止（参照/自己完結型に応じた失効方式） | 対応可 | ログアウト後のAPI/画面アクセスが無効か確認 | [WSTG-SESS-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/06-Testing_for_Logout_Functionality)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | ログアウト後に旧Cookieを再設定して再利用 | Cookie退避→ログアウト→旧Cookie復元で保護資源にアクセスできれば検出 |
+| V7.4.2 | L1 | アカウント無効/削除時は全アクティブセッションを終了 | 対応可 | 権限剝奪後の継続利用可否検証 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | 管理側でアカウント無効化後も別端末のセッションが生存 | 他端末でログイン維持→管理側で無効化→操作継続可なら検出 |
+| V7.4.3 | L2 | 認証要素更新後に他端末含む全セッション終了のオプション提供 | 対応可 | PW/MFA変更直後の他端末強制ログアウト確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | パスワード変更後も他端末で操作継続可能 | 資格情報更新→他端末のセッション継続を確認し終了できなければ検出 |
+| V7.4.4 | L2 | すべての保護ページで明確なログアウト導線 | 対応可 | 目立つ位置/1クリック到達確認 | [WSTG-SESS-06](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/06-Testing_for_Logout_Functionality)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | ログアウト導線が見当たらず放置セッションが残存 | 全ページでのログアウトUI有無/反応を確認し不備あれば検出 |
+| V7.4.5 | L2 | 管理者が個別/全体のセッション終了を実行可能 | 対応可 | 管理UI/APIの存在・監査ログ確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | 侵害端末のセッションを管理側で強制終了できない | 管理UIから特定/全セッション終了操作が行えない/反映されないなら検出 |
 
 ---
 
@@ -426,9 +427,9 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V7.5.1 | L2 | 機密アカウント属性変更前に完全再認証 | 対応可 | メアド/電話/MFA/復旧情報変更時の再認証確認 | [WSTG-ATHN-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication) | 再認証なしでメール/電話/MFA設定を変更 | 高リスク設定変更時に追加認証/MFA要求が無ければ検出 |
-| V7.5.2 | L2 | ユーザがアクティブセッション一覧と選択終了を実施可能 | 対応可 | セッション管理画面の有無/終了動作確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions) | 乗っ取られた端末のセッションをユーザが失効できない | 端末/場所ごとのセッション一覧とリモート終了可否を確認し不可なら検出 |
-| V7.5.3 | L3 | 高リスク操作前に追加認証/二次検証を要求 | 対応可 | 送金/権限変更時のステップアップ確認 | [WSTG-ATHN-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication) | 高額送金や権限昇格が追加認証なしで実行可能 | 高リスク機能呼出時に追加要素が要求されない場合を検出 |
+| V7.5.1 | L2 | 機密アカウント属性変更前に完全再認証 | 対応可 | メアド/電話/MFA/復旧情報変更時の再認証確認 | [WSTG-ATHN-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication)/[PortSwigger WSA](https://portswigger.net/web-security/authentication/other-mechanisms)/[CWE-306](https://cwe.mitre.org/data/definitions/306.html) | 再認証なしでメール/電話/MFA設定を変更 | 高リスク設定変更時に追加認証/MFA要求が無ければ検出 |
+| V7.5.2 | L2 | ユーザがアクティブセッション一覧と選択終了を実施可能 | 対応可 | セッション管理画面の有無/終了動作確認 | [WSTG-SESS-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/06-Session_Management_Testing/11-Testing_for_Concurrent_Sessions)/[CWE-613](https://cwe.mitre.org/data/definitions/613.html) | 乗っ取られた端末のセッションをユーザが失効できない | 端末/場所ごとのセッション一覧とリモート終了可否を確認し不可なら検出 |
+| V7.5.3 | L3 | 高リスク操作前に追加認証/二次検証を要求 | 対応可 | 送金/権限変更時のステップアップ確認 | [WSTG-ATHN-11](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/04-Authentication_Testing/11-Testing_Multi-Factor_Authentication)/[PortSwigger WSA](https://portswigger.net/web-security/authentication/multi-factor)/[CWE-306](https://cwe.mitre.org/data/definitions/306.html) | 高額送金や権限昇格が追加認証なしで実行可能 | 高リスク機能呼出時に追加要素が要求されない場合を検出 |
 
 ---
 
@@ -436,8 +437,8 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V7.6.1 | L2 | RP-IdP間の有効期間/終了が文書通り動作し必要時に再認証要求 | 範囲外 | IdP設定/契約の確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | IdPでログアウトしてもRPセッションが存続（SSO単方向終了） | IdP/RP双方でログアウト実施後の再認証要求の有無を確認し乖離があれば検出 |
-| V7.6.2 | L2 | ユーザの同意/明示操作なしに新規アプリセッションを作成しない | 対応可 | サイレントSSO成立条件の確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses) | OAuth同意画面を経ずに自動でアプリセッション作成 | 初回アクセス時に同意/UI操作なしでログイン成立なら検出 |
+| V7.6.1 | L2 | RP-IdP間の有効期間/終了が文書通り動作し必要時に再認証要求 | 範囲外 | IdP設定/契約の確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses)/[PortSwigger WSA](https://portswigger.net/web-security/oauth)/[OpenID Connect RP-Initiated Logout](https://openid.net/specs/openid-connect-rpinitiated-1_0.html) | IdPでログアウトしてもRPセッションが存続（SSO単方向終了） | IdP/RP双方でログアウト実施後の再認証要求の有無を確認し乖離があれば検出 |
+| V7.6.2 | L2 | ユーザの同意/明示操作なしに新規アプリセッションを作成しない | 対応可 | サイレントSSO成立条件の確認 | [WSTG-ATHZ-05](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/05-Authorization_Testing/05-Testing_for_OAuth_Weaknesses)/[PortSwigger WSA](https://portswigger.net/web-security/oauth)/[OpenID Connect Core: prompt](https://openid.net/specs/openid-connect-core-1_0.html#AuthRequest) | OAuth同意画面を経ずに自動でアプリセッション作成 | 初回アクセス時に同意/UI操作なしでログイン成立なら検出 |
 
 # V8 認可
 
