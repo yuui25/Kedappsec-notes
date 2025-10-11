@@ -1,4 +1,4 @@
-# ASVS(v5.0)-WSTG mapping
+# ASVS(v5.0) mapping
 - 本サマリは ASVS v5.0 の V1〜V17 を前提資料として、Webペネトレーションテスト（WebPT）で実施・判定しやすい検査観点を抽出し、個別要件の扱い（対応//範囲外）を整理および対応するWSTGを示したもの。
 - 範囲外は主に「設計/運用/文書レビュー中心」「構成監査のみで実挙動からは検証困難」などを理由とする。
 - 記載内容はChatGPTによって作成しているため、使用時は要確認。
@@ -11,8 +11,9 @@
 
 | 章/要件ID | レベル | 要点 | 対応可否 | WebPTでの扱い | WSTG | 具体的な攻撃例 | 精査方法 |
 | :---: | :---: | :--- | :---: | :--- | :--- | :--- | :--- |
-| V1.1.1 | L2 | 入力は一度だけ標準形式にデコード／アンエスケープされ、処理前に行うこと（入力バリデーション後に行わない）。 | 対応可 | 入力のエンコード経路観察、二重デコードの検出（リクエスト差分／侵入テスト） | [WSTG-INPV-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Reflected_Cross_Site_Scripting) | `%253Cscript%253Ealert(1)%253C/script%253E` を送信し二重デコードで `<script>` 実行 | 単一エンコードと二重エンコードの挙動差／反射位置でスクリプト実行を確認 |
-| V1.1.2 | L2 | 出力エンコーディング／エスケープは最終ステップで行うこと（インタプリタに渡す直前）。 | 対応可 | 出力のエンコード方法の検証（反射・保存型ペイロードで確認） | [WSTG-INPV-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/02-Testing_for_Stored_Cross_Site_Scripting) | 掲示板に `<img src=x onerror=alert(1)>` を保存し表示時に実行 | 保存→閲覧で未エスケープにより XSS が発火する事実を確認 |
+| V1.1.1 | L2 | 入力は一度だけ標準形式にデコード／アンエスケープされ、処理前に行うこと（入力バリデーション後に行わない）。 | 対応可 | 入力のエンコード経路観察、二重デコードの検出（リクエスト差分／侵入テスト） | [WSTG-INPV-01](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/01-Testing_for_Reflected_Cross_Site_Scripting)/[PortSwigger WSA](https://portswigger.net/web-security/cross-site-scripting/reflected)/[PayloadsAllTheThings](https://swisskyrepo.github.io/PayloadsAllTheThings/XSS%20Injection/)/[CWE-174](https://cwe.mitre.org/data/definitions/174.html) | `%253Cscript%253Ealert(1)%253C/script%253E` を送信し二重デコードで `<script>` 実行 | 単一エンコードと二重エンコードの挙動差／反射位置でスクリプト実行を確認 |
+| V1.1.2 | L2 | 出力エンコーディング／エスケープは最終ステップで行うこと（インタプリタに渡す直前）。 | 対応可 | 出力のエンコード方法の検証（反射・保存型ペイロードで確認） | [WSTG-INPV-02](https://owasp.org/www-project-web-security-testing-guide/latest/4-Web_Application_Security_Testing/07-Input_Validation_Testing/02-Testing_for_Stored_Cross_Site_Scripting)/[PortSwigger WSA](https://portswigger.net/web-security/cross-site-scripting/stored)/[PayloadsAllTheThings](https://swisskyrepo.github.io/PayloadsAllTheThings/XSS%20Injection/)/[CWE-79](https://cwe.mitre.org/data/definitions/79.html) | 掲示板に `<img src=x onerror=alert(1)>` を保存し表示時に実行 | 保存→閲覧で未エスケープにより XSS が発火する事実を確認 |
+
 
 ---
 
