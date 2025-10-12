@@ -35,20 +35,16 @@
 | deser | Insecure Deserialization | 言語差は `engine` |
 | xxe | XML External Entity | inband/oob は `variant` |
 | csrf | Cross-Site Request Forgery | SameSite/トークン等の検証 |
-| open-redirect | Open Redirect | OAuth 連鎖は `pivot=oauth` |
+| open_redirect | Open Redirect | OAuth 連鎖は `pivot=oauth` |
 | tpl | Template Injection（SSTI/CSTI） | ssti/csti は `variant` |
 | auth | 認証実装不備 | 弱パス/2FA回避/リカバリ悪用 等 |
 | authz | 認可/アクセス制御不備 | 水平/垂直/ポリシ迂回 等 |
-| proto-pollution | Prototype Pollution | RCE/SSRF 連鎖は `pivot` |
-| http-smuggle | HTTP Request Smuggling | cache 連鎖は `pivot=cache` |
+| proto_pollution | Prototype Pollution | RCE/SSRF 連鎖は `pivot` |
+| http_smuggle | HTTP Request Smuggling | cache 連鎖は `pivot=cache` |
 | cache | Cache Poisoning/Deception |  |
 | cors | CORS 誤設定 | 認証付き跨り取得可否 等 |
-| file-upload | 不適切なファイルアップロード | 拡張子/Content-Type/画像偽装 等 |
-| header-inject | ヘッダインジェクション | Host/CRLF/Cache 連鎖 等 |
-
-### 1.2 候補（要検討/追加見込み）
-| token | 意味/範囲 | 代表例・備考 |
-|---|---|---|
+| file_upload | 不適切なファイルアップロード | 拡張子/Content-Type/画像偽装 等 |
+| header_inject | ヘッダインジェクション | Host/CRLF/Cache 連鎖 等 |
 | subtake | サブドメインテイクオーバー | DNS/ホスティング連携依存 |
 | bfl | Business Logic Flaw | 広義。カード粒度に注意 |
 | samesite | Cookie SameSite 誤設定群 | `csrf` と交差。表現重複に注意 |
@@ -76,36 +72,32 @@
 | meta | メタデータ到達 | SSRF→IMDS 等 |
 | blind | 応答なし観測 | タイム/外部副作用で判断 |
 | nullbyte | ヌルバイト注入 | `%00` による終端/型変換 |
-| filter-bypass | フィルタ/ブラックリスト回避 | 2重/Unicode/正規化ずらし |
+| filter_bypass | フィルタ/ブラックリスト回避 | 2重/Unicode/正規化ずらし |
 | gadget | 既知ガジェット連鎖 | 逆直列化のチェーン利用 |
 | inband | 同帯域内取得 | XXE 等でアプリ応答に混載 |
-| weak-pass | 弱パス許容 | リスト攻撃/総当り耐性不足 |
-| 2fa-bypass | 2要素認証回避 | リカバリ/CSRF/ロジック抜け |
-| reset-abuse | パスワードリセット悪用 | トークン露出/期限/回数制御不備 |
-| h-priv | 水平権限逸脱 | 他ユーザ資産への越権 |
-| v-priv | 垂直権限昇格 | 一般→管理 等 |
-| policy-bypass | ポリシ/ACL 迂回 | デフォルト許可/オーダ不整合 |
+| weak_pass | 弱パス許容 | リスト攻撃/総当り耐性不足 |
+| 2fa_bypass | 2要素認証回避 | リカバリ/CSRF/ロジック抜け |
+| reset_abuse | パスワードリセット悪用 | トークン露出/期限/回数制御不備 |
+| h_priv | 水平権限逸脱 | 他ユーザ資産への越権 |
+| v_priv | 垂直権限昇格 | 一般→管理 等 |
+| policy_bypass | ポリシ/ACL 迂回 | デフォルト許可/オーダ不整合 |
 | ssti | サーバ側テンプレ注入 | Jinja/Twig 等（RCE 連鎖） |
 | csti | クライアント側テンプレ注入 | Vue/Angular 等 |
 | mxss | Mutation XSS | HTML パーサ変換起点 |
 | dns | DNS 経由観測/流出 | SQLi/XXE の OOB |
 | gopher | gopher プロトコル悪用 | SSRF で任意プロトコル送信 |
-| redirect-chain | 多段リダイレクト悪用 | SSRF/CORS/Redirect 絡み |
+| redirect_chain | 多段リダイレクト悪用 | SSRF/CORS/Redirect 絡み |
 | symlink | シンボリックリンク悪用 | パス/アップロードで外逸 |
 | zip-slip | アーカイブ展開経路逸脱 | `../../` 展開 |
-| cl-te | CL→TE 矛盾型 Smuggle | 解析器差を利用 |
-| te-cl | TE→CL 矛盾型 Smuggle | 解析器差を利用 |
-| double-encode | 二重/重複エンコード | `%252e` 等の正規化回避 |
+| cl_te | CL→TE 矛盾型 Smuggle | 解析器差を利用 |
+| te_cl | TE→CL 矛盾型 Smuggle | 解析器差を利用 |
+| double_encode | 二重/重複エンコード | `%252e` 等の正規化回避 |
 | unicode | Unicode/正規化差 | NFC/NFD 差異や homoglyph |
-
-### 2.2 候補（要検討/追加見込み）
-| token | 意味/範囲 | 代表例・備考 |
-|---|---|---|
-| origin-reflection | 要求 Origin 反射 | CORS 誤設定の一形態 |
+| origin_reflection | 要求 Origin 反射 | CORS 誤設定の一形態 |
 | wildcard | `*` 許容誤設定 | CORS で Credentials と併用 |
-| cred-allowed | 資格情報付き許容 | CORS `Allow-Credentials:true` |
-| proto-downgrade | プロトコル降格 | HTTPS→HTTP 誘導 |
-| lenient-parse | 寛容パース悪用 | RFC 非準拠許容差利用 |
+| cred_allowed | 資格情報付き許容 | CORS `Allow-Credentials:true` |
+| proto_downgrade | プロトコル降格 | HTTPS→HTTP 誘導 |
+| lenient_parse | 寛容パース悪用 | RFC 非準拠許容差利用 |
 
 ---
 
@@ -155,12 +147,8 @@
 | keycloak | Keycloak | OIDC/SAML/トークン処理 |
 | okta | Okta |  |
 | auth0 | Auth0 |  |
-| imds-v1 | AWS IMDSv1 | ヘッダ不要/SSRF 易 |
-| imds-v2 | AWS IMDSv2 | セッショントークン必須 |
-
-### 3.2 候補（要検討/追加見込み）
-| token | 意味/範囲 | 例/備考 |
-|---|---|---|
+| imds_v1 | AWS IMDSv1 | ヘッダ不要/SSRF 易 |
+| imds_v2 | AWS IMDSv2 | セッショントークン必須 |
 | adfs | Active Directory Federation Services | SAML/WS-Fed |
 | istio | Istio | サイドカー/正規化差 |
 | cloudflare | CDN/Proxy | キャッシュ/正規化 |
@@ -190,10 +178,6 @@
 | portscan | 内部ポート走査 | SSRF でのスキャン |
 | oauth | OAuth/OIDC 連鎖 | Redirect→トークン操作 |
 | cache | キャッシュ汚染/奪取 | Smuggle/Cache Poisoning |
-
-### 4.2 候補（要検討/追加見込み）
-| token | 意味/範囲 | 代表例・備考 |
-|---|---|---|
 | dns | DNS 経由観測/流出 | XXE/SQLi の OOB |
 | s3 | S3 等のオブジェクト格納到達 | 認証情報流出/横展開 |
 | gcs | GCS 到達 | 同上 |
@@ -218,10 +202,6 @@
 | dos | 可用性阻害 | 予約枯渇/高負荷 |
 | integrity | 改ざん | 支払先/権限変更 |
 | fraud | 金銭/不正取引 | 支払/ポイント奪取 |
-
-### 5.2 候補（要検討/追加見込み）
-| token | 意味/範囲 | 例 |
-|---|---|---|
 | ip | 知財流出 | ソース/モデル |
 | supply | サプライチェーン汚染 | アップデート改ざん |
 | brand | 風評/ブランド毀損 | フィッシング拡散 |
