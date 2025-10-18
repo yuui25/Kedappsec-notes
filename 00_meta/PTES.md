@@ -1787,3 +1787,210 @@ Asterisk サーバが使用されている場合、enumIAX のようなユーザ
 ~~~~
 
 <<<END>>>
+
+<<<BEGIN>>>
+# 3 脆弱性分析（Vulnerability Analysis）
+
+脆弱性分析は、特定された脆弱性がもたらすセキュリティリスクを特定し評価するために用いられます。脆弱性分析作業は大きく二つの領域に分かれます：識別（Identification）と検証（Validation）。識別フェーズの主要要素は脆弱性発見の努力です。検証は、特定された脆弱性の中から実際に有効なものだけに絞り込む作業を指します。
+
+## 3.1 脆弱性テスト（Vulnerability Testing）
+
+脆弱性テストは、アクティブ（Active）とパッシブ（Passive）の両手法を含む形で分類されます。
+
+### アクティブ（Active）
+
+#### 自動化ツール（Automated Tools）
+自動化スキャナは、ネットワーク、ホスト、および関連アプリケーションを評価するよう設計されています。現在利用できる自動スキャナには様々なタイプがあり、特定のターゲットやターゲット種別に特化したものもあります。自動化スキャナの核心的目的は、ネットワーク、ホスト、および関連アプリケーション上に存在する脆弱性の列挙です。
+
+##### ネットワーク／一般的な脆弱性スキャナ（Network/General Vulnerability Scanners）
+
+###### Open Vulnerability Assessment System (OpenVAS)（Linux）
+Open Vulnerability Assessment System（OpenVAS）は、包括的で強力な脆弱性スキャンおよび脆弱性管理ソリューションを提供する複数のサービスとツールのフレームワークです。OpenVAS は Nessus のフォークであり、非専有ツールの自由な開発を可能にします。  
+Nessus の初期バージョン同様、OpenVAS はクライアントとスキャナで構成されます。スキャナを開始するには、コマンドラインから `openvassd` を実行します。
+
+~~~~
+（スクリーンショット参照）
+~~~~
+
+OpenVAS クライアントは GUI またはコマンドラインのいずれかで実行できます。メニューから OpenVAS Client を選ぶか、コンソールでは "OpenVAS-Client" を実行します。クライアントが起動したらスキャナに接続する必要があります。提供されたユーザ資格情報を入力します。証明書を作成している場合はそれも供給し、表示される証明書を受け入れて続行します。証明書を受け入れると、OpenVAS が初期化され、見つかったプラグイン数と有効化されたプラグイン数を示します。必要なプラグインのダウンロード数に応じて時間がかかることがあります。また、IPv4 と IPv6 の両方のアドレスに対して `/etc/hosts` エントリを適切に追加していることを確認する必要があります。例：
+
+~~~~
+127.0.0.1       localhost
+
+127.0.0.1       pentest
+
+# IPv6 対応ホストに望ましい行
+::1     ip6-localhost ip6-loopback pentest localhost
+~~~~
+
+スキャンを開始する前に OpenVAS のスキャンオプションを設定する必要があります。General セクションは一般的なスキャンオプションを網羅します。新しいスキャンを開始するには Scan Assistant を使用します。Scan Assistant を起動したら、タスクを作成するための情報（タスク名、範囲、ターゲット情報：ホスト名、FQDN、IP アドレス、ネットワークレンジ、CIDR など）を入力し、最後に Execute をクリックしてスキャンを開始します。
+
+（複数のスクリーンショット参照）
+
+------
+
+###### Nessus（Windows/Linux）
+Nessus は商用の自動スキャンプログラムで、評価対象のネットワーク、ホスト、および関連アプリケーション上の潜在的脆弱性を検出するよう設計されています。Nessus は特定の評価用にカスタムポリシーを利用できます。非 Web アプリケーションには "Only Safe Checks" ポリシー（付録 A 参照）を、Web アプリケーションには "Only Safe Checks (Web)" ポリシー（付録 B 参照）を使用するべきです。  
+Nessus にアクセスするには、正しい URL を Web ブラウザに入力します。Pentest ラボからアクセスする場合の例: `https://<IP ADDRESS>:8834`。
+
+~~~~
+（スクリーンショット参照）
+~~~~
+
+アクセス用の資格情報は事前に確立しておく必要があります。ログインすると Reports インターフェースが表示されます。Nessus スキャンを実行する前に、最新のシグネチャで正しく更新されているかを検証する必要があります。これは通常スケジュールタスクで行われますが、「About」をクリックしてインストール情報を確認できます。Client Build ID は YYYYMMDD 形式で更新日を示します。例えば 20110223 は 2011 年 2 月 23 日に最後に更新されたことを意味します。スキャナが先週以内に更新されていればスキャンを安全に実施できます。1 週間以上更新されていない場合は直ちに報告し、Nessus が更新されるまで使用を避けるべきです。
+
+Nessus には主に Reports、Scans、Policies、Users の四つのタブがあります。スキャンを開始するには Scans タブを使用し、Add、Edit、Browse、Launch、Pause、Stop、Delete などのオプションが利用できます。新しいスキャンを作成するには Scans → + Add をクリックし、スキャン名、タイプ（Run Now または Template）、ポリシー、ターゲット（ホストを一行ずつ入力するか、ターゲットが記載されたテキストファイルを参照）などのフィールドを入力します。すべて入力したら Launch Scan をクリックしてスキャンを開始します。
+
+注意：自動化ツールはデフォルトで攻撃的すぎることがあり、顧客の業務に影響が出る場合は強度を下げる必要があります。
+
+検証スキャンは毎週 `<IP ADDRESS>` に対して "Validation Scan" ポリシー（付録 C）を用いて実施し、Nessus が正しくスキャンを行っていることを確認するべきです。Validation Scan を実施して同等の結果が得られない場合は直ちに報告し、そのスキャナ利用を停止してください。
+
+スキャン完了後は Reports タブに結果が表示され、該当する完了ファイルをダブルクリックするとスキャン情報と結果が見られます。結果は解析のため保存する必要があります。Download Report をクリックしてフォーマットを指定して保存します。デフォルトは `.nessus` ですが、HTML 形式で保存すると脆弱性のレビューが容易です。
+
+------
+
+###### NeXpose
+NeXpose（現 Rapid7 製品）は脆弱性管理、ポリシーコンプライアンス、修復管理を提供する商用スキャナです。アクセス URL の例: `https://<IP ADDRESS>:3780/login.html`。ログイン後はダッシュボードが表示されます。NeXpose を実行する前に、スキャナが最新のシグネチャで更新されているかを検証する必要があります。通常スケジュールで更新されますが、'News' セクションでスキャンエンジンの更新ログやチェックの更新を確認できます。スキャナが先週以内に更新されていればスキャンを安全に実行できます。そうでなければ直ちに報告し、更新されるまで使用を控えるべきです。
+
+NeXpose には Home, Assets, Tickets, Reports, Vulnerabilities, Administration の 6 つの主要タブがあります。スキャンを開始するには 'New Site' を設定します。Site Configuration - General には Site name、Site importance、Site Description などを入力します。Site importance（重要度）はリスク指数計算に影響し、Very Low はリスク指数を 1/3、Low は 2/3、High は 2x、Very High は 3x に変更します。Normal は変更を行いません。
+
+Devices ページで新しいサイトのアセットを一覧化します。IP アドレスやホスト名を手動で入力するか、カンマ区切りのファイルをインポートできます。各行に 1 つのアドレス／ホスト名が必要です。除外ターゲットがある場合は 'Devices to Exclude' エリアで設定します。ターゲットを追加したら 'Scan Setup' でスキャンテンプレートを選択します。スキャンエンジンのドロップダウンでローカルまたは Rapid7 ホストエンジンを選べます。テンプレートを変更すると、そのテンプレートを使っているすべてのサイトに変更が反映されるため注意が必要です。多くのテンプレート（Denial of Service、Discovery scan、Exhaustive、Full audit、PCI 監査 など）が利用可能です（詳細は付録 D）。
+
+スキャンの自動実行をスケジュールすることも可能で、開始日時、最大スキャン時間、繰り返し頻度などを指定できます。スキャンの開始、停止、失敗などを通知するアラートを設定でき、通知方法は SMTP、SNMP、Syslog などが選べます。
+
+資格情報を設定することで、より深いチェック（ポリシー違反、アドウェアやスパイウェア等）を行え、認証済みスキャンはより正確な結果をもたらします。'Credentials' ページで 'New Login' を作成し、ログインタイプを選んでユーザ名／パスワードを入力し、必要ならば Device や Port の制限を設定して Test login を実行します。スキャン完了後は複数のビュー（site、groups、OS、services、software、all assets）で結果を確認でき、'Create Site Report' からレポートのテンプレート選択、配布オプション設定などが可能です。自動レポートの生成や手動実行のいずれでも利用できます。
+
+------
+
+###### eEye Retina
+eEye Retina Vulnerability Assessment Scanner は eEye Digital Security による脆弱性スキャナで、Nmap や Nessus の所見を相関・検証するために使われます。初見ではインターフェースが複雑に見えますが、慣れれば扱いやすいです。初期画面は Discovery Tasks ページで、Discovery スキャンにより稼働ホストを判定します。ターゲット指定は単一 IP／ホスト名、IP レンジ、CIDR、Named Host、Address Groups などが指定可能です。Discovery オプションには ICMP Discovery、TCP Discovery（ポートリスト指定）、UDP Discovery、OS 検出、逆引き DNS、NetBIOS 名、MAC アドレス取得などがあります。
+
+Discovery スキャンは即時実行（Discover）またはスケジュール実行（Schedule）できます。Discovery 結果は Results テーブルに表示され、XML 形式でエクスポート（Generate）できます。
+
+主な作業は Audit Interface（監査インターフェース）で行われ、Targets、Ports（All Ports を選択）、Audits（All Audits を選択）、Options（各種列挙や検出オプション）等を確認します。Options には OS 検出、逆引き DNS、NetBIOS 名、MAC 取得、Traceroute、Connect Scan 有効化、Force Scan 有効化、ターゲットリストのランダム化、NetBIOS 経由のレジストリ／ユーザ／共有／ファイル／Hotfix／Named Pipes／Machine Info／Audit Policy／Per-User レジストリ設定／グループ／プロセス列挙、最大 100 ユーザ列挙など多数のオプションがあります。
+
+監査スキャンは即時実行またはスケジュール可能です。自動化ツールは攻撃的すぎる場合があるため、顧客への影響があるときは強度を下げる必要があります。スキャン結果は `.rtd` 形式で保存され、Results テーブルで確認できます。
+
+（複数のスクリーンショット参照）
+
+------
+
+###### Qualys
+<寄稿が必要です（<Contribution Needed>）>
+
+###### Core IMPACT
+Core IMPACT は情報セキュリティ対策の有効性をテストするためのペネトレーションテストおよびエクスプロイトツールセットです。Core IMPACT はいくつかの困難なエクスプロイトを自動化し、多数のエクスプロイトおよびポストエクスプロイト機能を備えています。
+
+###### Core IMPACT Web
+Core は脆弱な Web アプリケーションの SQL インジェクション、Remote File Inclusion、Reflected XSS の脆弱性を悪用できます。以下が一般的なワークフローです：
+
+1) 情報収集：Core は Web 攻撃をシナリオに整理します。複数のシナリオを作成して同一アプリを異なる設定でテストしたり、Web アプリをセグメント化したり、複数アプリを分離できます。ターゲットの選択（URL 指定またはネットワークリポートで発見された Web サーバ選択）、サイト探索方法の選択（自動 or インタラクティブ）などを設定します。自動クロールではブラウザエージェント、最大ページ数と深度、外部ドメインへのリンクの追従有無、サーバ／アプリケーションフレームワーク判定、JavaScript 評価、robots.txt のチェック、フォームの扱いなどを選べます。インタラクティブモードでは Core をプロキシとしてブラウザを設定し、手動でアプリを操作して発見を行います。バックアップや隠しページのチェック等の追加モジュールも利用可能です。
+
+2) Web 攻撃と侵入：攻撃はシナリオまたは個別ページへ実行できます。各エクスプロイトは専用の設定ウィザードを持ちます。SQL インジェクションはリクエストパラメータやクッキーでテストできます。注入攻撃には FAST（一般的なテストのみ）、NORMAL（FAST に追加テスト）、FULL（すべてのテスト）の 3 レベルがあります。XSS テストではブラウザの設定、POST パラメータの評価有無、永続的 XSS の検出有無を設定します。PHP RFI（Remote File Inclusion）では実際に試みるか否かを設定します。実行中は Executed Modules ペインで進行を監視します。成功すれば Core Agents が Entity View の脆弱ページ下に表示されます。
+
+3) Web Apps Browser 攻撃：XSS を利用したソーシャルエンジニアリングを補助できます。ウィザードに従って XSS を悪用し、クライアント情報収集フェーズで得た受信者リストに対して攻撃を仕掛けます。
+
+4) Web App ローカル情報収集：敏感情報の検出、データベースログインやスキーマ取得、コマンド／SQL シェルの可能性確認などを行います。RFI エージェント（PHP）は情報収集、シェルアクセス、またはフル Core Agent のインストールに使用できます。
+
+5) レポート生成：エグゼクティブ、脆弱性、アクティビティなど多様なレポートを生成します。
+
+###### Core Onestep Web RPTs
+Core には 2 種類のワンステップ迅速侵入テストがあります：1) WebApps Vulnerability Test — Web アプリを入力すると Core が SQLi、PHP RFI、XSS の脆弱ページを探します（スケジュール可能）。2) WebApps Vulnerability Scanner Validator — IBM AppScan、HP WebInspect、NTOspider のスキャン結果を確認します。
+
+###### Core IMPACT WiFi
+Core Impact は 802.11 無線ネットワークとクライアントのペネトレーションテスト用モジュールを含みます。無線モジュールを使うには AirPcap アダプタが必要です。機能にはチャネルスキャン（AP 発見、パケットキャプチャ）、DoS（deauth モジュール）、暗号キークラッキング（WEP/WPA/WPA2 PSK）、Man-in-the-Middle（WiFi クライアントのスニッフィング／改ざん）、偽 AP（Karma Attack）などがあります。レポート機能も備えています。
+
+###### Core IMPACT Client Side
+Core Impact はメール、ブラウザ、サードパーティプラグイン等を介したクライアント側の標的型ソーシャルエンジニアリング攻撃を制御・実行できます。メールアドレス収集、PGP、DNS/WHOIS、LinkedIn、サイトのドキュメントメタデータ解析、またはテキストファイルからのインポート等でターゲットリストを生成します。攻撃テンプレートを選び、持続時間やメールテンプレートを設定し（テンプレートは環境に合わせてカスタマイズ推奨）、リンク短縮サービスを利用して誘導し、成功時に収集モジュールを実行するなどの設定が行えます。進行は Executed Modules で監視でき、エージェントが展開されるとネットワークタブに表示されます。クライアント側攻撃完了後に詳細レポートを生成できます。USB トロイ化ドライブの作成で自動的に Core Agent をインストールすることも可能です。
+
+（複数のスクリーンショット参照）
+
+------
+
+###### SAINT
+SAINT Professional は SAINTscanner と SAINTexploit を統合した商用スイートで、脆弱性評価と侵入テストのツールキットを提供します。SAINTscanner はネットワークデバイス、OS、アプリケーション内の脆弱性を識別し、コンプライアンス／監査テストにも使えます。SAINTexploit は識別された脆弱性を悪用し、ソーシャルエンジニアリングやフィッシング攻撃のカスタム実行も可能です。ホストが侵害されるとトンネルして他の脆弱ホストへ移動可能です。SAINT はソースからビルドするか、ベンダ提供の仮想マシンを利用して実行できます（推奨）。仮想マシン利用時はアイコンをダブルクリックで起動し、デフォルトパスワードは "SAINT!!!" です。自動更新後にデフォルトブラウザが指定 URL を開きます。
+
+SAINTscanner の使用はログイン後に開始し、スキャンオプション（nmap を使うか内蔵ポートスキャナを使うか、危険なチェックを無効にするか、コンプライアンス項目の有効化等）を設定します。ターゲット制限やスキャンポリシー（プローブオプション、ポリシー構築）を適切に設定したら、IP レンジの挿入、資格情報入力、スキャンポリシー選択、Firewall 設定、Scan Now の順でスキャンを開始します。
+
+SAINTexploit では Discovery、Information Gathering、Single Penetration、Root Penetration、Full Penetration、Web Application といった異なるレベルのペネトレーションテストを選べます。侵害後は Connections タブでセッションに直接操作を行え、コマンドプロンプト、ファイルアップロード／ダウンロードマネージャ、スクリーンショット取得、トンネル等の工具が利用できます。クライアントサイド攻撃用のエクスプロイトも内蔵され、メールテンプレート編集や実行が可能です。
+
+###### SAINTwriter
+SAINTwriter はカスタムレポートを生成するコンポーネントで、8 つの事前設定レポート、8 つのレポート形式（HTML、フレームレス HTML、シンプル HTML、PDF、XML、テキスト、タブ区切り、CSV）、および 100 以上のカスタマイズオプションを提供します。
+
+（手順：SAINT GUI → Data → SAINTwriter 等）
+
+------
+
+##### Web アプリケーションスキャナ（Web Application Scanners）
+
+###### 一般的な Web アプリケーションスキャナ（General Web Application Scanners）
+
+###### WebInspect（Windows）
+HP の WebInspect は Web アプリケーション層の既知／未知の脆弱性を特定するためのアプリケーションセキュリティ評価ツールです。パラメータインジェクション、クロスサイトスクリプティング、ディレクトリトラバーサルなどの一般的な Web 攻撃を試みます。起動すると Start Page が表示され、Web Site Assessment、Web Service Assessment、Enterprise Assessment、Report 生成、Smart Update の 5 主要機能にアクセスできます。
+
+WebInspect の最初のスキャンは Web Site Assessment で、New Web Site Assessment Wizard を使って設定します。Scan Name を入力し、Assessment Mode（Crawl Only、Crawl and Audit、Audit Only、Manual）を選択します。Crawl Only はサイトの階層構造を完全にマップし、後から Audit を実行できます。Crawl and Audit は発見されたページをその場で監査します。Audit Only はサイトをクロールせず脆弱性検出のみ行います。Manual は手動でサイト内を移動して記録します。認証が必要な場合や、クレデンシャルを埋め込む必要がある場合は Manual を使うことが推奨されます。
+
+通常は最初にサイトをクロールすることが推奨され、フォームのフィルタや無視すべきディレクトリ／ファイル名を特定できます。Assessment Type（Standard、List-Driven、Manual、Workflow-Driven）を選択し、開始 URL を正確に入力します。URL の変種（www あり／なし等）は明確に指定する必要があります。スキャン範囲をフォルダ単位で制限するオプション（Directory only / Directory and subdirectories / Directory and parent directories）もあります。
+
+プロキシ経由でアクセスする必要がある場合は Network Proxy で設定します（Use Internet Explorer / Autodetect / Use PAC File / Use Explicit Proxy Settings / Use Mozilla Firefox など）。ネットワーク認証が必要なら Network Authentication を選択して認証方式と資格情報を入力します。Coverage と Thoroughness オプションは通常変更しませんが、Oracle サイトを最適化する場合は Framework → Optimize scan for でサイトタイプを選びます。
+
+Crawl スライダで Thorough / Default / Normal / Quick のいずれかを選べます。各設定は Redundant Page Detection、Maximum Single URL Hits、Maximum Web Form Submissions、Create Script Event Sessions、Maximum Script Events Per Page、Number of Dynamic Forms Allowed Per Session、Include Parameters In Hit Count といった細かいパラメータを変更します。選択後に Run Profiler Automatically をチェックし、Scan をクリックしてスキャンを開始します。
+
+スキャン中は Navigation ペインにセッションアイコンが表示され、Summary ペインの Vulnerabilities タブや Information タブに可能性のある脆弱性が報告されます。Summary ペイン内の URL をクリックすると関連セッションが強調表示され、Information pane に関連情報が表示されます。Vulnerabilities タブは監査で発見された脆弱性を列挙し、Information タブは監査またはクロールで発見された情報（脆弱性ではないが注目点）をリストします。Best Practices タブは一般的な Web 開発ベストプラクティスに関する検出事項を示します。Scan Log タブは評価のログ（いつどの監査が実行されたか等）を表示し、Server Information タブはサーバに関する興味深い情報を示します。
+
+最終的に解析結果を XML でエクスポートするには File → Export を選び、Scan または Scan Details を選択します。Export Scan Details では Details に Full を選び、必要に応じて SSN、クレジットカードなどのデータをスクラブするオプションを選べます（IP アドレスのスクラブを選ぶとエクスポートデータが解析に使えなくなる点に注意）。Export を実行して保存先を指定します。
+
+###### Web Service Assessment Scan
+Web Service Assessment も同様に New Web Service Scan Wizard を使用して設定します。Assessment Mode（Crawl Only、Crawl and Audit）や WSDL ファイルの場所を指定してスキャンを実行します。実行後の結果表示、ナビゲーション、サマリ表示、エクスポート方法は Web Site Assessment と同様です。
+
+（複数のスクリーンショット参照）
+
+###### IBM AppScan
+IBM Rational AppScan はアプリケーションセキュリティテストを自動化し、脆弱性を特定して修復提言付きのレポートを生成します。本節は AppScan Standard Edition（デスクトップ版）を対象とします。AppScan はアップデートをツールバーの Update で確認し、インターネットアクセスが必要です。スキャン設定は Configuration Wizard（New → Configuration Wizard）で行い、Web Application Scan をデフォルトとします。開始 URL、ケースセンシティブパス、追加サーバやドメイン、プロキシ・プラットフォーム認証などの設定を行います。認証が必要な場合は Recorded（ログイン手順記録）、Prompt（スキャン中にプロンプト）、Automatic（ユーザ名／パスワードのみのアプリ向け）等のオプションがあります。In-Session 検出オプションを適切に設定しないとスキャン結果は信頼できなくなります。
+
+テストポリシーを選択し、ログイン／ログアウトページでテストを送信するか、セッショントークンのクリアなどのオプションを確認します。アプリ全体のカバレッジを確保するには Manual Explore（手動探索）でアプリをブラウズしてページを発見してからフルスキャンを実行するのが望ましいです。
+
+（複数のスクリーンショット参照）
+
+###### Web Directory Listing / Bruteforcing
+DirBuster はディレクトリ／ファイル名をブルートフォースする Java アプリで、隠しディレクトリや難読化されたファイルを発見するために用いられます。効果は使用するワードリストの品質に依存し、DirBuster は 9 種類のリストを持ちます。
+
+###### Webserver Version / Vulnerability Identification
+Web サーバのバージョン特定は特定インストール固有の脆弱性を特定する上で重要です。これらの情報は前段階で収集済みであるべきです。
+
+###### NetSparker（Windows）
+NetSparker は Windows ベースの Web アプリケーションスキャナで、一般的な Web アプリケーション脆弱性をすべてテストします。NTLM、Forms ベース、証明書ベースの認証を入力でき、報告された所見の確認機能（自動検証）を売りにしています。スキャンは Start Scan、Crawl and Wait、Manual Crawl（Proxy Mode）、Scan Imported Links Only、Schedule Scan などで開始できます。スキャンはクロール → 攻撃の順で進み、発見した脆弱性はブラウザビューや HTTP リクエスト／レスポンス表示で詳述できます。ダッシュボードや脆弱性チャート、PDF/HTML/CSV/XML の報告形式が利用可能です。
+
+（複数のスクリーンショット参照）
+
+###### 専門的な脆弱性スキャナ（Specialized Vulnerability Scanners）
+以下は特定領域に特化したスキャナの例です。
+
+- VPN（Virtual Private Networking）検出：VPN はトンネリングによりインターネット上でデータを運ぶため、通常の TCP ポートスキャンでは検出されにくい。`ike-scan` のようなツールが IPsec VPN サーバの検出、フィンガープリンティング、テストに用いられます。
+- IPv6：THC-IPV6 Attack Toolkit は IPv6 展開の実装上の脆弱性チェックツール群を提供します（Implementation6、Exploit6 等）。
+- War Dialing：モデムで電話番号レンジを自動ダイヤルし、接続可能なモデム／BBS／ファクシミリを探す手法。WarVOX はオーディオを解析することでモデムに限らず多様な電話回線を分類可能にします。
+- SIP／VoIP スキャナ：SIPSCAN（REGISTER/OPTIONS/INVITE を用いて拡張子やユーザを列挙）、SIPSAK（OPTION リクエストのみでテスト）、SVMAP（SIPVicious の一部で OPTIONS/INVITE/REGISTER を用いた識別とフィンガープリント）など。
+
+###### WarVOX, iWar, PAW/PAWS（ワーディアル関連）
+WarVOX、iWar、PAW／PAWS などのツールは電話網の監査やワードイアルを簡便に行うためのツール群です。VoIP 環境ではネットワーク機器全般（ルータ、VPN ゲートウェイ、TFTP、DNS、DHCP、RADIUS、ファイアウォールなど）をターゲットに含めるべきです。
+
+##### パッシブテスト（Passive Testing）
+パッシブテストはその名の通り、受動的に脆弱性を検出する手法です。自動化ツールで行うのが一般的ですが手動でも可能です。
+
+###### 自動化ツール（Automated Tools）
+- トラフィックモニタリング（Traffic Monitoring）は、ターゲットのさらなる情報を受動的に収集する仕組みで、OS やネットワークデバイスの特定に役立ちます。アクティブなフィンガープリンティングで古い OS と判定された場合でも、パッシブフィンガープリンティングでそれを確認できます。
+
+###### P0f
+P0f は強力なパッシブフィンガープリンティングツールで、接続先・接続元・観測可能な通信に基づき OS を識別できます。
+
+###### Wireshark
+Wireshark はオープンソースのパケットアナライザで、ネットワークのトラブルシューティング、分析、プロトコル開発、学習に広く使われます。GTK+ を用いた UI と pcap を利用したパケットキャプチャで、多くの Unix 系 OS と Windows で動作します。
+
+###### Tcpdump
+Tcpdump はコマンドラインで動作する一般的なパケットアナライザで、libpcap を使用してネットワーク上の TCP/IP パケットなどをキャプチャ／表示します。Windows 版として WinDump（WinPcap ベース）も存在します。
+
+###### Metasploit スキャナ
+Metasploit Framework を活用した脆弱性スキャンについては Metasploit Unleashed コース等で多くのチュートリアルが提供されています。
+
+（この節では各ツールの使用方法、注意点、出力の保存と検証の重要性、及び自動化ツールの攻撃的挙動による副作用の回避について述べました。）
+<<<END>>>
