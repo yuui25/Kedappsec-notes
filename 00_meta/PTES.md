@@ -491,3 +491,595 @@ Linux は多くのセキュリティコンサルタントの**第一選択**で�
 | Fast-Track | http://www.secmaniac.com/download/ | **自動化ペンテスト**ツールスイート。多くの攻撃は、Web アプリにおける**クライアントサイド入力の不適切なサニタイズ**、**パッチ管理不備**、**ハードニング不足**に起因。Linux 上で動作し、**Metasploit 3** に依存。 |  |
 
 > [1] 原文では BackTrack の参照リンクが `[1]` として記されているのみです。
+
+<<<BEGIN>>>
+# 2 情報収集（Intelligence Gathering）
+
+情報収集（Intelligence Gathering）は、評価の行動を導くためにデータ、すなわち「インテリジェンス」を収集するフェーズです。広義にはこのインテリジェンス収集は従業員、施設、製品、計画に関する情報を含みます。より広い観点では、競合他社の潜在的に機密・私的な「インテリジェンス」や、ターゲットに関連するその他の情報が含まれることがあります。
+
+## 2.1 OSINT
+
+オープンソースインテリジェンス（OSINT）とは、単純に言えば公に（オープンに）利用可能な情報源を**発見し解析すること**です。ここでの重要な要素は、このインテリジェンス収集プロセスの目的が、攻撃者や競合にとって価値のある**最新かつ関連性のある情報を生成すること**にある点です。大半の場合、OSINTは単に様々なソースでウェブ検索を行う以上のものです。
+
+### 2.1.1 企業（Corporate）
+
+特定のターゲットに関する情報には、その**法的実体（legal entity）**に関する情報を含めるべきです。米国の多くの州では、法人（Corporations）、有限責任会社（limited liability companies）および有限組合（limited partnerships）は州の担当部署に登記を行うことが要求されています。この部署は登記の保管者として機能し、書類・登記のコピーや認証を保持します。これらの情報には、株主、メンバー、役員、その他ターゲット実体に関与する人物に関する情報が含まれている可能性があります。
+
+#### 州（State） — 参照 URL
+（原文どおり各州と URL を列挙）
+
+Alabama  
+http://sos.alabama.gov/BusinessServices/NameRegistration.aspx
+
+Alaska  
+http://www.dced.state.ak.us/bsc/corps.htm
+
+Arizona  
+http://starpas.azcc.gov/scripts/cgiip.exe/WService=wsbroker1/main.p
+
+Arkansas  
+http://www.sosweb.state.ar.us/corps/incorp
+
+California  
+http://kepler.sos.ca.gov/
+
+Colorado  
+http://www.state.co.us
+
+Connecticut  
+http://www.state.ct.us
+
+Delaware  
+http://www.state.de.us
+
+District of Columbia  
+http://www.ci.washington.dc.us
+
+Florida  
+http://www.sunbiz.org/search.html
+
+Georgia  
+http://corp.sos.state.ga.us/corp/soskb/CSearch.asp
+
+Hawaii  
+http://www.state.hi.us
+
+Idaho  
+http://www.accessidaho.org/public/sos/corp/search.html?SearchFormstep=crit
+
+Illinois  
+http://www.ilsos.gov/corporatellc
+
+Indiana  
+http://secure.in.gov/sos/bus_service/online_corps/default.asp
+
+Iowa  
+http://www.state.ia.us
+
+Kansas  
+http://www.accesskansas.org/apps/corporations.html
+
+Kentucky  
+http://ukcc.uky.edu/~vitalrec
+
+Louisiana  
+http://www.sec.state.la.us/crpinq.htm
+
+Maine  
+http://www.state.me.us/sos/cec/corp/ucc.htm
+
+Maryland  
+http://sdatcert3.resiusa.org/ucc-charter
+
+Massachusetts  
+http://ucc.sec.state.ma.us/psearch/default.asp
+
+Michigan  
+http://www.cis.state.mi.us/bcs_corp/sr_corp.asp
+
+Minnesota  
+http://www.state.mn.us/
+
+Mississippi  
+http://www.sos.state.ms.us/busserv/corpsnap
+
+Missouri  
+http://www.state.mo.us
+
+Montana  
+http://sos.state.mt.us
+
+Nebraska  
+http://www.sos.state.ne.us/htm/UCCmenu.htm
+
+Nevada  
+http://sandgate.co.clark.nv.us:8498/cicsRecorder/ornu.htm
+
+New Hampshire  
+http://www.state.nh.us
+
+New Jersey  
+http://www.state.nj.us/treasury/revenue/searchucc.htm
+
+New Mexico  
+http://www.sos.state.nm.us/UCC/UCCSRCH.HTM
+
+New York  
+http://wdb.dos.state.ny.us/corp_public/corp_wdb.corp_search_inputs.show
+
+North Carolina  
+http://www.secstate.state.nc.us/research.htm
+
+North Dakota  
+http://www.state.nd.us/sec
+
+Ohio  
+http://serform.sos.state.oh.us/pls/report/report.home
+
+Oklahoma  
+http://www.oklahomacounty.org/coclerk/ucc/default.asp
+
+Oregon  
+http://egov.sos.state.or.us/br/pkg_web_name_srch_inq.login
+
+Pennsylvania  
+http://www.dos.state.pa.us/DOS/site/default.asp
+
+Rhode Island  
+http://155.212.254.78
+
+South Carolina  
+http://www.scsos.com/corp_search.htm
+
+South Dakota  
+http://www.state.sd.us
+
+Tennessee  
+http://www.state.tn.us/sos/service.htm
+
+Texas  
+https://ourcpa.cpa.state.tx.us/coa/Index.html
+
+Utah  
+http://www.commerce.state.ut.us
+
+Vermont  
+http://www.sec.state.vt.us/seek/database.htm
+
+Virginia  
+http://www.state.va.us
+
+Washington  
+http://www.dol.wa.gov/business/UCC/
+
+West Virginia  
+http://www.wvsos.com/wvcorporations
+
+Wisconsin  
+http://www.wdfi.org/corporations/crispix
+
+Wyoming  
+http://soswy.state.wy.us/Corp_Search_Main.asp
+
+### 2.1.2 物理（Physical）
+
+OSINT の最初のステップは、対象企業の**物理的所在地**を特定することが多いです。この情報は公開されている（周知の）場所については入手しやすいですが、より秘匿性の高い施設については容易ではありません。公開されているサイトは、次のような検索エンジンで所在地を特定できることがよくあります：
+
+- Google — http://www.google.com  
+- Yahoo — http://yahoo.com  
+- Bing — http://www.bing.com  
+- Ask.com — http://ask.com
+
+#### Locations（所在地）
+
+##### Shared/Individual（共同／個別）
+物理的な場所を特定する際、その場所が**独立した建物**なのか、単により大きな施設内の**スイート（区画）**なのかを確認することが重要です。隣接する事業所や共用部分も特定するよう努めてください。
+
+##### Owner（所有者）
+物理的な所在地が特定されたら、実際の**不動産所有者**を特定することが有用です。所有者は個人、グループ、法人のいずれかであり得ます。ターゲット企業が不動産を所有していない場合、物理的な改良や改善に制約があることがあります。
+
+##### Land/tax records（土地・税記録）
+Tax records: http://www.naco.org/Counties/Pages/CitySearch.aspx
+
+土地や税の記録には、所有権、占有者、抵当会社、差押通知、写真など、ターゲットに関する豊富な情報が含まれることが一般的です。記録される情報や公開度合いは管轄によって大きく異なります。米国内では土地・税記録は通常郡（county）レベルで扱われます。
+
+開始手順として、ターゲットの市または郵便番号が分かっている場合は、まず http://publicrecords.netronline.com/ のようなサイトでどの郡に属するかを特定します。その後 Google に切り替え、"XXXX county tax records"、"XXXX county recording office"、"XXXX county assessor" のようなクエリを使うと、該当する検索可能なオンラインデータベースがあれば辿り着けるはずです。存在しない場合でも、郡の登記所に電話して、特定の記録をファックスしてもらえるか尋ねることは可能です。
+
+##### Building department（建築部門）
+一部の評価では、さらに踏み込んで**地域の建築部門**に問い合わせることが有益な場合があります。市によってはターゲットが郡の管轄か市の管轄かが異なるため、どちらに問い合わせるべきかは電話で確認できます。
+
+建築部門は通常、平面図、過去および現在の許可証、テナント改善情報などを保管しています。その情報の中には請負業者、技術者、建築家の名前などが埋もれていることがあり、これらは SET（Social-Engineer Toolkit）などと組み合わせて利用できます。多くの場合これらの情報を入手するには電話が必要になりますが、多くの建築部門は問い合わせに対して情報を提供してくれます。
+
+床面図を入手するための口実の例としては、あなたが改装や増築を設計するために雇われた**建築コンサルタント**であり、元の図面のコピーがあればプロセスが円滑に進む、と伝える方法があります。
+
+### 2.1.3 データセンターの所在（Datacenter Locations）
+
+コーポレートサイト、公的届出、土地記録、検索エンジンなどを通じてターゲット企業の**データセンター所在地**を特定することは、追加の潜在的ターゲットを提供する可能性があります。
+
+#### 2.1.3.1 タイムゾーン（Time zones）
+ターゲットが活動するタイムゾーンを特定することは営業時間に関する有用な情報を提供します。また、ターゲットのタイムゾーンと評価チームのタイムゾーンの関係を理解することも重要です。テストを行う際にはタイムゾーン地図が参考になります。
+
+（原文：TimeZone Map）
+
+#### 2.1.3.2 オフサイトの集まり（Offsite gathering）
+コーポレートサイトや検索エンジンを通じて、最近や今後の**オフサイトイベントやパーティ**を特定することは企業文化に関する有益な洞察を与えます。企業は従業員だけでなくビジネスパートナーや顧客向けにもオフサイト集まりを開催することが一般的であり、これらのデータは攻撃者にとって興味深い手掛かりとなり得ます。
+
+#### 2.1.3.3 製品／サービス（Product/Services）
+コーポレートサイト、ニュースリリース、検索エンジンを用いて、ターゲット企業の**製品やそのローンチに関連する重要なデータ**を特定することは、組織内部の動きに関する有用な洞察を提供します。企業は注目を集めたり既存および新規顧客へ通知するためにこうした情報を公開することが一般的です。公開情報には外国語文書、ラジオやテレビ放送、インターネットサイト、公開講演などが含まれます。
+
+#### 2.1.3.4 会社の重要日（Company Dates）
+重要な会社の日付は、スタッフの警戒レベルが通常より高まる可能性のある日を示すことがあります（取締役会、投資家会合、創立記念など）。一般に、祝日を観察する企業では人員が大幅に減るため、その期間に攻撃を試みるのは困難になり得ます。
+
+#### 2.1.3.5 役職の特定（Position identification）
+ターゲット組織の上位ポジションを特定し記録することは重要です。これは最終的な報告が正しい対象に向けられることを確保するために必要です。最低限、主要な従業員はエンゲージメントの一部として特定されるべきです。
+
+#### 2.1.3.6 組織図（Organizational Chart）
+組織構造を理解することは、その深さだけでなく広がりを把握するのに重要です。非常に大きな組織では新規スタッフや人員変動が見落とされることがありますが、小規模組織ではその可能性は低くなります。構造を把握することで機能グループに関する洞察を得られ、内部ターゲット選定に役立ちます。
+
+#### 2.1.3.7 コーポレートコミュニケーション（Corporate Communications）
+コーポレートサイトや求人エンジンを通じて企業のコミュニケーションを特定することで、ターゲット内部の運用に関する有益な洞察が得られます。
+
+##### マーケティング（Marketing）
+マーケティングコミュニケーションは、現在または将来の製品リリースや提携に関する企業発表にしばしば使用されます。
+
+##### 訴訟（Lawsuits）
+訴訟に関するコミュニケーションは、潜在的な脅威主体や注目すべきデータに関する手掛かりを与えることがあります。
+
+##### 取引（Transactions）
+企業取引に関するコミュニケーションは、マーケティング発表や訴訟に対する間接的な反応であることがあります。
+
+#### 2.1.3.8 求人（Job openings）
+コーポレートサイトや求人エンジンで公開されている現在の求人を検索することは、社内の動向を把握する上で有用です。企業は新たに導入する技術や将来の技術計画について求人情報に記載することがよくあり、これらは攻撃者にとって興味深い情報源となります。参照可能な求人検索サイトの例：
+
+- Monster — http://www.monster.com  
+- CareerBuilder — http://www.careerbuilder.com  
+- Computerjobs.com — http://www.computerjobs.com  
+- Craigslist — http://www.craigslist.org/about/sites
+
+### 2.1.4 関係性（Relationships）
+
+ターゲットの論理的な関係（ベンダー、ビジネスパートナー、法律事務所等）を特定することは、企業の運用を理解する上で重要です。公開情報（ニュースリリース、コーポレートサイト、業界フォーラム等）を活用してください。
+
+#### Charity Affiliations（慈善団体との関係）
+ターゲット企業の慈善団体関係を特定することは、企業文化や内部事情に関する洞察を与える可能性があります。企業がどの団体に寄付しているかを収集することで、攻撃者にとって関心ある情報が得られることがあります。
+
+#### Network Providers（ネットワークプロバイダ）
+割り当てられたネットブロックやアドレス情報、コーポレートサイト、検索エンジンを通じてネットワークのプロビジョニングやプロバイダを特定することは、ターゲットの潜在能力に関する重要な洞察を提供します。
+
+#### Business Partners（ビジネスパートナー）
+ビジネスパートナーを特定することは企業文化だけでなく利用中の技術スタックに関する手掛かりを得るうえで重要です。企業は提携契約を公表することが多く、これらの情報は攻撃者にとって有用です。
+
+#### Competitors（競合）
+競合を特定することは潜在的な敵対者を把握する窓口となります。競合は新規採用、製品ローンチ、提携などを発表し、これらがターゲットに影響を与えることがあるため、情報収集が重要です。
+
+---
+
+## 2.2 個人（Individuals）
+
+### 2.2.1 ソーシャルネットワーキング・プロフィール（Social Networking Profile）
+
+多数のアクティブなソーシャルネットワーキングサイトおよび大量のユーザが存在することから、従業員の友情、親族、共通の興味、金銭のやり取り、好み／嫌い、性的関係、信条などを特定するのに最適な場所です。従業員の社内知識や社内での評価が推察できることさえあります。
+
+### 2.2.2 ソーシャルネットワーキング・サイト（Social Networking Websites）
+
+（原文は多数のサイト名、URL、フォーカスを列挙しています。ここでは原文に忠実に列挙します）
+
+例：  
+Academia.edu — http://www.academia.edu （学術／研究者）  
+Advogato — http://www.advogato.org （オープンソース開発者）  
+aNobii — http://www.anobii.com/anobii_home （書籍）  
+…（以降、原文どおりの長いリストが続きます）…
+
+### Tone and Frequency（投稿のトーンと頻度）
+従業員の投稿のトーンや頻度を把握することは、不満を持つ従業員や社内でのソーシャルネットワーキングの受容度を示す指標になり得ます。時間はかかりますが、従業員の勤務スケジュールや休暇期間を推定することも可能です。
+
+### Location awareness（位置情報の把握）
+多くのソーシャルネットワーキングサイトは投稿にジオロケーション情報を含める機能を提供しています。これにより、投稿時にその人物がどこにいたかを正確に特定することができます。また、アップロードされた画像にジオタグが含まれている場合もあります。ユーザがこの機能をオフにしている可能性はありますが、投稿本文に所在地を明示する場合もあります。
+
+### 2.2.3 Cree.py
+
+Cree.py は Twitter および FourSquare から情報収集タスクを自動化するベータツールです。加えて Cree.py は flickr、twitpic.com、yfrog.com、img.ly、plixi.com、twitrpix.com、foleext.com、shozu.com、pickhur.com、moby.to、twitsnaps.com、twitgoo.com などからジオロケーションデータを収集できます。Cree.py はオープンソースのインテリジェンス収集アプリケーションです。Cree.py をインストールするには /etc/apt/sources.list にリポジトリを追加する必要があります。
+
+~~~~
+echo "deb http://people.dsv.su.se/~kakavas/creepy/ binary/" >> /etc/apt/sources.list
+~~~~
+
+パッケージリストを更新：
+
+~~~~
+apt-get update
+~~~~
+
+Cree.py をインストール：
+
+~~~~
+apt-get install creepy
+~~~~
+
+#### Cree.py インターフェース
+Cree.py は主にソーシャルネットワーキングプラットフォームや画像ホスティングサービスから**ジオロケーション関連情報**を抽出することを目的としています。収集された情報はアプリケーション内の地図上に表示され、取得したデータとそれに紐づく関連情報（例：その位置から投稿された内容）を示して文脈を提供します。
+
+---
+
+## 2.3 インターネット・フットプリント（Internet Footprint）
+
+インターネット・フットプリントは、後続フェーズで活用可能なターゲットインフラに関する**外部から入手可能な情報**を収集する領域です。
+
+### 2.3.1 メールアドレス（Email addresses）
+メールアドレスの収集は一見無意味に思えるかもしれませんが、ターゲット環境に関する貴重な情報を提供します。命名規則の手掛かりや、後の段階でのターゲット候補を示すことがあります。メールアドレス収集には多くのツールがあり、たとえば Maltego が挙げられます。
+
+#### Maltego
+Paterva の Maltego は情報収集タスクを自動化するためのツールです。Maltego はオープンソースインテリジェンスおよびフォレンジクスのアプリケーションで、本質的にはデータマイニングと情報収集ツールであり、収集した情報を理解し操作しやすい形式でマップ化します。メールハーベスティングやサブドメインのマッピングなどのタスクを自動化して時間を節約します。Maltego のドキュメントは比較的乏しいため、必要なデータを取得する手順をここに含めます。
+
+Maltego を起動すると、メインインターフェースが表示されます。インターフェースの主要な領域はツールバー、パレット、グラフ（表示）領域、オーバービュー領域、詳細領域、プロパティ領域の六つです。
+
+（スクリーンショット参照）
+
+開始のワークフロー（例、トレーニングとして考えてください）：
+1. Maltego の左上で「new graph」をクリックします。  
+2. パレットから "domain" アイテムをグラフにドラッグします。グラフ領域ではトランスフォームを処理でき、マイニングビュー、ダイナミックビュー、エッジ加重ビュー、エンティティリストのいずれかでデータを表示できます。最初に domain アイコンを追加するとデフォルトで "paterva.com" になりますので、そのアイコンをダブルクリックしてターゲットのドメインに変更します（www のようなサブドメインは含めない）。これでマイニングを開始できます。
+
+例の流れ：
+1. domain アイコンを右クリック（またはダブルクリック）し、"run transform" から "To Website DNS[using search engine]" を選択します。これによりターゲットのサブドメインが一覧表示されるはずです。  
+2. すべてのサブドメインを選択し "To IP Address [DNS] transform" を実行します。これによりサブドメインがそれぞれの IP アドレスに解決されます。  
+3. 次の論理的ステップはネットブロックの特定で、"To Netblock [Using natural boundaries]" トランスフォームを実行します。
+
+以降は想像力次第で、電話番号、メールアドレス、ジオロケーション情報などをトランスフォームで収集できます。パレットには利用可能（または有効化されている）すべてのトランスフォームが含まれており、本作成時点で約72個のトランスフォームが存在します。Community Edition の制限としては、任意のトランスフォームが返す結果は最大12件であり、Professional 版にはこの制限はありません。
+
+「全トランスフォームを実行する」誘惑には注意してください。データが過剰になり、エンゲージメントに関連する最も興味深いデータへ深掘りする能力を阻害します。
+
+Maltego は事前調査だけでなく、たとえば airodump の CSV/XLS ダンプをインポートしてネットワークを視覚化することにも利用できます。
+
+#### TheHarvester
+TheHarvester は Christian Martorella によって書かれたツールで、検索エンジンや PGP キーサーバなどの公開ソースからメールアカウントやサブドメイン名を収集するために使用できます。非常にシンプルですが有効です。
+
+~~~~
+root@pentest:/pentest/enumeration/theharvester# ./theHarvester.py
+
+*************************************
+*TheHarvester Ver. 1.6             *
+*Coded by Christian Martorella      *
+*Edge-Security Research             *
+*cmartorella@edge-security.com      *
+*************************************
+
+Usage: theharvester options
+
+       -d: domain to search or company name
+       -b: data source (google,bing,pgp,linkedin)
+       -s: start in result number X (default 0)
+       -v: verify host name via dns resolution
+       -l: limit the number of results to work with(bing goes from 50 to 50 results,
+            google 100 to 100, and pgp does'nt use this option)
+
+Examples:./theharvester.py -d microsoft.com -l 500 -b google
+         ./theharvester.py -d microsoft.com -b pgp
+         ./theharvester.py -d microsoft -l 200 -b linkedin
+~~~~
+
+TheHarvester は指定したデータソースを検索して結果を返します。これらは後の OSINT ドキュメントに追加すべきです。
+
+例（実行出力）：
+
+~~~~
+root@pentest:/pentest/enumeration/theharvester# ./theHarvester.py -d client.com -b google -l 500
+
+*************************************
+*TheHarvester Ver. 1.6             *
+*Coded by Christian Martorella      *
+*Edge-Security Research             *
+*cmartorella@edge-security.com      *
+************************************* 
+
+Searching for client.com in google : 
+
+====================================== 
+
+Limit: 500 
+Searching results: 0 
+Searching results: 100 
+Searching results: 200 
+Searching results: 300 
+Searching results: 400 
+
+Accounts found: 
+==================== 
+admin@client.com 
+nick@client.com 
+jane@client.com 
+sarah@client.com 
+~~~~
+
+#### NetGlub
+NetGlub は Maltego に非常によく似たオープンソースツールです。NetGlub は情報マイニング／収集ツールで、収集した情報を理解しやすい形式で提示します。現時点で NetGlub のドキュメントはほとんど存在しないため、必要なデータを取得する手順をここに示します。
+
+NetGlub のインストールは容易ではありませんが、次のような手順で行えます（抜粋）：
+
+~~~~
+apt-get install build-essential mysql-server libmysqlclient-dev zlib1g-dev libperl-dev libnet-ip-perl libopenssl-ruby ruby-dev ruby omt php5-cli nmap libnet-dns-perl libnet-ip-perl python-dev
+wget http://pypi.python.org/packages/source/s/simplejson/simplejson-2.1.5.tar.gz
+tar -xzvf simplejson-2.1.5.tar.gz
+cd simplejson-2.1.5
+python2.7 setup.py build
+python2.7 setup.py install 
+cd ..
+wget http://sourceforge.net/projects/pyxml/files/pyxml/0.8.4/PyXML-0.8.4.tar.gz
+tar -xvzf PyXML-0.8.4.tar.gz
+cd PyXML-0.8.4
+wget http://launchpadlibrarian.net/31786748/0001-Patch-for-Python-2.6.patch
+patch -p1 < 0001-Patch-for-Python-2.6.patch
+python setup.py install 
+cd /pentest/enumeration
+~~~~
+
+この時点で GUI 用の QT-SDK をインストールします。インストールパスは `/opt/qtsdk` に変更することを推奨します（異なるパスを使う場合は後述のスクリプト内パスを適宜変更してください）。QT-SDK のインストール時に外部依存パッケージのインストールが促されるので、次を実行しておきます：
+
+~~~~
+apt-get install libglib2.0-dev libSM-dev libxrender-dev libfontconfig1-dev libxext-dev
+wget http://blog.hynesim.org/ressources/install/qt-sdk-linux-x86-opensource-2010.03.bin
+chmod +x qt-sdk-linux-x86-opensource-2010.03.bin
+./qt-sdk-linux-x86-opensource-2010.03.bin
+wget http://www.graphviz.org/pub/graphviz/stable/SOURCES/graphviz-2.26.3.tar.gz
+tar -xzvf graphviz-2.26.3.tar.gz
+cd graphviz-2.26.3
+./configure
+make
+make install
+cd /pentest/enumeration 
+wget http://redmine.lab.diateam.net/attachments/download/1/netglub-1.0.tar.gz
+tar -xzvf netglub-1.0.tar.gz 
+mv netglub-1.0 netglub
+cd /pentest/enumeration/netglub/qng/
+/opt/qtsdk/qt/bin/qmake
+make
+~~~~
+
+MySQL を起動し、NetGlub 用データベースを作成します：
+
+~~~~
+start mysql 
+mysql -u root -ptoor
+
+create database netglub;
+use netglub;
+create user "netglub"@"localhost";
+set password for "netglub"@"localhost" = password("netglub");
+GRANT ALL ON netglub.* TO "netglub"@"localhost";
+quit
+
+mysql -u root -ptoor netglub < /pentest/enumeration/netglub/master/tools/sql/netglub.sql  
+~~~~
+
+QT の MySQL ドライバをビルドして配置し、NetGlub をビルド・インストールします（抜粋）：
+
+~~~~
+cd /opt/qtsdk/qt/src/plugins/sqldrivers/mysql/
+/opt/qtsdk/qt/bin/qmake INCLUDEPATH+=/usr/include/mysql/
+make
+cp /opt/qtsdk/qt/src/plugins/sqldrivers/mysql/libqsqlmysql.so /opt/qtsdk/qt/plugins/sqldrivers/.
+cd /pentest/enumeration/netglub/master
+/opt/qtsdk/qt/bin/qmake
+make
+cd tools/
+./install.sh
+cd /pentest/enumeration/netglub/slave
+/opt/qtsdk/qt/bin/qmake
+make
+cd tools/
+./install.sh
+wget http://sourceforge.net/projects/xmlrpc-c/files/Xmlrpc-c%20Super%20Stable/1.16.34/xmlrpc-c-1.16.34.tgz/download
+tar -zxvf xmlrpc-c-1.16.34.tgz
+cd xmlrpc-c-1.16.34
+./configure
+make 
+make install
+~~~~
+
+インストール後の起動手順（四段階）：
+1. MySQL が動作していることを確認： `start mysql`  
+2. NetGlub Master を起動： `/pentest/enumeration/netglub/master/master`  
+3. NetGlub Slave を起動： `/pentest/enumeration/netglub/slave/slave`  
+4. NetGlub GUI を起動： `/pentest/enumeration/netglub/qng/bin/unix-debug/netglub`
+
+GUI が表示されれば、Maltego に慣れている人はすぐに操作感を掴めるはずです。インターフェースの主要領域はツールバー、パレット、グラフ（ビュー）領域、詳細、プロパティエリアの六つです（スクリーンショット参照）。
+
+利用可能（または有効化済み）のトランスフォームは約33個あります。トランスフォームは与えられたサイトに対して実際のアクションを行うスクリプトです。
+
+グラフ領域ではトランスフォームの処理結果をマイニングビュー、ダイナミックビュー、エッジ加重ビュー、エンティティリスト等で閲覧できます。オーバービュー領域は発見されたエンティティのミニマップを提供します。詳細領域ではエンティティの特性を掘り下げられ、関係性や情報がどのように生成されたかの詳細を見ることができます。プロパティ領域は、トランスフォームのプロパティに結果が反映された内容を確認できます。
+
+まずは Domain トランスフォームをグラフ領域へドラッグ＆ドロップしてクライアントのドメイン名を設定します。多くの場合 "Run All Transforms" を実行することで初期に必要なデータの大半を収集できます。収集したエンティティのデータを基に追加情報を取得していきます。必要に応じて新しいトランスフォームをドラッグしてプロパティを編集し実行してください。
+
+NetGlub が正しく動作するように、DNS サーバの指定など一部情報を入力する必要があります。また Alchemy と Open Calais の API キーを入力する必要があります。Alchemy の API キーは http://www.alchemyapi.com/api/register.html で、Open Calais の API キーは http://www.opencalais.com/APIkey でそれぞれ取得します。
+
+### Usernames/Handles（ユーザ名／ハンドル）
+特定のメールアドレスに関連するユーザ名やハンドルを特定することは有用で、ユーザ名やパスワードの手掛かりになったり、個人の職務外の興味を示したりします。討論グループ（ニュースグループ、メーリングリスト、フォーラム、チャットルーム等）はこの種の情報を探す良い場です。
+
+### Social Networks（ソーシャルネットワーク）
+- Check Usernames — 指定ユーザ名が 160 のソーシャルネットワークに存在するか確認するのに有用。
+
+### Newsgroups（ニュースグループ）
+- Google — http://www.google.com  
+- Yahoo Groups — http://groups.yahoo.com  
+- Delphi Forums — http://www.delphiforums.com  
+- Big Boards — http://www.big-boards.com
+
+### Mailing Lists（メーリングリスト）
+- TILE.Net — http://tile.net/lists  
+- Topica — http://lists.topica.com  
+- L-Soft CataList（LISTSERV リストの公式カタログ） — http://www.lsoft.com/lists/listref.html  
+- The Mail Archive — http://www.mail-archive.com
+
+### Chat Rooms（チャットルーム）
+- SearchIRC — http://searchirc.com  
+- Gogloom — http://www.gogloom.com
+
+### Forums Search（フォーラム検索）
+- BoardReader — http://boardreader.com  
+- Omgili — http://www.omgili.com
+
+### Personal Domain Names（個人ドメイン）
+ターゲット従業員が所有する個人ドメインを見つけることで、潜在的なユーザ名やパスワードの手掛かり、あるいは個人の興味が判明することがあります。
+
+### Personal Activities（個人の活動）
+個人が音声ファイルや動画を作成・公開していることは珍しくありません。些細に見えるこれらも、個人の職務外の興味や手掛かりを与えることがあります。
+
+#### Audio（音声）
+- iTunes — http://www.apple.com/itunes  
+- Podcast.com — http://podcast.com  
+- Podcast Directory — http://www.podcastdirectory.com  
+- Yahoo! Audio Search — http://audio.search.yahoo.com
+
+#### Video（動画）
+- YouTube — http://youtube.com  
+- Yahoo Video — http://video.search.yahoo.com  
+- Google Video — http://video.google.com  
+- Bing Video — http://www.bing.com/videos
+
+### Archived Information（アーカイブ情報）
+ウェブサイトの情報が元のソースで既に入手できない場合があります。アーカイブされたコピーにアクセスできれば過去の情報にアクセス可能です。一般的な手段としては Google のキャッシュ（例: `cache:<site.com>`）や Wayback Machine（http://www.archive.org）を利用します。
+
+（スクリーンショット参照）
+
+### 2.3.7 電子データ（Electronic Data）
+
+諜報・偵察に直接応答して収集される電子データの収集は、ターゲット企業または個人に焦点を合わせるべきです。
+
+#### Document leakage（文書の流出）
+公開されている文書は、日付、時刻、場所固有の情報、言語、著者などの重要データを収集するために集めるべきです。収集したデータは現状の環境、運用手順、従業員教育、人事に関する洞察を与える可能性があります。
+
+#### Metadata leakage（メタデータの流出）
+メタデータの特定は専門の検索エンジンを使用して行えます。目的はターゲット企業に関連するデータを特定することで、ソーシャルネットワーキング投稿から場所、ハードウェア、ソフトウェアなどを特定できる場合があります。メタデータ検索が可能ないくつかの検索エンジン例：
+
+- ixquick — http://ixquick.com  
+- MetaCrawler — http://metacrawler.com  
+- Dogpile — http://www.dogpile.com  
+- Search.com — http://www.search.com  
+- Jeffery's Exif Viewer — http://regex.info/exif.cgi
+
+検索エンジンに加えて、ファイルを収集して各種文書から情報を抽出するツールも存在します。
+
+##### FOCA（Windows）
+FOCA は幅広い文書・メディア形式からメタデータを読み取るツールです。FOCA は関連するユーザ名、パス、ソフトウェアバージョン、プリンタ詳細、メールアドレスなどを抽出します。これらはファイルを個別にダウンロードすることなく実行可能です。
+
+##### Foundstone SiteDigger（Windows）
+Foundstone の SiteDigger は、Google Hacking Database（GHDB）と Foundstone Database（FSDB）両方の特別なクエリ文字列を使ってドメインを検索するツールです。これにより約 1640 を超えるクエリを利用して追加情報の発見を試みられます。具体的なクエリとその結果は表示され、結果のリンクをダブルクリックするとブラウザで開けます。
+
+##### Metagoofil（Linux/Windows）
+Metagoofil はクライアントのウェブサイト上にある公開ドキュメント（.pdf、.doc、.xls、.ppt、.odp、.ods）からメタデータを抽出することを目的とした Linux ベースの情報収集ツールです。Metagoofil は抽出結果を HTML 結果ページとして生成し、ブルートフォース攻撃に有用な潜在的ユーザ名リストも出力します。メタデータからパスや MAC アドレス情報も抽出します。Metagoofil にはいくつかのオプションがあり、主にターゲットや取得結果数に関する指定を行います。
+
+実行例（コマンド）：
+
+~~~~
+metagoofil.py -d <client domain> -l 100 -f all -o <client domain>.html -t micro-files
+~~~~
+
+##### Exif Reader（Windows）
+Exif Reader は Windows 用の画像ファイル解析ソフトウェアです。シャッタースピード、フラッシュの有無、焦点距離など、ほとんどの最新デジタルカメラでサポートされる Exif 形式の情報を解析・表示します。拡張子 JPG の Exif 画像ファイルは通常の JPEG ファイルと同様に扱えます。Exif Reader は JPEG を解析するソフトで、ダウンロード元（原文参照）から入手できます。
+
+##### ExifTool（Windows / OS X）
+ExifTool は Windows と OS X 向けのメタ情報読み取りツールです。ExifTool は多数のファイル形式をサポートします。ダウンロード先（原文参照）から入手できます。
+
+##### Image Search（画像検索）
+メタデータに直接関係しないものの、Tineye（http://www.tineye.com/）は有用です。もしプロフィールに写真はあるが実名がない場合、Tineye を使って同一画像が使われている他のプロフィールや（出会い系等を含む）詳細情報のあるページを見つけられることがあります。
+
+<<<END>>>
