@@ -402,3 +402,92 @@
 12.15　SCADA 監査（SCADA audit）  
 12.16　Web 監査（Web audit）
 
+# 必要なツール（Tools Required）
+
+ペネトレーションテストで必要となるツールの選定は、実施する取り組み（エンゲージメント）の**種類**や**深さ**など、複数の要因に依存します。一般的には、期待される結果でペネトレーションテストを完了するために、以下のツールが**必須**です。
+
+---
+
+## オペレーティングシステム（Operating Systems）
+
+ペネトレーションテストで使用するオペレーティングプラットフォームの選定は、ネットワークおよび関連システムのエクスプロイトに成功するかどうかを左右する**重要要素**です。そのため、**主要な 3 つのオペレーティングシステムを同時に使用できる能力**が求められます。これは**仮想化**なしには実現できません。
+
+### MacOS X
+MacOS X は BSD 系のオペレーティングシステムです。標準のコマンドシェル（sh、csh、bash など）や、ペネトレーションテスト時に使用できるネイティブのネットワークユーティリティ（telnet、ftp、rpcinfo、snmpwalk、host、dig など）を備えており、当方のペネトレーションテストツール群の**基盤となるホストシステム**として最適です。これは**ハードウェアプラットフォーム**でもあるため、特定ハードウェアの選定を非常に簡単にし、**すべてのツールが設計どおりに動作**することを保証します。
+
+### VMware Workstation
+VMware Workstation は、ワークステーション上で複数の OS インスタンスを容易に動かすための**絶対必須**ツールです。商用パッケージとして**正式サポート**があり、無償版にはない**暗号化機能**や**スナップショット機能**を提供します。VM 上で収集したデータを暗号化できなければ**機密情報が危険にさらされる**ため、**暗号化をサポートしない版は使用すべきではありません**。以下に挙げる OS は、VMware の**ゲスト**として実行します。
+
+#### Linux
+Linux は多くのセキュリティコンサルタントの**第一選択**です。プラットフォームとして**汎用性**が高く、カーネルは先端技術やプロトコルに対する**低レベルのサポート**を提供します。主流の **IP ベース攻撃／侵入ツール**は、概ね問題なく Linux 上でビルド・実行できます。こうした理由から、必要なツールをすべて備えた **BackTrack** がプラットフォームの第一選択となります。
+
+#### Windows XP/7
+**Windows XP/7** は、特定のツールを使用する上で**必要**です。商用ツールや Microsoft 由来のネットワーク評価・ペネトレーションツールの多くが、このプラットフォーム上で安定して動作します。
+
+---
+
+## 無線周波数ツール（Radio Frequency Tools）
+
+### 周波数カウンタ（Frequency Counter）
+**10 Hz～3 GHz** をカバーできる周波数カウンタが望ましい。手頃な価格帯の例として **MFJ-886 Frequency Counter** があります。
+
+### 周波数スキャナ（Frequency Scanner）
+スキャナは、2 つ以上の離散周波数を自動で**チューニング（走査）**し、いずれかで信号を検知すると停止し、最初の送信が終了すると他の周波数の走査を続ける**受信機**です。**フロリダ、ケンタッキー、ミネソタ**では、**FCC（連邦通信委員会）発行の現行アマチュア無線免許**を有する者以外は使用してはいけません。推奨ハードウェアは **Uniden BCD396T Bearcat Handheld Digital Scanner** または **PSR-800 GRE Digital trunking scanner** です。
+
+### スペクトラムアナライザ（Spectrum Analyzer）
+スペクトラムアナライザは、電気・音響・光の**波形のスペクトル構成**を解析する装置です。**無線送信機が連邦規定の標準どおり動作しているか**を確認し、**デジタル／アナログ信号の帯域幅**を直接観測により求めるために使用します。手頃な価格帯の例として **Kaltman Creations HF4060 RF Spectrum Analyzer** があります。
+
+### 802.11 USB アダプタ（802.11 USB adapter）
+802.11 USB アダプタは、**無線アダプタをテスト用システムに容易に接続**するためのものです。**認定済み以外の USB アダプタ**を用いると、必要な機能をすべて**サポートしない**場合があり問題となります。推奨ハードウェアは **Alfa AWUS051NH 500mW High Gain 802.11a/b/g/n high power Wireless USB** です。
+
+### 外部アンテナ（External Antennas）
+外部アンテナは**用途に応じて多様な形状**や**各種コネクタ**を持ちます。すべての外部アンテナは、Alfa と互換性のある **RP-SMA コネクタ**を備えている必要があります。Alfa には**無指向性（Omni）アンテナ**が同梱されるため、別途**指向性アンテナ**を用意します。**パネルアンテナ**が最適で、必要な性能を満たしつつ**携帯性**にも優れます。推奨ハードウェアは **L-com 2.4 GHz 14 dBi Flat Panel Antenna（RP-SMA）**。また、**L-com 2.4 GHz/900 MHz 3 dBi Omni Magnetic Mount Antenna（RP-SMA プラグ）** のような**マグネットマウントの無指向性アンテナ**も有用です。
+
+### USB GPS
+**RF 評価を適切に行うには GPS が必須**です。これがないと、**RF 信号がどこまで・どのように伝搬しているか**を把握できません。多数の選択肢がありますが、使用する **OS（Linux／Windows／Mac OS X）でサポートされる USB GPS** を入手してください。
+
+---
+
+## ソフトウェア（Software）
+
+ソフトウェアの要件は**エンゲージメントのスコープ**に依存しますが、**完全なペネトレーションテスト**を適切に実施するために必要となり得る**商用およびオープンソース**のソフトウェアを以下に挙げます。
+
+> **注記**：「Windows Only」は該当項目が **Windows 専用**であることを示します（原文中の `*` 記号）。
+
+| Software | URL | 説明 | Windows Only |
+|---|---|---|---|
+| Maltego | http://www.paterva.com/web5 | 個人や企業に関するデータマイニングの**事実上の標準**。無償のコミュニティ版と有償版あり。 |  |
+| Nessus | http://tenable.com/products/nessus | 有償／無償版のある**脆弱性スキャナ**。主に**内部ネットワーク**からの脆弱性発見と文書化に有用。 |  |
+| IBM AppScan | http://www-01.ibm.com/software/awdtools/appscan | IBM の**自動 Web アプリケーションセキュリティテスト**スイート。 | * |
+| eEye Retina | http://www.eeye.com/Products/Retina.aspx | 単一の Web ベースコンソールから管理できる**自動ネットワーク脆弱性スキャナ**。**Metasploit** と連携し、該当エクスプロイトがあれば Retina から直接起動して**脆弱性の実在**を検証可能。 |  |
+| Nexpose | http://www.rapid7.com | **Metasploit** と同社の**脆弱性スキャナ**。無償／有償版あり、サポートや機能に差。 |  |
+| OpenVAS | http://www.openvas.org | **Nessus** のフォークとして始まった**脆弱性スキャナ**。**毎日更新**される NVT（Network Vulnerability Tests）フィードを同梱（**20,000 超／2011 年 1 月時点**）。 |  |
+| HP WebInspect | https://www.fortify.com/products/web_inspect.html | 複雑な Web アプリケーションを対象とした**Web アプリ脆弱性テスト**。JavaScript、Flash、Silverlight などをサポート。 | * |
+| HP SWFScan | https://h30406.www3.hp.com/campaigns/2009/wwcampaign/1-5TUVE/index.php?key=swf | HP Web Security Research Group 開発の**無償ツール**。Flash アプリの脆弱性を自動検出。**デコンパイル**や**ハードコード資格情報**の発見にも有用。 | * |
+| Backtrack Linux | [1] | もっとも充実した**ペネトレーションテスト向け Linux ディストリ**の一つ。多くの無償ペンテストツールを同梱し、**Ubuntu ベース**で拡張性が高い。**Live CD／USB／VM／HDD インストール**可。 |  |
+| SamuraiWTF (Web Testing Framework) | http://samurai.inguardians.com | **Web アプリスキャン専用**の Live Linux ディストリ。Fierce、Maltego、WebScarab、BeEF など Web テスト特化ツールを同梱。 |  |
+| SiteDigger | http://www.mcafee.com/us/downloads/free-tools/sitedigger.aspx | **Windows 用**の無償ツール（v3.0）。Google キャッシュを検索し、**脆弱性／エラー／設定不備／機密情報**などをサイト上から見つける。 | * |
+| FOCA | http://www.informatica64.com/DownloadFOCA | Web サイトが公開する文書の**メタデータ解析**などを通じ、対象に関する情報を収集するツール。 | * |
+| THC IPv6 Attack Toolkit | http://www.thc.org/thc-ipv6 | **IPv6／ICMPv6** の脆弱性を突くための、最大規模の**ツール集**。 |  |
+| THC Hydra | http://thc.org/thc-hydra/ | 多様なサービスやリソースに対し高速に**総当たりログオン**を行うクラックツール。 | * |
+| Cain | http://www.oxid.it/cain.html | **Windows** で動作するパスワードリカバリツール。ネットワークスニッフィング、辞書／総当たり／解析による**パスワード解読**、VoIP 録音、無線鍵回収、パスワードボックスの表示、キャッシュパスワードの取得、ルーティングプロトコル解析などを提供。 | * |
+| cree.py | http://ilektrojohn.github.com/creepy/ | SNS や画像ホスティングから**位置情報関連データ**を収集し、**地図上に可視化**して文脈情報とともに提示。 |  |
+| inSSIDer | http://www.metageek.net/products/inssider | **Windows 用 GUI** の Wi-Fi **検出／トラブルシュート**ツール。 | * |
+| Kismet Newcore | http://www.kismetwireless.net | 802.11 の **L2 無線ネットワーク検出・スニッファ・IDS**。**モニタモード**対応アダプタで、SSID 公開／非公開を問わず受動収集。 |  |
+| Rainbow Crack | http://project-rainbowcrack.com | 事前計算済みの**レインボーテーブル**を用いて各種ハッシュに対し**高速照合**を行うパスワードクラックツール。 |  |
+| dnsenum | http://code.google.com/p/dnsenum | whois の**超強化版**のようなツール。DNS レコードの網羅的発見に加え、Google 経由の**サブドメイン発見**、**BIND バージョン**の特定なども試みる。 |  |
+| dnsmap | http://code.google.com/p/dnsmap | **受動型**の DNS マッパー。**サブドメインの総当たり発見**に使用。 |  |
+| dnsrecon | http://www.darkoperator.com/tools-and-scripts/ | Ruby 製の **DNS 列挙**スクリプト。TLD 展開、SRV レコード列挙、ホスト／サブドメイン総当たり、ゾーン転送、逆引き、一般的なレコードの特定に対応。 |  |
+| dnstracer | http://www.mavetju.org/unix/dnstracer.php | 指定した DNS サーバが**どこから情報を得ているか**を特定し、**権威サーバ**へと至る連鎖を追跡。 |  |
+| dnswalk | http://sourceforge.net/projects/dnswalk | **DNS デバッガ**。指定ドメインのゾーン転送を行い、**整合性や正確さ**を多面的に検査。 |  |
+| Fierce | http://ha.ckers.org/fierce | ネットワークの**非連続な IP 範囲**を発見する**ドメインスキャン**。 |  |
+| Fierce2 | http://trac.assembla.com/fierce/ | 新たな開発チームにより保守される **Fierce の更新版**。 |  |
+| FindDomains | http://code.google.com/p/finddomains | 多数の IP に分散する**ドメイン／サイト／バーチャルホスト**の発見に有用な**マルチスレッド**検索ツール。コンソール UI を備え、**自動化**への組み込みが容易。 | * |
+| HostMap | http://hostmap.lonerunners.net | 指定 IP アドレス上の**すべてのホスト名／バーチャルホスト**を自動発見する**無償ツール**。 |  |
+| URLcrazy | http://www.morningstarsecurity.com/research/urlcrazy | **タイポドメイン**生成ツール。対象企業に関連する**ドメイン占有（スコッティング）**の発見や、独自の生成にも役立つ。 |  |
+| theHarvester | http://www.edge-security.com/theHarvester.php | 検索エンジンや **PGP キーサーバ**など**公開ソース**から、**メール／ユーザ名／ホスト名・サブドメイン**を収集。 |  |
+| The Metasploit Framework | http://metasploit.com | あらゆるプラットフォーム向けの**リモートエクスプロイト**と**ポストエクスプロイト**の**巨大コレクション**。**ほぼ毎日**機能・エクスプロイトが追加されるため、常に **svn update** すること。詳細は書籍（http://nostarch.com/metasploit.htm）を参照。 |  |
+| The Social-Engineer Toolkit (SET) | http://www.secmaniac.com/download/ | **人的要素**を狙う高度な攻撃に特化。**正規サイトに似せたダミーサイト**や**悪性メール**を生成し、**ソーシャルエンジニアリング攻撃**を補完。 |  |
+| Fast-Track | http://www.secmaniac.com/download/ | **自動化ペンテスト**ツールスイート。多くの攻撃は、Web アプリにおける**クライアントサイド入力の不適切なサニタイズ**、**パッチ管理不備**、**ハードニング不足**に起因。Linux 上で動作し、**Metasploit 3** に依存。 |  |
+
+> [1] 原文では BackTrack の参照リンクが `[1]` として記されているのみです。
