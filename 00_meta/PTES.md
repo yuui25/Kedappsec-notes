@@ -1518,3 +1518,272 @@ HEAD / HTTP/1.0
 （原文の示す他のバナーグラビングの出力例やツールに関する説明は上記に含まれる通りです。）
 
 <<<END>>>
+
+<<<BEGIN>>>
+# 2.6 内部フットプリンティング（Internal Footprinting）
+
+内部フットプリンティング段階のインテリジェンス収集は、内部の視点からターゲットと直接やり取りして得られる応答結果を収集することを含みます。目標はターゲットに関する情報を可能な限り多く集めることです。
+
+## 2.6.1 アクティブフットプリンティング（Active Footprinting）
+アクティブフットプリンティング段階は、ターゲットとの直接的なやり取りに基づいて応答結果を収集することを含みます。
+
+### 2.6.1.1 Ping スイープ（Ping Sweeps）
+アクティブフットプリンティングはライブシステムの特定から始まります。これは通常、どのホストが応答するかを判定するために Ping スイープを行うことで実施されます。
+
+### 2.6.1.2 Nmap（Windows / Linux）
+Nmap（"Network Mapper"）はネットワーク監査／スキャンの事実上の標準ツールです。Nmap は Linux と Windows の両方で動作し、コマンドライン版と GUI 版があります。本書ではコマンドラインに限定して説明します。
+
+Nmap 5.51（ http://nmap.org ）
+
+使用法:
+~~~~
+nmap [Scan Type(s)] [Options] {target specification}
+~~~~
+
+#### ターゲット指定（TARGET SPECIFICATION）
+ホスト名、IP アドレス、ネットワークなどを渡せます。  
+例: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254  
+- -iL <inputfilename>: ホスト/ネットワークのリストから入力  
+- -iR <num hosts>: ランダムにターゲットを選択  
+- --exclude <host1[,host2][,host3],...>: ホスト/ネットワークを除外  
+- --excludefile <exclude_file>: ファイルから除外リストを指定
+
+#### ホスト検出（HOST DISCOVERY）
+- -sL: List Scan — スキャン対象を単に列挙  
+- -sn: Ping Scan — ポートスキャンを行わない  
+- -Pn: 全ホストをオンラインと見なす（ホスト検出をスキップ）  
+- -PS/PA/PU/PY[portlist]: 指定ポートへの TCP SYN/ACK、UDP、または SCTP による検出  
+- -PE/PP/PM: ICMP エコー、タイムスタンプ、ネットマスク要求による検出プローブ  
+- -PO[protocol list]: IP プロトコル Ping  
+- -n/-R: DNS 解決を行わない／常に解決する（デフォルト：場合により）  
+- --dns-servers <serv1[,serv2],...>: カスタム DNS サーバを指定  
+- --system-dns: OS の DNS リゾルバを使用  
+- --traceroute: 各ホストへのホップ経路をトレース
+
+#### スキャン手法（SCAN TECHNIQUES）
+- -sS / -sT / -sA / -sW / -sM: TCP SYN / Connect() / ACK / Window / Maimon スキャン  
+- -sU: UDP スキャン  
+- -sN / -sF / -sX: TCP Null, FIN, Xmas スキャン  
+- --scanflags <flags>: TCP フラグをカスタマイズ  
+- -sI <zombie host[:probeport]>: Idle スキャン  
+- -sY / -sZ: SCTP INIT / COOKIE-ECHO スキャン  
+- -sO: IP プロトコルスキャン  
+- -b <FTP relay host>: FTP バウンススキャン
+
+#### ポート指定とスキャン順序（PORT SPECIFICATION AND SCAN ORDER）
+- -p <port ranges>: 指定ポートのみをスキャン  
+  例: -p22; -p1-65535; -p U:53,111,137,T:21-25,80,139,8080,S:9  
+- -F: Fast モード — デフォルトより少ないポートをスキャン  
+- -r: ポートを連続してスキャン（ランダム化しない）  
+- --top-ports <number>: よく使われる上位ポート数をスキャン  
+- --port-ratio <ratio>: 指定比率より一般的なポートをスキャン
+
+#### サービス／バージョン検出（SERVICE/VERSION DETECTION）
+- -sV: オープンポートのサービス／バージョン情報をプローブ  
+- --version-intensity <level>: 0（軽量）〜9（全プローブ）で設定  
+- --version-light: 可能性の高いプローブに限定（強度 2）  
+- --version-all: すべてのプローブを試行（強度 9）  
+- --version-trace: バージョンスキャンの詳細を表示（デバッグ用）
+
+#### スクリプトスキャン（SCRIPT SCAN）
+- -sC: --script=default と同等  
+- --script=<Lua scripts>: カンマ区切りのスクリプト、スクリプトファイル、またはスクリプトカテゴリ  
+- --script-args=<n1=v1,[n2=v2,...]>: スクリプトへの引数  
+- --script-trace: 送受信データを全て表示  
+- --script-updatedb: スクリプトデータベースを更新
+
+#### OS 検出（OS DETECTION）
+- -O: OS 検出を有効にする  
+- --osscan-limit: 有望なターゲットに限定して OS 検出  
+- --osscan-guess: より積極的に OS を推測
+
+#### タイミングとパフォーマンス（TIMING AND PERFORMANCE）
+時間指定のオプションは秒（s）、ミリ秒（ms）、分（m）、時（h）を付けられます。  
+- -T<0-5>: タイミングテンプレート（数値が大きいほど速い）  
+- --min-hostgroup / --max-hostgroup <size>: 並列ホストスキャンのグループサイズ  
+- --min-parallelism / --max-parallelism <numprobes>: プローブ並列度  
+- --min-rtt-timeout / --max-rtt-timeout / initial-rtt-timeout <time>: プローブ往復時間のタイムアウト指定  
+- --max-retries <tries>: プローブ再送の上限  
+- --host-timeout <time>: 指定時間経過後にターゲットを諦める  
+- --scan-delay / --max-scan-delay <time>: プローブ間の遅延調整  
+- --min-rate / --max-rate: 秒あたりの送信パケット数の最小／最大
+
+#### ファイアウォール／IDS 回避と偽装（FIREWALL/IDS EVASION AND SPOOFING）
+- -f; --mtu <val>: パケットを断片化（必要であれば MTU 指定）  
+- -D <decoy1,decoy2[,ME],...>: デコイでスキャンを覆い隠す  
+- -S <IP_Address>: 送信元アドレスを偽装  
+- -e <iface>: 指定インターフェースを使用  
+- -g / --source-port <portnum>: 送信元ポートを指定  
+- --data-length <num>: 送信パケットにランダムデータを付加  
+- --ip-options <options>: 指定 IP オプションで送信  
+- --ttl <val>: IP TTL フィールドを設定  
+- --spoof-mac <mac address/prefix/vendor name>: MAC アドレスを偽装  
+- --badsum: 不正な TCP/UDP/SCTP チェックサムを送信
+
+#### 出力（OUTPUT）
+- -oN / -oX / -oS / -oG <file>: 通常、XML、s|<rIpt kIddi3, および Grepable 形式で出力  
+- -oA <basename>: 主要 3 形式を同時に出力  
+- -v: 冗長度を上げる（-vv などでさらに増加）  
+- -d: デバッグ出力を増やす（-dd など）  
+- --reason: ポート状態の理由を表示  
+- --open: 開いている（または開いている可能性のある）ポートのみ表示  
+- --packet-trace: 送受信パケットを全て表示  
+- --iflist: ホストのインターフェースとルートを表示（デバッグ用）  
+- --log-errors: 正常出力にエラー／警告を記録  
+- --append-output: 指定ファイルに追記  
+- --resume <filename>: 中断したスキャンを再開  
+- --stylesheet <path/URL>: XML を HTML に変換する XSL スタイルシートを指定  
+- --webxml: Nmap.Org のスタイルシート参照でより移植性の高い XML を生成  
+- --no-stylesheet: XML にスタイルシートを関連付けない
+
+#### 雑多（MISC）
+- -6: IPv6 スキャンを有効にする  
+- -A: OS 検出、バージョン検出、スクリプトスキャン、トレーサートを同時に有効化  
+- --datadir <dirname>: Nmap データファイルのカスタム位置を指定  
+- --send-eth / --send-ip: 生のイーサネットフレームまたは IP パケットで送信  
+- --privileged / --unprivileged: 権限を想定  
+- -V: バージョン表示  
+- -h: ヘルプ表示
+
+##### 例:
+~~~~
+nmap -v -A scanme.nmap.org
+nmap -v -sn 192.168.0.0/16 10.0.0.0/8
+nmap -v -iR 10000 -Pn -p 80
+~~~~
+
+（詳細はマニュアル http://nmap.org/book/man.html を参照）
+
+Nmap は非常に多くのオプションを持ちます。本節ではポートスキャンに必要なコマンドに焦点を当てています。使用するコマンドは主に利用可能な時間とスキャン対象ホスト数に依存します。ホスト数が多く、時間が限られているほど、対象への詳細な問い合わせは減らされます。
+
+Ping スイープを実施するには次のコマンドを利用します:
+~~~~
+nmap -sn <client ip range>/<CIDR> or <Mask>
+~~~~
+例:
+~~~~
+nmap -sn 10.25.0.0/24
+~~~~
+
+（原文の Nmap 実行例抜粋）
+- Nmap 実行開始、スキャン結果として複数ホストが up と報告され、MAC アドレスやホストの応答時間が示されます。例えば 256 IP アドレス中 4 hosts up といった要約が得られます。
+
+### 2.6.1.3 Alive6（Linux）
+Alive6 は THC IPv6 Attack Toolkit の一部であり、IPv6 システムを検出する最も効果的なメカニズムを提供します。オプションは多数ありますが、単純にインターフェースを指定して実行するだけで、ローカルリンク上で稼働中の IPv6 システムを返します。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## 2.6.2 ポートスキャン（Port Scanning）
+（本節の Nmap に関する説明は上記 2.6.1.2 と同様の内容を含みます。要点は同じく Nmap の使用法、オプション、タイミングとパフォーマンス、回避技術、出力形式、及び実行例に関する説明です。）
+
+基本的な推奨として、評価対象の IP セットに対して TCP と UDP の両方をポート 1–65535 の範囲でスキャンすることが挙げられます。使用例は以下の通りです：
+~~~~
+nmap -A -PN -sU -sS -T2 -v -p 1-65535 <client ip range>/<CIDR> or <Mask> -oA NMap_FULL_<client ip range>
+nmap -A -PN -sU -sS -T2 -v -p 1-65535 client.com -oA NMap_FULL_client
+~~~~
+
+（実行ログ例：NSE スクリプトの読み込み、DNS 解決、SYN ステルススキャン、65535 ポートのスキャン実行、80/tcp のオープン検出などの出力が含まれます）
+
+大規模な IP セット（100 アドレス以上）の場合はポート範囲指定を行わないことが推奨されます。例：
+~~~~
+nmap -A -O -PN <client ip range>/<CIDR> or <Mask> -oA NMap_<client ip range>
+nmap -A -O -PN client.com -oA NMap_client
+~~~~
+
+IPv6 に関する制限事項や実行例も前述の通りです。
+
+## 2.6.3 SNMP スイープ（SNMP Sweeps）
+SNMP スイープは多くの情報を提供するため実施されます。SNMP はステートレスな UDP ベースのプロトコルであり、不正な community string には応答しません。したがって「応答無し」は以下のいずれかを意味する可能性があります：
+- マシンが到達不能である  
+- SNMP サーバが稼働していない  
+- 無効な community string  
+- 応答データグラムがまだ到着していない
+
+### SNMPEnum（Linux）
+SNMPEnum は単一ホストに対して SNMP リクエストを送り、応答を待ちログする Perl スクリプトです。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## 2.6.4 Metasploit
+アクティブフットプリンティングは Metasploit によってもある程度実行できます。詳細は Metasploit Unleashed コースなどを参照してください。
+
+## 2.6.5 ゾーン転送（Zone Transfers）
+（前述のゾーン転送に関する説明と同様）DNS ゾーン転送（AXFR）は DNS データベースを複製する仕組みで、host、dig、nmap などでテスト可能です。
+
+#### host の例
+~~~~
+host <domain> <DNS server>
+~~~~
+
+#### dig の例
+~~~~
+dig @server domain axfr
+~~~~
+
+## 2.6.6 SMTP バウンスバック（SMTP Bounce Back）
+SMTP のバウンスバック（NDR / DSN / NDN、いわゆる bounce）は配信問題を通知する自動メールであり、SMTP サーバの指紋（ソフトウェアやバージョン）を把握する手がかりになることがあります。
+
+## 2.6.7 逆引き DNS（Reverse DNS）
+逆引き DNS は組織で使用されるサーバ名を取得するために使えますが、PTR レコードが存在する必要があります。様々な IP を試して結果が返るかを確認します。
+
+## 2.6.8 バナーグラビング（Banner Grabbing）
+（前述）バナーグラビングは HTTP、FTP、SMTP（ポート 80、21、25 など）で行われ、ツールとして Telnet、nmap、netcat、netca6（IPv6）などが利用されます。
+
+#### HTTP 生データ例（原文抜粋）
+~~~~
+JUNK / HTTP/1.0
+
+HEAD / HTTP/9.3
+
+OPTIONS / HTTP/1.0
+
+HEAD / HTTP/1.0
+~~~~
+
+### httprint
+httprint はウェブサーバ指紋ツールで、サーババナーが偽装されている場合でも特性からサーバを正確に特定することを目標とします。無バナーデバイス（ワイヤレスアクセスポイント、ルータ、スイッチ等）も検出可能です。テキスト署名を用い、署名データベースに署名を追加するのも容易です。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## 2.6.9 VoIP マッピング（VoIP mapping）
+VoIP マッピングはトポロジ、サーバ、クライアントに関する情報を収集する作業です。目的はライブホスト、PBX の種類とバージョン、VoIP サーバ／ゲートウェイ、クライアント（ハード／ソフト）の種類とバージョンを特定することです。多くの手法は SIP（Session Initiation Protocol）の理解を前提とします。
+
+- SMAP: SIP 対応デバイスをスキャンするためのツール（SIP リクエストを生成して応答を待つ）  
+- SIPScan: 単一ホストまたはサブネット全体をスキャンできる SIP スキャナ
+
+~~~~
+（Screenshot Here）
+~~~~
+
+### エクステンション（Extensions）
+エクステンションは IP 電話、PC ソフトフォン、インスタントメッセージクライアント、モバイルデバイスなど、SIP 接続を開始するクライアントアプリケーションやデバイスを指します。目的は有効なユーザ名や SIP デバイスのエクステンションを特定することです。REGISTER、OPTIONS、INVITE といった SIP メソッドのエラーメッセージからエクステンション列挙が可能です。
+
+- Svwar（SIPVicious スイートの一部）: エクステンション列挙に使用可能。範囲または辞書ファイルを使用して列挙を行い、デフォルトは REGISTER メソッドでの列挙です。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+### enumIAX
+Asterisk サーバが使用されている場合、enumIAX のようなユーザ名推測ツールを利用して IAX2（Inter Asterisk Exchange version 2）プロトコルのユーザ名列挙を行う必要があります。enumIAX は逐次推測モードまたは辞書攻撃モードの 2 モードで動作します。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## 2.6.10 パッシブ偵察（Passive Reconnaissance）
+
+### 2.6.10.1 パケットスニッフィング（Packet Sniffing）
+パケットスニッフィングを行うことで、解析中のストリームに含まれるシステムの IP アドレスや MAC アドレスを収集できます。大部分においてパケットスニッフィングは検出が困難であり、この形態の偵察は本質的にパッシブで極めてステルスです。大量のパケットを収集・分析することで、対象デバイスの OS と稼働サービスのフィンガープリンティングが可能になります。さらに、ログイン情報、パスワードハッシュ、その他の認証情報をパケットストリームから取得できる場合があります。古い Telnet や古い SNMP バージョンは資格情報を平文で送るため、スニッフィングで容易に傍受されます。パケットスニッフィングはどのサーバが重要インフラとして機能しているかを判断するのにも有用であり、攻撃者にとって関心のあるサーバを特定する助けとなります。
+
+~~~~
+（ここでパケットスニッフィングに関連するツールや例が挙げられることが想定されます）
+~~~~
+
+<<<END>>>
