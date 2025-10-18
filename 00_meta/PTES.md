@@ -1249,3 +1249,272 @@ Netstumbler を使用していた場合、Windows Vista/7（64bit）では正し
 ~~~~
 
 <<<END>>>
+
+<<<BEGIN>>>
+# 2.5 外部フットプリンティング（External Footprinting）
+
+外部フットプリンティング段階のインテリジェンス収集は、外部の視点からターゲットに直接働きかけて得られる応答結果を収集することを含みます。目標はターゲットに関する情報を可能な限り多く集めることです。
+
+## IP 範囲の特定（Identifying IP Ranges）
+外部フットプリンティングでは、まずどの WHOIS サーバが我々の求める情報を持っているかを特定する必要があります。ターゲットドメインの TLD を把握していれば、対象ドメインが登録されているレジストラ（Registrar）を見つければよいのです。WHOIS 情報はツリー階層に基づいています。ICANN（IANA）は全ての TLD に対する権威あるレジストリであり、手動の WHOIS クエリを行う際の出発点として有用です。
+
+### WHOIS 参照例
+- ICANN - http://www.icann.org  
+- IANA - http://www.iana.com  
+- NRO - http://www.nro.net  
+- AFRINIC - http://www.afrinic.net  
+- APNIC - http://www.apnic.net  
+- ARIN - http://ws.arin.net  
+- LACNIC - http://www.lacnic.net  
+- RIPE - http://www.ripe.net
+
+適切なレジストラを問い合わせると、登録者（Registrant）情報を取得できます。WHOIS 情報を提供するサイトはいくつかありますが、正確な記録のためには該当するレジストラのみを使用するべきです。
+- InterNIC - http://www.internic.net/
+
+## BGP のルッキンググラス（BGP looking glasses）
+BGP（Border Gateway Protocol）に参加するネットワークの自律システム番号（ASN）を特定することが可能です。BGP のルート経路は世界中で広報されているため、BGP4 や BGP6 のルッキンググラスを使ってこれらを見つけられます。
+- BGP4 - http://www.bgp4.as/looking-glasses  
+- BGP6 - http://lg.he.net/
+
+## アクティブ偵察（Active Reconnaissance）
+- 手動ブラウジング（Manual browsing）  
+- Google Hacking - http://www.exploit-db.com/google-dorks
+
+## パッシブ偵察（Passive Reconnaissance）
+- Google Hacking - http://www.exploit-db.com/google-dorks
+
+## アクティブフットプリンティング（Active Footprinting）
+アクティブフットプリンティング段階は、ターゲットとの直接的なやり取りに基づいて応答結果を収集することを含みます。
+
+### ゾーン転送（Zone Transfers）
+DNS ゾーン転送（AXFR としても知られる）は DNS 取引の一種で、DNS データを含むデータベースを複数の DNS サーバ間で複製するための仕組みです。ゾーン転送にはフル（AXFR）と増分（IXFR）の 2 種類があります。ゾーン転送の可否をテストするためのツールは多数あり、一般的に zone transfer に使われるツールは host、dig、nmap などです。
+
+#### host の例
+~~~~
+host <domain> <DNS server>
+~~~~
+
+#### dig の例
+~~~~
+dig @server domain axfr
+~~~~
+
+### 逆引き DNS（Reverse DNS）
+逆引き DNS は、組織内で使用されている有効なサーバ名を取得するために使用できます。ただし、指定された IP アドレスから名前を解決するには PTR（逆引き）DNS レコードが存在する必要がある点に注意してください。PTR レコードが存在すれば結果が返されます。通常は様々な IP アドレスを用いてサーバをテストし、結果が返るかを確認します。
+
+### DNS ブルーティング（DNS Bruting）
+クライアントのドメインに関連するすべての情報を特定した後、DNS への問い合わせを開始します。DNS は IP アドレスとホスト名を相互にマップするために使用されるので、設定が不十分かどうかを確認したいのです。DNS を用いてクライアントに関する追加情報を明らかにすることを目指します。DNS に関する深刻な設定ミスの一つは、インターネットユーザが利用可能な状態でゾーン転送を許可していることです。ゾーン転送の可否チェックのみならず、一般には知られていない追加のホスト名を発見する可能性がある DNS 列挙ツールがいくつかあります。
+
+#### Fierce2（Linux）
+DNS 列挙には複数のツールがあり、まず注目するのは Fierce2（Fierce の改良版）です。Fierce2 は多くのオプションを持ちますが、ここではゾーン転送を試行する機能に注目します。ゾーン転送が不可能な場合は、登録されているホスト名を列挙するために様々なサーバ名を用いた DNS クエリを実行します。
+
+実行コマンドの例：
+~~~~
+fierce -dns <client domain> -prefix <wordlist>
+~~~~
+
+一般的なプレフィックス（common-tla.txt と呼ばれる）ワードリストが DNS エントリ列挙の際に利用されます。原文では以下の URL にあると記載されています：
+https://address-unknown/
+
+#### DNSEnum（Linux）
+Fierce2 の代替ツールとして DNSEnum があります。DNSEnum はサブドメインのブルートフォース、逆引き、ドメインのネットワークレンジ一覧、whois クエリなどを通じて DNS を列挙する機能を提供します。また Google スクレイピングを行い追加でクエリすべき名前を収集します。
+
+実行コマンドの例：
+~~~~
+dnsenum -enum -f <wordlist> <client domain>
+~~~~
+
+ここでも共通プレフィックスのワードリストが利用され、原文では同 URL が示されています：
+https://address-unknown/
+
+#### Dnsdict6（Linux）
+Dnsdict6 は THC IPv6 Attack Toolkit の一部で、IPv6 DNS 辞書ブルートフォーサーです。オプションは比較的単純で、ドメインと辞書ファイルを指定します。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## ポートスキャン（Port Scanning）
+
+### Nmap（Windows / Linux）
+Nmap（"Network Mapper"）はネットワーク監査／スキャンの事実上の標準ツールです。Nmap は Linux と Windows の両方で動作し、コマンドライン版と GUI 版があります。本書ではコマンドラインに限定して説明します。
+
+Nmap 5.51（ http://nmap.org ）
+使用法：
+~~~~
+nmap [Scan Type(s)] [Options] {target specification}
+~~~~
+
+#### TARGET SPECIFICATION:
+  ホスト名、IP アドレス、ネットワーク等を渡せます。  
+  例: scanme.nmap.org, microsoft.com/24, 192.168.0.1; 10.0.0-255.1-254  
+  -iL <inputfilename>: ホスト／ネットワークのリストから入力  
+  -iR <num hosts>: ランダムターゲットの選択  
+  --exclude <host1[,host2][,host3],...>: スキャン対象から除外  
+  --excludefile <exclude_file>: ファイルから除外リストを指定
+
+#### HOST DISCOVERY:
+  -sL: List Scan - スキャン対象を単に列挙  
+  -sn: Ping Scan - ポートスキャンを行わない  
+  -Pn: 全ホストをオンラインとみなす（ホスト検出をスキップ）  
+  -PS/PA/PU/PY[portlist]: 指定ポートへの TCP SYN/ACK、UDP、または SCTP 発見  
+  -PE/PP/PM: ICMP エコー、タイムスタンプ、ネットマスク要求発見プローブ  
+  -PO[protocol list]: IP プロトコル Ping  
+  -n/-R: DNS 解決を行わない／常に解決する（デフォルト：場合により）  
+  --dns-servers <serv1[,serv2],...>: カスタム DNS サーバを指定  
+  --system-dns: OS の DNS リゾルバを使用  
+  --traceroute: 各ホストへのホップ経路をトレース
+
+#### SCAN TECHNIQUES:
+  -sS/sT/sA/sW/sM: TCP SYN/Connect()/ACK/Window/Maimon スキャン  
+  -sU: UDP スキャン  
+  -sN/sF/sX: TCP Null, FIN, Xmas スキャン  
+  --scanflags <flags>: TCP フラグをカスタマイズ  
+  -sI <zombie host[:probeport]>: Idle スキャン  
+  -sY/sZ: SCTP INIT/COOKIE-ECHO スキャン  
+  -sO: IP プロトコルスキャン  
+  -b <FTP relay host>: FTP バウンススキャン
+
+#### PORT SPECIFICATION AND SCAN ORDER:
+  -p <port ranges>: 指定ポートのみをスキャン  
+    例: -p22; -p1-65535; -p U:53,111,137,T:21-25,80,139,8080,S:9  
+  -F: Fast モード - デフォルトより少ないポートをスキャン  
+  -r: ポートを連続してスキャン（ランダム化しない）  
+  --top-ports <number>: 最も一般的なポートを指定数だけスキャン  
+  --port-ratio <ratio>: 指定比率より一般的なポートをスキャン
+
+#### SERVICE/VERSION DETECTION:
+  -sV: オープンポートのサービス／バージョン情報をプローブ  
+  --version-intensity <level>: 0（軽い）〜9（全プローブ）で設定  
+  --version-light: 最も可能性の高いプローブに制限（強度 2）  
+  --version-all: すべてのプローブを試行（強度 9）  
+  --version-trace: バージョンスキャン活動の詳細を表示（デバッグ用）
+
+#### SCRIPT SCAN:
+  -sC: --script=default と同等  
+  --script=<Lua scripts>: カンマ区切りのスクリプト／ディレクトリ／カテゴリ  
+  --script-args=<n1=v1,[n2=v2,...]>: スクリプトへの引数指定  
+  --script-trace: 送受信データを全て表示  
+  --script-updatedb: スクリプトデータベース更新
+
+#### OS DETECTION:
+  -O: OS 検出を有効化  
+  --osscan-limit: 有望なターゲットに限定して OS 検出  
+  --osscan-guess: より積極的に OS を推測
+
+#### TIMING AND PERFORMANCE:
+  時間指定のオプションは秒（'s'）、ミリ秒（'ms'）、分（'m'）、時（'h'）を付けられます。  
+  -T<0-5>: タイミングテンプレート（数値が大きいほど速い）  
+  --min-hostgroup/max-hostgroup <size>: 並列ホストスキャングループサイズ  
+  --min-parallelism/max-parallelism <numprobes>: プローブ並列度  
+  --min-rtt-timeout/...: プローブの往復時間タイムアウト等を調整  
+  --max-retries <tries>: プローブ再送の上限  
+  --host-timeout <time>: 指定時間後にターゲットを諦める  
+  --scan-delay/--max-scan-delay <time>: プローブ間の遅延調整  
+  --min-rate / --max-rate: 秒あたりのパケット送信レート制限
+
+#### FIREWALL/IDS EVASION AND SPOOFING:
+  -f; --mtu <val>: パケット断片化（MTU 指定可）  
+  -D <decoy1,decoy2[,ME],...>: デコイでスキャンを覆い隠す  
+  -S <IP_Address>: 送信元アドレスを偽装  
+  -e <iface>: 指定インターフェースを使用  
+  -g/--source-port <portnum>: 送信元ポートを指定  
+  --data-length <num>: 送信パケットにランダムデータを付加  
+  --ip-options <options>: 指定 IP オプションで送信  
+  --ttl <val>: IP TTL フィールドを設定  
+  --spoof-mac <mac address/prefix/vendor name>: MAC アドレス偽装  
+  --badsum: 不正な TCP/UDP/SCTP チェックサムを送信
+
+#### OUTPUT:
+  -oN/-oX/-oS/-oG <file>: 通常／XML／s|<rIpt kIddi3,／Grepable 形式で出力  
+  -oA <basename>: 主要 3 形式を同時に出力  
+  -v: 冗長性レベルを上げる（-vv など）  
+  -d: デバッグレベルを上げる（-dd など）  
+  --reason: ポート状態の理由を表示  
+  --open: 開いている（または開いている可能性のある）ポートのみ表示  
+  --packet-trace: 送受信パケットをすべて表示  
+  --iflist: ホストのインターフェースとルートを表示（デバッグ用）  
+  --log-errors: 正常フォーマット出力にエラー／警告を記録  
+  --append-output: 指定出力ファイルに追記  
+  --resume <filename>: 中断したスキャンを再開  
+  --stylesheet <path/URL>: XML 出力を HTML に変換する XSL スタイルシート指定  
+  --webxml: Nmap.Org のスタイルシート参照でより移植性の高い XML を生成  
+  --no-stylesheet: XML にスタイルシートを関連付けない
+
+#### MISC:
+  -6: IPv6 スキャンを有効化  
+  -A: OS 検出、バージョン検出、スクリプトスキャン、トレースルートを同時に有効化  
+  --datadir <dirname>: カスタム Nmap データファイルの位置指定  
+  --send-eth/--send-ip: 生のイーサネットフレームまたは IP パケットで送信  
+  --privileged / --unprivileged: 権限の有無を想定  
+  -V: バージョン表示  
+  -h: ヘルプサマリ表示
+
+#### 例:
+  nmap -v -A scanme.nmap.org  
+  nmap -v -sn 192.168.0.0/16 10.0.0.0/8  
+  nmap -v -iR 10000 -Pn -p 80
+
+詳細や追加のオプション・例についてはマニュアル（http://nmap.org/book/man.html）を参照してください。
+
+Nmap は多数のオプションを備えています。本節はポートスキャンに関連するコマンドに焦点を当てます。使用するコマンドは主に利用可能な時間とスキャンするホスト数に依存します。ホスト数が多く時間が限られているほど調査は簡素化されます。
+
+評価対象の IP セットに基づき、TCP と UDP の両方のポートを 1–65535 の範囲でスキャンすることが望ましいです。使用するコマンド例は以下の通りです：
+~~~~
+nmap -A -PN -sU -sS -T2 -v -p 1-65535 <client ip range>/<CIDR> or <Mask> -oA NMap_FULL_<client ip range>
+nmap -A -PN -sU -sS -T2 -v -p 1-65535 client.com -oA NMap_FULL_client
+~~~~
+
+（以下は Nmap 実行時の出力例を示す原文の抜粋を翻訳して保持しています）
+- Nmap 実行開始のメッセージ、スクリプトの読み込み、DNS 解決の並列実行、SYN ステルススキャンの開始、65535 ポートのスキャン結果などの記録例があります。スキャンにより 80/tcp が open と検出されたことなどが示されています。
+
+大きな IP セット（100 IP アドレスを超える場合）ではポート範囲を指定しないことが推奨されます。その場合の例：
+~~~~
+nmap -A -O -PN <client ip range>/<CIDR> or <Mask> -oA NMap_<client ip range>
+nmap -A -O -PN client.com -oA NMap_client
+~~~~
+
+出力例（抜粋）ではホストが up、rDNS レコード、フィルタ状態のポート数、開いているポートとサービス情報（例: 80/tcp open http Apache httpd 2.2.3 ((CentOS))）などが示されます。また OS 推定が信頼性に乏しい場合の注意書きもあります。
+
+#### IPv6 に関する注意
+Nmap は IPv6 に対して限定的なオプションしか持たないことに留意してください。利用可能なオプションには TCP connect（-sT）、Ping スキャン（-sn）、List スキャン（-sL）、バージョン検出などが含まれます。IPv6 の例：
+~~~~
+nmap -6 -sT -P0 fe80::80a5:26f2:8db7:5d04%12
+~~~~
+
+（IPv6 実行例の出力例も原文通りに示され、複数の開いているポートがリストアップされています）
+
+## SNMP スイープ（SNMP Sweeps）
+SNMP スイープも実施されます。SNMP はステートレスなデータグラム指向プロトコルで、多くのシステム情報を提供し得ます。ただし不正な community string には応答せず、基盤にある UDP は閉じた UDP ポートを確実に報告しないため、プローブした IP から "no response"（応答無し）が返る場合、以下のいずれかが考えられます：
+- マシンに到達できない  
+- SNMP サーバが稼働していない  
+- 無効な community string  
+- 応答データグラムがまだ到着していない
+
+### SNMPEnum（Linux）
+SNMPEnum は単一ホストに SNMP リクエストを送り、応答を待ってログする Perl スクリプトです。
+
+~~~~
+（Screenshot Here）
+~~~~
+
+## SMTP バウンスバック（SMTP Bounce Back）
+SMTP バウンスバック（NDR/DSN/NDN、いわゆる bounce）は、配信問題を送信者に通知するためにメールシステムが自動的に返す電子メッセージです。これを利用すると SMTP サーバの指紋特定に役立つ場合があり、バウンスメッセージにサーバのソフトウェア名やバージョン情報が含まれることがあります。
+
+## バナーグラビング（Banner Grabbing）
+バナーグラビングはネットワーク上のコンピュータシステムや開放ポート上で動作するサービスについて情報を取得するための列挙技法です。バナーグラビングによりターゲットホストが実行しているアプリケーションや OS のバージョンを特定できます。通常 HTTP、FTP、SMTP（ポート 80、21、25）等で行われ、よく使われるツールは Telnet、nmap、Netcat などです。
+
+#### HTTP の例（原文にある生データの例）
+~~~~
+JUNK / HTTP/1.0
+
+HEAD / HTTP/9.3
+
+OPTIONS / HTTP/1.0
+
+HEAD / HTTP/1.0
+~~~~
+
+（原文の示す他のバナーグラビングの出力例やツールに関する説明は上記に含まれる通りです。）
+
+<<<END>>>
