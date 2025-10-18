@@ -460,7 +460,7 @@ RF 評価で信号の伝播範囲や位置を正確に記録するには GPS が
 | BackTrack Linux | [1] | ペネトレーション用ツールを多数収録した Linux ディストリビューション（歴史的）。Live CD/USB/VM での運用が可能。 |  |
 | SamuraiWTF (Web Testing Framework) | http://samurai.inguardians.com | Web アプリケーション用のライブ Linux ディストリビューション。Fierce, Maltego, WebScarab, BeEF 等を含む。 |  |
 | SiteDigger | http://www.mcafee.com/us/downloads/free-tools/sitedigger.aspx | Windows 向けの無料ツール。Google キャッシュを利用して脆弱性、エラー、設定ミス、公開文書から興味深い情報を探す。 | * |
-| FOCA | http://www.informatica64.com/DownloadFOCA | 公開ドキュメントのメタデータ解析によりサイトの情報を収集するツール。 |  |
+| FOCA | http://www.informatica64.com/DownloadFOCA | 公開ドキュメントのメタデータ解析によりサイトの情報を収集するツール。 | * |
 | THC IPv6 Attack Toolkit | http://www.thc.org/thc-ipv6 | IPv6 と ICMP6 の脆弱性を突くツール群。 |  |
 | THC Hydra | http://thc.org/thc-hydra/ | 高速なログオンブルートフォースツール。多くのサービスに対して並列攻撃が可能。 | * |
 | Cain | http://www.oxid.it/cain.html | Windows 向けのパスワードリカバリツール。ネットワークスニッフィング、辞書/ブルートフォース、VoIP録音、ハッシュ解析など多機能。 | * |
@@ -468,20 +468,20 @@ RF 評価で信号の伝播範囲や位置を正確に記録するには GPS が
 | inSSIDer | http://www.metageek.net/products/inssider | Windows 用の GUI ベース Wi-Fi 発見／トラブルシュートツール。 | * |
 | Kismet Newcore | http://kismetwireless.net | 802.11 レイヤ2 無線検出器・スニッファ・侵入検知システム。モニターモード対応アダプタでパッシブにパケット収集が可能。 |  |
 | Rainbow Crack | http://project-rainbowcrack.com | レインボーテーブルを用いたハッシュクラッキングツール。 |  |
-| dnsenum | http://code.google.com/p/dnsenum | whois を拡張した DNS 列挙ツール。サブドメイン発見や BIND バージョン調査などに利用。 | * |
-| dnsmap | http://code.google.com/p/dnsmap | サブドメイン総当たりによる DNS マッピング用の受動的ツール。 | * |
-| dnsrecon | http://www.darkoperator.com/tools-and-scripts/ | Ruby で書かれた DNS 列挙スクリプト。TLD 拡張、SRV 列挙、ゾーン転送、逆引き等を行う。 | * |
-| dnstracer | http://www.mavetju.org/unix/dnstracer.php | 指定ドメインの DNS 情報の由来をたどるツール。 | * |
-| dnswalk | http://sourceforge.net/projects/dnswalk | DNS データベースの整合性チェックを行うデバッガ。ゾーン転送や一貫性チェックを実施。 | * |
-| Fierce | http://ha.ckers.org/fierce | ノンコンティグな IP 範囲を探索するドメインスキャンツール。 | * |
-| Fierce2 | http://trac.assembla.com/fierce/ | Fierce の更新版。開発者グループによるメンテナンスあり。 | * |
+| dnsenum | http://code.google.com/p/dnsenum | whois を拡張した DNS 列挙ツール。サブドメイン発見や BIND バージョン調査などに利用。 |  |
+| dnsmap | http://code.google.com/p/dnsmap | サブドメイン総当たりによる DNS マッピング用の受動的ツール。 |  |
+| dnsrecon | http://www.darkoperator.com/tools-and-scripts/ | Ruby で書かれた DNS 列挙スクリプト。TLD 拡張、SRV 列挙、ゾーン転送、逆引き等を行う。 |  |
+| dnstracer | http://www.mavetju.org/unix/dnstracer.php | 指定ドメインの DNS 情報の由来をたどるツール。 |  |
+| dnswalk | http://sourceforge.net/projects/dnswalk | DNS データベースの整合性チェックを行うデバッガ。ゾーン転送や一貫性チェックを実施。 |  |
+| Fierce | http://ha.ckers.org/fierce | ノンコンティグな IP 範囲を探索するドメインスキャンツール。 |  |
+| Fierce2 | http://trac.assembla.com/fierce/ | Fierce の更新版。開発者グループによるメンテナンスあり。 |  |
 | FindDomains | http://code.google.com/p/finddomains | マルチスレッドのドメイン発見ツール。大量の IP に対応する仮想ホスト/サブドメイン発見に有用。 | * |
-| HostMap | http://hostmap.lonerunners.net | 指定 IP に紐づく全ホスト名・仮想ホストを自動発見するツール。 | * |
-| URLcrazy | http://www.morningstarsecurity.com/research/urlcrazy/ | ドメインのタイプミス候補を生成し、スカッティングや類似ドメインを発見する。 | * |
-| theHarvester | http://www.edge-security.com/theHarvester.php | 検索エンジンや PGP キーサーバ等からメールアドレス／ユーザ名／ホスト名を収集する情報収集ツール。 | * |
-| The Metasploit Framework | http://metasploit.com | リモートエクスプロイトやポストエクスプロイテーションツール群の集積。定期的な更新（svn 等）で新機能・エクスプロイトが追加されるため常時更新が望ましい。 | * |
-| The Social-Engineer Toolkit (SET) | http://www.secmaniac.com/download/ | 人間要素に対する高度な攻撃を実行するためのフレームワーク。偽メールや偽サイト生成などソーシャルエンジニアリングに特化。 | * |
-| Fast-Track | http://www.secmaniac.com/download/ | 自動化されたペンテストスイート。多くの攻撃はクライアント側のデータサニタイズ不備やパッチ未適用に起因。Metasploit 3 に依存。 | * |
+| HostMap | http://hostmap.lonerunners.net | 指定 IP に紐づく全ホスト名・仮想ホストを自動発見するツール。 |  |
+| URLcrazy | http://www.morningstarsecurity.com/research/urlcrazy/ | ドメインのタイプミス候補を生成し、スカッティングや類似ドメインを発見する。 |  |
+| theHarvester | http://www.edge-security.com/theHarvester.php | 検索エンジンや PGP キーサーバ等からメールアドレス／ユーザ名／ホスト名を収集する情報収集ツール。 |  |
+| The Metasploit Framework | http://metasploit.com | リモートエクスプロイトやポストエクスプロイテーションツール群の集積。定期的な更新（svn 等）で新機能・エクスプロイトが追加されるため常時更新が望ましい。 |  |
+| The Social-Engineer Toolkit (SET) | http://www.secmaniac.com/download/ | 人間要素に対する高度な攻撃を実行するためのフレームワーク。偽メールや偽サイト生成などソーシャルエンジニアリングに特化。 |  |
+| Fast-Track | http://www.secmaniac.com/download/ | 自動化されたペンテストスイート。多くの攻撃はクライアント側のデータサニタイズ不備やパッチ未適用に起因。Metasploit 3 に依存。 |  |
 
 （表中の「*」は該当ツールが Windows 専用であることを示しています。表内リンクは参考 URL のまま記載しています。）
 
@@ -824,4 +824,135 @@ Exif Reader は画像の EXIF 情報（シャッタースピード、フラッ�
 ExifTool は多くのファイル形式に対応したメタ情報読み取りツールです。幅広いフォーマットのメタデータ抽出が可能です。
 
 ##### 2.3.7.2.6　画像検索（Image Search）
-画像のトレースや類似画像検索には (TinEye)[http://www.tineye.com/] 等が有用です。匿名プロフィールに掲載された写真の逆検索で、当該人物の別プロファイルや実名を突き止められる場合があります。
+画像のトレースや類似画像検索には [TinEye](http://www.tineye.com/) 等が有用です。匿名プロフィールに掲載された写真の逆検索で、当該人物の別プロファイルや実名を突き止められる場合があります。
+
+# 秘匿的収集（Covert gathering）
+
+現地（オンサイト）での収集は、評価担当者がターゲットの物理的・環境的・運用上のセキュリティを観察・収集する機会を提供します。ここでは観察が主であり、可能な限り痕跡を残さずに施設の実態を把握することが目的です。
+
+## 2.4　秘匿的収集（Covert gathering）
+
+### 2.4.1　現地での収集（On-location gathering）
+オンサイト訪問では、ターゲット周辺の環境や運用を直接観察できます。観察対象には周辺施設、物理的防護、従業員の挙動、廃棄物、無線周波数などが含まれます。
+
+#### 2.4.1.1　隣接施設（Adjacent Facilities）
+物理ロケーションを特定したら、**隣接施設**を洗い出して記録してください。隣接施設や共有サービス（共用駐車場、配送ヤード、電力・通信設備など）があれば可能な範囲で記載し、必要に応じて写真や地図で位置関係を残します。
+
+#### 2.4.1.2　物理セキュリティ点検（Physical security inspections）
+秘匿の物理セキュリティ点検は、ターゲットのセキュリティ姿勢を評価するために、秘密裏に行う観察活動です。観察が主要手段で、以下の項目を含めて（ただしこれに限定されない）記録します。
+
+##### 2.4.1.2.1　警備員（Security guards）
+警備員は視覚的抑止力として重要です。制服や巡回経路、詰所の位置、交代・休憩のパターン、武装の有無、通信手段（無線の使用）などを観察します。双眼鏡などを用いて安全な距離から動きを把握し、手順（受付対応、ゲートでの対応、入退室検査など）を特定します。武装している警備員を見つけた場合は事前にドキュメント化し、許可されていない限り近接行動や干渉は行わないでください。
+
+##### 2.4.1.2.2　バッジの使用（Badge Usage）
+バッジ使用は視覚的あるいは電子的アクセス制御手段です。バッジが常時見えるように着用されているか、出入口で提示が求められているか、バッジの形状・ホルダー・ID 表示の仕方、バッジの検証手順（セキュリティ担当による目視確認やカードリーダ）などを観察・記録します。可能ならバッジの外観（写真、但し法令・契約順守が必要）や読み取り方式の推定（磁気、近接、スマートカード等）を記録します。
+
+##### 2.4.1.2.3　施錠装置（Locking devices）
+施錠装置（機械式／電子式、デッドボルト、暗証式、暗証＋カード、シリンダ錠、シーケンス錠など）の種類と配置を観察します。扉が主に出入口用か非常口用かを判別し、カバーされている配線や外部ハウジングの有無、使用感（摩耗、補修跡）もメモします。可能であれば、写真や位置のスケッチを残します（法令・契約順守のもとで）。
+
+##### 2.4.1.2.4　侵入検知システム（IDS）／アラーム（Intrusion detection systems (IDS)/Alarms）
+侵入検知・アラームシステムの存在（ドア／窓開閉センサー、ガラス破砕センサー、振動センサー、マグネット接点、パッシブ赤外線 PIR、地域分割の有無）を観察します。観察対象には警備会社のステッカーや配線の痕跡、警告掲示、アラームボックス、サイレントアラームに関する標識などが含まれます。システムが物理的に保護されているかどうか（筐体の施錠、ケーブル保護）も記録します。
+
+##### 2.4.1.2.5　防犯照明（Security lighting）
+防犯照明は抑止・検出の両方に寄与します。使用されている照明の種類（高強度放電灯、投光器、低圧ナトリウム灯、PIR 連動ライト等）、設置高さ、保護（ワイヤーメッシュや耐衝撃シールド）、照度のムラ（陰となる死角）を観察します。PIR センサとチャイムの有無、夜間常時点灯か動作検知型か、非常用電源の有無も確認してください。誤配置により視界が阻害されている箇所や、照明が破壊・汚損されうる位置（低所・容易に届く）も記録します。
+
+##### 2.4.1.2.6　監視／CCTV システム（Surveillance /CCTV systems）
+監視カメラ（察知用、抑止用）の存在、可視・不可視カメラの混在、パン・チルト・ズーム（PTZ）の有無、設置角度、保護の有無（防護ハウジング、金網、設置高さ）、配線・電源の露出状況、配信方式（有線／無線の推定）を確認します。カバー範囲の有無（死角）を推定し、物理的に損傷を受けやすいか（むき出しカメラ、手の届く位置）を記録します。ワイヤレスカメラの場合は周波数干渉やジamming の理論的リスクも留意します。
+
+##### 2.4.1.2.7　入退室管理装置（Access control devices）
+入退室管理装置（カードリーダ、PIN パッド、生体認証端末、インターホン等）の種類、設置場所、インターフェース（LCD、ボタン、カメラ・スピーカ付きか）、独立した知能化の有無（ローカルで判断するかコントローラ依存か）を観察します。代表的 reader の例（市場では見かける機種）や外観的特徴をメモします。設備が時刻打刻（出退勤）機能を兼ねているか、管理端末の設置箇所も確認します。
+
+##### 2.4.1.2.8　環境設計（Environmental Design）
+施設周辺の地形、植栽、建築デザイン、外構（フェンス、収納コンテナ、守衛ボックス、バリケード、メンテナンススペース）など、環境設計がセキュリティに与える影響を観察します。視界を遮る地形や植栽、見通しを悪くする構造物、ガードが見にくくなる死角などを特定し、隠密行動が可能かどうかの評価に組み込みます。
+
+#### 2.4.1.3　従業員の挙動（Employee Behavior）
+従業員の行動観察により、運用上の手順や暗黙知（許可されている運用、入退室の慣習、従業員の警戒レベル）を把握します。出入口の混雑時間、入退室の頻度、貴重物の移動方法、従業員の私物管理（ノートPC の持ち出し方等）を観察し、パターン化します。双眼鏡等を用い安全距離から観察してください。
+
+#### 2.4.1.4　ダンプスターダイビング（廃棄物漁り）（Dumpster diving）
+廃棄物（ゴミ箱・ダンプスター）から得られる情報は有益です。廃棄物には請求書、設計図のコピー、機器ラベル、社員名簿、付箋などが含まれる可能性があります。廃棄物漁りは私有地に踏み込む行為になる場合があるため、事前にエンゲージメントで許可されているか確認してください。法的に問題がある場合は**現場で廃棄物を持ち帰らず写真撮影のみ**とする等のルールを厳守します。
+
+#### 2.4.1.5　RF／無線周波数スキャン（RF / Wireless Frequency scanning）
+無線スペクトルのバンド毎に利用状況を把握する調査（RF サイトサーベイ）を行います。帯域は用途ごとに割り当てがあり、干渉やサービス特定のために観測が必要です。SNR（信号対雑音比）を各地点で測定して有効範囲を推定します。事前に想定周波数とライセンス周波数を調べ、警備や業務で使用されている周波数（警備無線、監視カメラのワイヤレス、業務無線等）に注意を払います。
+
+### 2.4.2　周波数の利用状況（Frequency Usage）
+攻撃者が注目する周波数帯を把握します。代表的な帯域と使用例は以下の通りです。
+
+| Band name | Abbr | ITU band | Frequency / Wavelength | Example uses |
+|---:|---|---:|---|---|
+| Very high frequency | VHF | 8 | 30–300 MHz (10m–1m) | FM, テレビ放送、地対空通信、業務無線、アマチュア無線 |
+| Ultra high frequency | UHF | 9 | 300–3000 MHz (1m–100mm) | テレビ、携帯電話、無線LAN、Bluetooth、GPS、業務無線 |
+
+RF サイトサーベイでは、事前に使用周波数を把握し、到達境界（カバレッジ）を決めることが重要です。SNR 測定や、ターゲットが保有するライセンス情報（警備会社や業務無線）を確認してください。参考となる外部リソース（例：ラジオデータベース）を併用すると効率的です。
+
+### 2.4.3　機器の識別（Equipment Identification）
+オンサイト調査では、使用中の無線機器・アンテナ・802.11 機器などのメーカー／機種特定を行います。視覚的に確認できない場合は RF 放射やベンダ特有の特徴から推定することもあります。以下は識別に使えるメーカー例（抜粋）：
+
+| Manufacturer |
+|---|
+| 3com |
+| Apple |
+| Aruba |
+| Atheros |
+| Belkin |
+| Bluesocket |
+| Buffalo Technology |
+| Cisco |
+| D-Link |
+| Engenius Tech |
+| Hewlett Packard |
+| Juniper |
+| Motorola |
+| Netgear |
+| Ruckus Wireless |
+| TRENDnet |
+| など |
+
+視覚で特定できない場合は、RF 信号の特徴（帯域、変調、送信出力）やベンダ固有の SSID/ビーコン情報、管理用ウェブインタフェースの推定等から推測します。
+
+#### 2.4.3.1　Airmon-ng
+`airmon-ng` は無線インタフェースをモニターモードに切り替えるためのツールです。USB デバイスや無線アダプタが正しく検出されているか（`lsusb` などで確認）を確認し、モニタモード用インタフェース（例：`mon0`）を作成します。
+
+簡易操作例：
+~~~~
+# モニタモード開始
+airmon-ng start wlan0
+
+# 既存の mon0 を停止する場合
+airmon-ng stop mon0
+~~~~
+
+#### 2.4.3.2　Airodump-ng
+`airodump-ng` は Aircrack-ng スイートの一部で、802.11 フレームのパケットキャプチャや AP／クライアントのリスト化、IV（Initialization Vectors）収集に適します。GPS が接続されていれば AP の緯度経度をログできます。
+
+主なオプション例：
+~~~~
+airodump-ng <options> <interface>
+
+# 例：
+--ivs       : IV のみ保存
+--gpsd      : GPSd を利用
+--write/-w  : ダンプファイルプレフィックス
+--output-format : pcap, ivs, csv, gps, kismet, netxml など
+~~~~
+
+`airodump-ng` は検出した AP と接続クライアントの一覧を表示し、WEP/WPA のハンドシェイク検出やチャネルホッピング等の情報提供に有用です。
+
+#### 2.4.3.3　Kismet-Newcore
+Kismet（newcore）は受動的に 802.11 ネットワークを検出・スニッフィングし、隠し SSID の検出やトラフィック解析を行います。構成は Drone（キャプチャ）／Server／Client（GUI）で構成され、複数インタフェースでのキャプチャが可能です。`/etc/kismet/kismet.conf` にソースを定義して運用します。キャプチャファイルは Aircrack 等と併用できます。
+
+基本手順（概略）：
+~~~~
+# モニタモードが作成されていることを確認（airmon-ng）
+# kismet の起動（サーバとクライアント）
+kismet
+~~~~
+
+#### 2.4.3.4　inSSIDer
+inSSIDer は Windows 環境で使いやすい Wi-Fi 発見／トラブルシューティングツールです。信号強度（dBi）を時系列で追跡し、GPS と連携して KML にエクスポートできるため Google Earth 上で可視化できます。Windows（XP/Vista/7 32/64bit）での互換性があり、GUI ベースでの調査に向きます。
+
+---
+
+### 補足
+- オンサイトでの観察／収集は必ず**事前に顧客と合意したスコープと法的許可の範囲内**で行ってください。許可のない侵入や私有地への立ち入り、器物破損や電波妨害（ジャミング）などは法令違反となります。  
+- 写真撮影や機器の接触を行う場合は、契約上の許可と評価上の必要性を確認し、記録は最小限に留めてください。  
+- RF 機器の使用や測定は国・地域の法規制（例：周波数帯の利用規制）に従って実施してください。
