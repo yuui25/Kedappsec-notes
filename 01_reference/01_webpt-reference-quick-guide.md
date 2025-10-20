@@ -4,7 +4,7 @@
 | サイト | 種別 | 主要用途 | 粒度 | 公式 | 備考 |
 | :-- | :-- | :-- | :-- | :-- | :-- |
 | OWASP ASVS | 標準 | セキュ要件定義/受入基準/DoD | 要件 | [OWASP ASVS](https://owasp.org/www-project-application-security-verification-standard/) | v5.0.0（2025年時点） |
-| OWASP WSTG | 手順 | テスト設計/実施の具体手順 | テストケース | [OWASP WSTG](https://owasp.org/www-project-web-security-testing-guide/latest/) | Living Doc（最新版）<br>[目次翻訳](00_meta/wstg.md) |
+| OWASP WSTG | 手順 | テスト設計/実施の具体手順 | テストケース | [OWASP WSTG](https://owasp.org/www-project-web-security-testing-guide/latest/) | Living Doc（最新版）<br>[目次翻訳](../00_meta/wstg.md) |
 | NIST SP 800-115 | 手順 | 計画/合意/報告/品質管理の方法論 | 手順・プロセス | [NIST SP 800-115](https://csrc.nist.gov/pubs/sp/800/115/final) | [目次翻訳](00_meta/NIST_SP_800-115.md)  |
 | PTES | 手順 | 実務の各フェーズ標準化 | フェーズ/手順 | [PTES](http://www.pentest-standard.org/index.php/Main_Page) | 技術ガイド有 <br>[目次翻訳](00_meta/PTES.md)|
 | OSSTMM | 標準 | 測定重視のテスト方法論/指標 | 測定・ルール | [OSSTMM](https://www.isecom.org/OSSTMM.3.pdf) | [目次翻訳](00_meta/OSSTMM.md) |
