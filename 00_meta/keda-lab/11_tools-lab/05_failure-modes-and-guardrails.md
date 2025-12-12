@@ -1,7 +1,3 @@
-フォルダ名: keda-lab/11_tools-lab/
-ファイル名: 05_failure-modes-and-guardrails.md
-STEP名: BASICS11-05 失敗パターン集＋ガードレール（過収集・ログ欠落・時刻ズレ・ROE逸脱を潰す）
-
 <<<BEGIN>>>
 # 11_tools-lab / BASICS11-05 失敗パターン集＋ガードレール（過収集・ログ欠落・時刻ズレ・ROE逸脱を潰す）
 
