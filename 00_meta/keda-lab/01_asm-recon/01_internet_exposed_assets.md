@@ -1,4 +1,4 @@
-# STEP1-2 インターネット露出資産（Internet-Exposed Assets）
+# STEP1-1 インターネット露出資産（Internet-Exposed Assets）
 
 本ドキュメントは、ASM（Attack Surface Management）の基礎となる  
 「インターネット露出資産」の定義と分類を、事実ベースで整理する。
