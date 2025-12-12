@@ -217,12 +217,4 @@
 
 ---
 
-## 6. 次のフォルダ（基礎補強の次ステップ）への接続
-11_tools-lab の共通基盤が揃ったため、次は “観測の根拠” を強くするために 06_os-network-protocol に進む。
-
-- 次：keda-lab/06_os-network-protocol/01_overview.md
-  - プロトコル別（SMB/RDP/LDAP/Kerberos/HTTP/TLS）の観測点
-  - どのログが Evidence になるか（LM-LOG/AD-DISC/DFIRへの接続）
-  - 本編STEP3/5での使いどころ
-
 <<<END>>>
