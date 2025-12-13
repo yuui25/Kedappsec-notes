@@ -1,5 +1,5 @@
 <<<BEGIN>>>
-# 99_templates/02_playbook-template.md（最小手順・分岐中心の雛形）
+# 02_playbook-template.md（最小手順・分岐中心の雛形）
 
 > 用途：`02_playbooks/` 配下の各ファイルを、この雛形で作成する。  
 > 方針：playbookは「手が止まらないための最小手順」。topicsの深掘りを前提に、分岐と判断基準を中心に書く。  
