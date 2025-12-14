@@ -174,7 +174,7 @@ repo-root/
 │
 ├─ 03_cases/
 │  ├─ 00_index.md
-│  ├─ 00_case-template.md
+│  ├─ 01_case-template.md
 │  └─ （1事例=1ファイルを追加していく。フォルダ分割はしない）
 │
 ├─ 04_labs/
