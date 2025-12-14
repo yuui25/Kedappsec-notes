@@ -133,105 +133,86 @@ keda-lab
 repo-root/
 ├─ README.md
 │
-├─01_topics
-│  ├─01_asm-osint
-│  │      00_index.md
-│  │      01_dns_委譲・境界・解釈.md
-│  │      02_tls_証明書・CT・外部依存推定.md
-│  │      03_http_観測（ヘッダ・挙動）と意味.md
-│  │      04_js_フロント由来の攻撃面抽出.md
-│  │      05_cloud_露出面（CDN_WAF_Storage等）推定.md
+├─ 01_topics/
+│  ├─ 01_asm-osint/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_dns_委譲・境界・解釈.md
+│  │  ├─ 02_tls_証明書・CT・外部依存推定.md
+│  │  ├─ 03_http_観測（ヘッダ/挙動）と意味.md
+│  │  ├─ 04_js_フロント由来の攻撃面抽出.md
+│  │  └─ 05_cloud_露出面（CDN/WAF/Storage等）推定.md
 │  │
-│  ├─02_web
-│  │  │  00_index.md
-│  │  │
-│  │  ├─01_web
-│  │  │      recon_入口・境界・攻め筋の確定.md
-│  │  │
-│  │  ├─02_authn
-│  │  │      00_認証・セッション・トークン.md
-│  │  │      01_cookie属性と境界（Secure_HttpOnly_SameSite_Path_Domain）.md
-│  │  │      02_session_lifecycle（更新_失効_固定化_ローテーション）.md
-│  │  │      03_token設計（Bearer_JWT_Refresh_Rotation）.md
-│  │  │
-│  │  ├─03_authz
-│  │  │      00_認可（IDOR BOLA BFLA）境界モデル化.md
-│  │  │      01_境界モデル（オブジェクト_ロール_テナント）.md
-│  │  │
-│  │  ├─04_api
-│  │  │      01_権限伝播モデル（フロント_バックエンド_ジョブ）.md
-│  │  │      権限伝播・入力・バックエンド連携.md
-│  │  │
-│  │  ├─05_input
-│  │  │      00_入力→実行境界（テンプレ デシリアライズ等）.md
-│  │  │      01_入力→実行境界（テンプレート注入_SSTI）.md
-│  │  │      02_入力→実行境界（デシリアライズ_型混乱_ガジェット前提）.md
-│  │  │
-│  │  └─06_config
-│  │          00_設定・運用境界（CORS ヘッダ Secrets）.md
-│  │          01_CORSと信頼境界（Origin_資格情報_プリフライト）.md
-│  │          02_Secrets管理と漏えい経路（JS_ログ_設定_クラウド）.md
+│  ├─ 02_web/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_web_recon_入口・境界・攻め筋の確定.md
+│  │  ├─ 02_authn_認証・セッション・トークン.md
+│  │  ├─ 03_authz_認可（IDOR/BOLA/BFLA）境界モデル化.md
+│  │  ├─ 04_api_権限伝播・入力・バックエンド連携.md
+│  │  ├─ 05_input_入力→実行境界（テンプレ/デシリアライズ等）.md
+│  │  └─ 06_config_設定・運用境界（CORS/ヘッダ/Secrets）.md
 │  │
-│  ├─03_network
-│  │      00_index.md
-│  │      01_enum_到達性→サービス→認証→権限推定.md
-│  │      02_post_侵入後の前提（権限 経路 横展開の入口）.md
-│  │      03_creds_認証情報の所在と扱い（攻撃 検知の両面）.md
-│  │      04_ad_ドメイン環境の基礎（ペンテスト視点の地図）.md
+│  ├─ 03_network/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_enum_到達性→サービス→認証→権限推定.md
+│  │  ├─ 02_post_侵入後の前提（権限/経路/横展開の入口）.md
+│  │  ├─ 03_creds_認証情報の所在と扱い（攻撃/検知の両面）.md
+│  │  └─ 04_ad_ドメイン環境の基礎（ペンテスト視点の地図）.md
 │  │
-│  └─04_saas
-│          00_index.md
-│          01_idp_連携（SAML OIDC OAuth）と信頼境界.md
-│          02_saas_共有・外部連携・監査ログの勘所.md
+│  └─ 04_saas/
+│     ├─ 00_index.md
+│     ├─ 01_idp_連携（SAML/OIDC/OAuth）と信頼境界.md
+│     └─ 02_saas_共有・外部連携・監査ログの勘所.md
 │
-├─02_playbooks
-│      00_index.md
-│      01_asm_passive-recon_資産境界→優先度付け.md
-│      02_web_recon_入口→境界→検証方針.md
-│      03_authn_観測ポイント（SSO_MFA前提）.md
-│      04_authz_境界モデル→検証観点チェック.md
-│      05_api_権限伝播→検証観点チェック.md
-│      06_network_enum_to_post_列挙→侵入後の導線.md
+├─ 02_playbooks/
+│  ├─ 00_index.md
+│  ├─ 01_asm_passive-recon_資産境界→優先度付け.md
+│  ├─ 02_web_recon_入口→境界→検証方針.md
+│  ├─ 03_authn_観測ポイント（SSO/MFA前提）.md
+│  ├─ 04_authz_境界モデル→検証観点チェック.md
+│  ├─ 05_api_権限伝播→検証観点チェック.md
+│  └─ 06_network_enum_to_post_列挙→侵入後の導線.md
 │
-├─03_cases
-│      00_index.md
-│      01_case-template.md
+├─ 03_cases/
+│  ├─ 00_index.md
+│  ├─ 01_case-template.md
+│  └─ （1事例=1ファイルを追加していく。フォルダ分割はしない）
 │
-├─04_labs
-│  │  00_index.md
+├─ 04_labs/
+│  ├─ 00_index.md
+│  ├─ 01_local/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_attack-box_作業端末設計.md
+│  │  ├─ 02_proxy_計測・改変ポイント設計.md
+│  │  └─ 03_capture_証跡取得（pcap/har/log）.md
 │  │
-│  ├─01_local
-│  │      00_index.md
-│  │      01_attack-box_作業端末設計.md
-│  │      02_proxy_計測・改変ポイント設計.md
-│  │      03_capture_証跡取得（pcap_harl_log）.md
+│  ├─ 02_virtualization/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_virtualbox_基盤.md
+│  │  ├─ 02_vmware_基盤.md
+│  │  └─ 03_networking_nat_hostonly_bridge.md
 │  │
-│  ├─02_virtualization
-│  │      00_index.md
-│  │      01_virtualbox_基盤.md
-│  │      02_vmware_基盤.md
-│  │      03_networking_nat_hostonly_bridge.md
+│  ├─ 03_targets/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_web_targets_検証用アプリ選定.md
+│  │  ├─ 02_api_targets_検証用API選定.md
+│  │  └─ 03_ad_lab_検証用ドメイン構成.md
 │  │
-│  ├─03_targets
-│  │      00_index.md
-│  │      01_web_targets_検証用アプリ選定.md
-│  │      02_api_targets_検証用API選定.md
-│  │      03_ad_lab_検証用ドメイン構成.md
+│  ├─ 04_cloud/
+│  │  ├─ 00_index.md
+│  │  ├─ 01_aws_lab_構成と検証観点.md
+│  │  ├─ 02_azure_lab_構成と検証観点.md
+│  │  └─ 03_logging_クラウド監査ログの取り方.md
 │  │
-│  ├─04_cloud
-│  │      00_index.md
-│  │      01_aws_lab_構成と検証観点.md
-│  │      02_azure_lab_構成と検証観点.md
-│  │      03_logging_クラウド監査ログの取り方.md
-│  │
-│  └─05_automation
-│          02_snapshots_reset_検証の巻き戻し.md
+│  └─ 05_automation/
+│     ├─ 00_index.md
+│     ├─ 01_iac_terraform_or_bicep.md
+│     └─ 02_snapshots_reset_検証の巻き戻し.md
+
 │
-└─99_templates
-        00_project-prompt.md
-        01_topic-template.md
-        02_playbook-template.md
-        03_case-template.md
+└─ 99_templates/
+   ├─ 01_topic-template.md
+   ├─ 02_playbook-template.md
+   └─ 03_case-template.md
 ~~~~
 
 ※上記ツリーは「最低限の基準構成」として維持する。  
