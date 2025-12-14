@@ -1,5 +1,5 @@
 <<<BEGIN>>>
-# 00_case-template.md
+# 01_case-template.md
 
 ## 使い方（このテンプレの意図）
 - 本ファイルは「実世界事例」を“教材”として扱い、`01_topics` と `02_playbooks` と `04_labs` に確実に接続するためのテンプレ。
