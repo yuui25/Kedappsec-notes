@@ -277,4 +277,187 @@ repo-root/
 4) 04_labs/00_index.md（検証環境の全体像と狙い）  
 5) 01_topics/01_asm-osint/01_dns_委譲・境界・解釈.md（“観測→解釈→利用”の基準品質確立）
 
+## 11. 今後作成予定ファイル候補（タイトル一覧：ぶれ防止）
+※この一覧は「候補バックログ」。以降の提案・生成は原則ここから選び、命名規則（2.10.4）に従う。
+※“厳選（約30）/推奨（80+）/最大（200）”の粒度を想定し、必要に応じて増減・整理する（重複・陳腐化は随時差し替え）。
+
+### 01_topics/01_asm-osint（追加候補）
+- 01_topics/01_asm-osint/06_subdomain_列挙（passive_active_辞書_優先度）.md
+- 01_topics/01_asm-osint/07_whois_rdap_所有者・関連企業推定（組織境界）.md
+- 01_topics/01_asm-osint/08_asn_bgp_ネットワーク境界（AS_プレフィックス_関連性）.md
+- 01_topics/01_asm-osint/09_passive-dns_履歴と再利用（過去資産の掘り起こし）.md
+- 01_topics/01_asm-osint/10_ctlog_証明書拡張観測（SAN_ワイルドカード_中間CA）.md
+- 01_topics/01_asm-osint/11_hosting_同居推定（共有IP_CDN_証明書共通）.md
+- 01_topics/01_asm-osint/12_waf_cdn_挙動観測（ブロック_チャレンジ_バイパス条件）.md
+- 01_topics/01_asm-osint/13_http2_h3_観測（ALPN_Alt-Svc_到達性）.md
+- 01_topics/01_asm-osint/14_js_sourcemap_公開物から攻撃面抽出（endpoint_key）.md
+- 01_topics/01_asm-osint/15_api_spec_公開（OpenAPI_GraphQLスキーマ）から面抽出.md
+- 01_topics/01_asm-osint/16_github_code-search_漏えい（key_token_endpoint）.md
+- 01_topics/01_asm-osint/17_ci-cd_artifact_公開物（ログ_ビルド成果物）.md
+- 01_topics/01_asm-osint/18_storage_discovery（S3_GCS_AzureBlob）境界推定.md
+- 01_topics/01_asm-osint/19_email_infra（SPF_DKIM_DMARC）と攻撃面.md
+- 01_topics/01_asm-osint/20_brand_assets_関連ドメイン推定（typo_lookalike）.md
+- 01_topics/01_asm-osint/21_third-party_外部依存（タグ_分析SDK）洗い出し.md
+- 01_topics/01_asm-osint/22_mobile_assets_アプリ由来攻撃面（deep-link_API）.md
+- 01_topics/01_asm-osint/23_vdp_scope_制約下での低アクティブ観測設計.md
+- 01_topics/01_asm-osint/24_subdomain_takeover_成立条件推定（DNS_CNAME_プロバイダ）.md
+- 01_topics/01_asm-osint/25_dnssec_観測と意味（委譲_検証_誤設定）.md
+
+### 01_topics/02_web（02_authn 追加候補）
+- 01_topics/02_web/02_authn_09_password_policy（強度_漏えい照合_禁止語）.md
+- 01_topics/02_web/02_authn_10_password_reset_回復経路（token_失効_多要素）.md
+- 01_topics/02_web/02_authn_11_account_recovery_本人確認（サポート代行_回復コード）.md
+- 01_topics/02_web/02_authn_12_bruteforce_rate-limit_lockout（例外パス）.md
+- 01_topics/02_web/02_authn_13_login_csrf_認証CSRFとstate設計.md
+- 01_topics/02_web/02_authn_14_logout_設計（RP_IdP_フロントチャネル）.md
+- 01_topics/02_web/02_authn_15_session_concurrency（多端末_同時ログイン制御）.md
+- 01_topics/02_web/02_authn_16_step-up_再認証境界（重要操作_再確認）.md
+- 01_topics/02_web/02_authn_17_refresh_token_rotation_盗用検知（reuse）.md
+- 01_topics/02_web/02_authn_18_token_binding（DPoP_mTLS）観測.md
+- 01_topics/02_web/02_authn_19_webauthn_passkeys_登録・回復境界.md
+- 01_topics/02_web/02_authn_20_magic-link_メールリンク認証の成立条件.md
+
+### 01_topics/02_web（03_authz 追加候補）
+- 01_topics/02_web/03_authz_02_idor_典型パターン（一覧_検索_参照キー）.md
+- 01_topics/02_web/03_authz_03_multi-tenant_分離（org_id_tenant_id）.md
+- 01_topics/02_web/03_authz_04_rbac_abac_判定点（policy_engine）.md
+- 01_topics/02_web/03_authz_05_mass-assignment_モデル結合境界.md
+- 01_topics/02_web/03_authz_06_privileged_action_重要操作（承認_送金_権限）.md
+- 01_topics/02_web/03_authz_07_graphql_authz（field_level）.md
+- 01_topics/02_web/03_authz_08_file_access_ダウンロード認可（署名URL）.md
+- 01_topics/02_web/03_authz_09_admin_console_運用UIの境界.md
+- 01_topics/02_web/03_authz_10_object_state_状態遷移と権限（draft_approved）.md
+
+### 01_topics/02_web（04_api 追加候補）
+- 01_topics/02_web/04_api_02_graphql_境界（schema_introspection_query_cost）.md
+- 01_topics/02_web/04_api_03_rest_filters_検索・ソート・ページング境界.md
+- 01_topics/02_web/04_api_04_webhook_受信側の信頼境界（署名_再送）.md
+- 01_topics/02_web/04_api_05_webhook_ssrf_送信側の到達性境界.md
+- 01_topics/02_web/04_api_06_idempotency_レースと二重実行境界.md
+- 01_topics/02_web/04_api_07_async_job_権限伝播（キュー_ワーカー）.md
+- 01_topics/02_web/04_api_08_file_export_エクスポート境界（CSV_PDF）.md
+- 01_topics/02_web/04_api_09_error_model_情報漏えい（例外_スタック）.md
+- 01_topics/02_web/04_api_10_versioning_互換性と境界（v1_v2）.md
+- 01_topics/02_web/04_api_11_grpc_メタデータと認可境界.md
+- 01_topics/02_web/04_api_12_websocket_sse_認証・認可境界.md
+
+### 01_topics/02_web（05_input 追加候補）
+- 01_topics/02_web/05_input_03_sql_injection（境界_プレースホルダ_ORM）.md
+- 01_topics/02_web/05_input_04_nosql_injection（Mongo_Elastic等）.md
+- 01_topics/02_web/05_input_05_command_injection（OS実行_引数_環境）.md
+- 01_topics/02_web/05_input_06_xss（反射_格納_DOM）境界モデル.md
+- 01_topics/02_web/05_input_07_csrf（同一生成元_トークン_二重送信）.md
+- 01_topics/02_web/05_input_08_xxe（XMLパーサ_外部実体_プロキシ）.md
+- 01_topics/02_web/05_input_09_ssrf（URL入力_到達性_メタデータ）.md
+- 01_topics/02_web/05_input_10_open_redirect（遷移先信頼境界）.md
+- 01_topics/02_web/05_input_11_path_traversal（FS境界_正規化）.md
+- 01_topics/02_web/05_input_12_file_upload（検査_保存先_実行）.md
+- 01_topics/02_web/05_input_13_deserialization_json_yaml_xml（型混乱）.md
+- 01_topics/02_web/05_input_14_prototype_pollution（JS_merge）.md
+- 01_topics/02_web/05_input_15_regex_dos（ReDoS_検証）.md
+- 01_topics/02_web/05_input_16_csv_formula_injection（export境界）.md
+- 01_topics/02_web/05_input_17_email_header_injection（SMTP境界）.md
+- 01_topics/02_web/05_input_18_http_request_smuggling（TE_CL）観測.md
+- 01_topics/02_web/05_input_19_cache_poisoning（Vary_キー）観測.md
+- 01_topics/02_web/05_input_20_crlf_injection（ヘッダ分割）.md
+
+### 01_topics/02_web（06_config 追加候補）
+- 01_topics/02_web/06_config_03_security_headers（CSP_HSTS_XFO等）.md
+- 01_topics/02_web/06_config_04_csp_実務設計（report-only_違反収集）.md
+- 01_topics/02_web/06_config_05_cache_control_機微レスポンスの境界.md
+- 01_topics/02_web/06_config_06_debug_endpoints（/actuator_/swagger）露出.md
+- 01_topics/02_web/06_config_07_error_pages_詳細表示と環境切替.md
+- 01_topics/02_web/06_config_08_logging_pii_secret（マスキング_相関）.md
+- 01_topics/02_web/06_config_09_cors_プリフライトcacheと例外.md
+- 01_topics/02_web/06_config_10_cdn_waf_運用境界（ルール例外_バイパス）.md
+- 01_topics/02_web/06_config_11_secrets_rotation_運用（回収_失効）.md
+- 01_topics/02_web/06_config_12_s3_presigned_url_期限と権限境界.md
+
+### 01_topics/02_web（その他：境界の接続・横断）
+- 01_topics/02_web/07_browser_security_境界（SOP_CORS_CSP）.md
+- 01_topics/02_web/08_clickjacking_境界（XFO_CSP-frame-ancestors）.md
+- 01_topics/02_web/09_mixed_content_境界（HTTPS移行）.md
+- 01_topics/02_web/10_authn_to_authz_接続（claims_権限伝播）.md
+- 01_topics/02_web/11_logging_tracing_相関IDと証跡設計.md
+- 01_topics/02_web/12_rate-limit_設計（API_key_user_ip）.md
+- 01_topics/02_web/13_session_replay_再利用と検知（ua_ip_binding）.md
+- 01_topics/02_web/14_cryptography_境界（hash_kdf_sign_encrypt）.md
+- 01_topics/02_web/15_payment_重要操作境界（3DS_返金）.md
+
+### 01_topics/03_network（追加候補）
+- 01_topics/03_network/05_scanning_到達性把握（nmap_masscan）.md
+- 01_topics/03_network/06_service_fingerprint（banner_tls_alpn）.md
+- 01_topics/03_network/07_pivot_tunneling（ssh_socks_chisel）.md
+- 01_topics/03_network/08_firewall_waf_検知と回避の境界（観測中心）.md
+- 01_topics/03_network/09_smb_enum_共有・権限・匿名（null_session）.md
+- 01_topics/03_network/10_ntlm_relay_成立条件（SMB署名_LLMNR）.md
+- 01_topics/03_network/11_ldap_enum_ディレクトリ境界（匿名_bind）.md
+- 01_topics/03_network/12_kerberos_asrep_kerberoast_成立条件.md
+- 01_topics/03_network/13_adcs_証明書サービス悪用の境界.md
+- 01_topics/03_network/14_delegation（unconstrained_constrained_RBCD）.md
+- 01_topics/03_network/15_acl_abuse（AD権限グラフ）.md
+- 01_topics/03_network/16_gpo_永続化と権限境界.md
+- 01_topics/03_network/17_laps_ローカル管理者パスワード境界.md
+- 01_topics/03_network/18_winrm_psremoting_到達性と権限.md
+- 01_topics/03_network/19_rdp_設定と認証（NLA）.md
+- 01_topics/03_network/20_mssql_横展開（xp_cmdshell_linkedserver）.md
+- 01_topics/03_network/21_nfs_共有とroot_squash境界.md
+- 01_topics/03_network/22_snmp_情報収集（community_v3）.md
+- 01_topics/03_network/23_dns_internal_委譲とゾーン転送（AXFR）.md
+- 01_topics/03_network/24_linux_priv-esc_入口（sudo_capabilities）.md
+- 01_topics/03_network/25_windows_priv-esc_入口（サービス権限_UAC）.md
+- 01_topics/03_network/26_credential_dumping_所在（LSA_DPAPI）.md
+- 01_topics/03_network/27_persistence_永続化（schtasks_services_wmi）.md
+- 01_topics/03_network/28_exfiltration_持ち出し経路（DNS_HTTP_SMB）.md
+
+### 01_topics/04_saas（追加候補）
+- 01_topics/04_saas/03_m365_権限境界（アプリ登録_Consent）.md
+- 01_topics/04_saas/04_azuread_条件付きアクセス（CA）と例外パス.md
+- 01_topics/04_saas/05_okta_サインオンポリシーとトークン境界.md
+- 01_topics/04_saas/06_google_workspace_oauth_スコープ境界.md
+- 01_topics/04_saas/07_github_組織権限境界（PAT_App_Actions）.md
+- 01_topics/04_saas/08_slack_トークン境界（xox_署名検証）.md
+- 01_topics/04_saas/09_atlassian_外部連携と権限境界.md
+- 01_topics/04_saas/10_saas_oauth_consent_phishing_成立条件.md
+- 01_topics/04_saas/11_scim_jit_provisioning_境界（権限初期値）.md
+- 01_topics/04_saas/12_audit_logs_取得と相関（誰が何をいつ）.md
+- 01_topics/04_saas/13_shadow_it_発見（DNS_CASB_ログ）.md
+- 01_topics/04_saas/14_sso_bypass_パス（ローカルログイン残存）.md
+- 01_topics/04_saas/15_token_lifetime_更新と失効（SaaS側）.md
+
+### 02_playbooks（追加候補）
+- 02_playbooks/07_input_to_rce_入力→実行の導線（最小差分）.md
+- 02_playbooks/08_xss_to_account_takeover_クッキー/トークン窃取の導線.md
+- 02_playbooks/09_ssrf_to_cloud_metadata_メタデータ到達性→権限推定.md
+- 02_playbooks/10_idor_harvest_横取り→エクスポート→到達点固定.md
+- 02_playbooks/11_webhook_abuse_署名/再送/到達性の導線.md
+- 02_playbooks/12_graphql_abuse_過剰取得→認可欠落の導線.md
+- 02_playbooks/13_ad_enum_to_da_列挙→資格→権限の導線.md
+- 02_playbooks/14_saas_oauth_同意→横展開→永続化の導線.md
+
+### 04_labs（追加候補）
+- 04_labs/01_local/04_browser_profiles_差分観測（cookie_storage）.md
+- 04_labs/01_local/05_mitm_tls_観測（証明書_ピンニング）.md
+- 04_labs/01_local/06_burp_project_証跡設計（整理_タグ付け）.md
+- 04_labs/01_local/07_replay_差分再現（再送_並列）.md
+- 04_labs/02_virtualization/04_kali_vm_拡張（tools_snapshots）.md
+- 04_labs/02_virtualization/05_windows_vm_検証基盤（edge_ie_mode）.md
+- 04_labs/03_targets/04_intentionally_vuln_apps_導入（DVWA_JuiceShop）.md
+- 04_labs/03_targets/05_graphql_targets_検証環境（vuln_graphql）.md
+- 04_labs/03_targets/06_ssrf_targets_検証環境（webhook_metadata）.md
+- 04_labs/03_targets/07_xss_targets_検証環境（CSP差分）.md
+- 04_labs/03_targets/08_deser_targets_検証環境（Java_PHP）.md
+- 04_labs/04_cloud/04_aws_metadata_到達性ラボ（IMDSv1_v2）.md
+- 04_labs/04_cloud/05_azure_msi_到達性ラボ（IMDS）.md
+- 04_labs/04_cloud/06_cloudtrail_sentinel_相関ラボ.md
+- 04_labs/05_automation/03_replay_har_to_tests_自動再現.md
+- 04_labs/05_automation/04_log_correlation_自動相関（trace_id）.md
+
+### 03_cases（追加候補：命名例）
+- 03_cases/C2023-xx_外部IdP設定不備_SSOバイパス.md
+- 03_cases/C2024-xx_API認可欠落_BOLAによるPII漏えい.md
+- 03_cases/C2024-xx_Webhook_SSFR_クラウドメタデータ到達.md
+- 03_cases/C2025-xx_RefreshToken再利用_セッション乗っ取り.md
+- 03_cases/C2025-xx_SaaS_OAuth同意_永続化.md
+
 <<<END>>>
