@@ -304,8 +304,6 @@ repo-root/
 - 01_topics/01_asm-osint/25_dnssec_観測と意味（委譲_検証_誤設定）.md
 
 ### 01_topics/02_web（02_authn 追加候補）
-- 01_topics/02_web/02_authn_09_password_policy（強度_漏えい照合_禁止語）.md
-- 01_topics/02_web/02_authn_10_password_reset_回復経路（token_失効_多要素）.md
 - 01_topics/02_web/02_authn_11_account_recovery_本人確認（サポート代行_回復コード）.md
 - 01_topics/02_web/02_authn_12_bruteforce_rate-limit_lockout（例外パス）.md
 - 01_topics/02_web/02_authn_13_login_csrf_認証CSRFとstate設計.md
