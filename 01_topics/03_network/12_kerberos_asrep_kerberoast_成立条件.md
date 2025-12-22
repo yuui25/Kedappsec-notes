@@ -1,8 +1,3 @@
-フォルダ名: keda-lab/01_topics/03_network/
-ファイル名: 12_kerberos_asrep_kerberoast_成立条件.md
-STEP名: NW03-12 Kerberos AS-REP Roast / Kerberoast 成立条件（事前認証・SPN・暗号方式・証跡）
-
-```md
 ## ガイドライン対応（ASVS / WSTG / PTES / MITRE ATT&CK：毎回記載）
 - ASVS：
   - 該当領域/章：認証（ID連携/SSO含む）、パスワード/鍵管理、アクセス制御（特権ID管理）、ログ/監視（監査証跡）
@@ -220,14 +215,3 @@ Kerberos AS-REP Roast / Kerberoast：成立条件（事前認証・SPN・暗号�
 - `01_topics/03_network/11_ldap_enum_ディレクトリ境界（匿名_bind）.md`
 - `01_topics/03_network/10_ntlm_relay_成立条件（SMB署名_LLMNR）.md`
 - `01_topics/03_network/14_delegation（unconstrained_constrained_RBCD）.md`
-```
-
-Kerberos監査で参照すべき一次情報として、`userAccountControl` の **DONT_REQ_PREAUTH（0x400000 / 4194304）** がMicrosoftの整理に明示されています。 ([Microsoft Learn][1])
-
-DCのSecurityログでは、4768（TGT要求）に **PreAuthType** や TicketEncryptionType 等が含まれ、4769（TGS要求）には **TicketEncryptionType** 等が含まれるため、暗号方式や要求傾向の観測に利用できます。 ([Microsoft Learn][2])
-
-RC4既定/許容がKerberoasting（サービスチケットを対象にした攻撃）に悪用され得る点と、AESへの移行で耐性を上げる考え方はMicrosoftのガイダンスとして整理されています。 ([Microsoft Learn][3])
-
-[1]: https://learn.microsoft.com/en-us/troubleshoot/windows-server/active-directory/useraccountcontrol-manipulate-account-properties?utm_source=chatgpt.com "UserAccountControl property flags - Windows Server"
-[2]: https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/auditing/event-4768 "4768(S, F) A Kerberos authentication ticket (TGT) was requested. - Windows 10 | Microsoft Learn"
-[3]: https://learn.microsoft.com/en-us/windows-server/security/kerberos/detect-remediate-rc4-kerberos?utm_source=chatgpt.com "Detect and Remediate RC4 Usage in Kerberos"
