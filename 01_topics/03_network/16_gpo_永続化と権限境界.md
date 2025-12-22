@@ -214,3 +214,170 @@ Get-GPOReport -Guid <GPO_GUID> -ReportType Xml -Path .\gpo_<GPO_GUID>.xml
 
 #### 4-3 GPC→GPT参照先（gPCFileSysPath）の逸脱確認（参照境界）
 - 目的：クライアントが“どこからGPTを取るか”を示す参照先が想定外になっていないか
+- 判断（次の一手）
+  - gPCFileSysPathが想定外（SYSVOL外、任意共有等）なら、GPO配布の信頼境界が崩れている可能性があるため最優先で是正・監査対象
+
+---
+
+### Step 5：影響評価（どこまで効くか：OU階層＋絞り込みで確定）
+- 影響を決める要素（最低限）
+  - リンク先（Site/Domain/OU）
+  - OU階層と継承、Block Inheritance、Enforced
+  - Security Filtering（誰に適用されるか）
+  - WMI Filtering（どの端末に適用されるか）
+  - Loopback（ユーザー設定が“どの端末で”効くか）
+- 実務の結論（状態として）
+  - 「このGPOは、OU=X配下のコンピュータY群に適用される（理由：リンク/継承/フィルタ）」の形で書く
+  - “不明”を残さない：不明な要素（WMI/Loopback/セキュリティフィルタ）があるなら、それ自体を追加調査タスクとして明記する
+
+---
+
+### Step 6：是正（削除だけでなく、権限分離と設計代替で閉じる）
+- 原則：GPOの権限は「作成/編集/リンク」を分離し、運用委任は“最小OU・最小GPO・最小主体”に閉じる
+- 具体（設計として書ける形）
+  - Tier分離（Tier0/DC/管理サーバ/一般端末でOUを分離し、上位OUに広範なリンクを置かない）
+  - Default Domain Policy / Default Domain Controllers Policy を“運用でいじらない”方針（変更は専用GPOで）
+  - GPO作成権限を限定（作成できる＝注入点が増える）
+  - OUのgPLink書き換え権限（Link委任）を厳格化（リンクは影響範囲の変更＝高リスク操作）
+  - GPO編集権限（Edit）を限定（編集＝配布内容の変更＝永続化に直結）
+  - SYSVOLの監査（変更監査）とバックアップ/差分管理（“いつ・誰が・どのファイルを”）
+
+---
+
+### Step 7：検知（AD変更＋SYSVOL変更＋クライアント適用の三点セット）
+> 「変更が起きた」だけでは足りない。どこが変わったか（GPC/GPT/Link）を分離して捕まえる。
+
+#### 7-1 AD（GPC/OU）変更の監査：Directory Service Changes
+- 狙い：GPO本体（GPC）やリンク（gPLink）が変わった瞬間を捕捉する
+- 最低限の観測
+  - GPO（groupPolicyContainer）の属性変更（例：versionNumber、gPCFileSysPath等）
+  - OU/Domainの `gPLink` / `gPOptions` 変更（リンク/ブロック/強制）
+- 実務メモ
+  - 監査イベントは「SACLで有効化して初めて出る」ため、監査設計（どのオブジェクトに何を監査するか）が前提になる
+
+#### 7-2 SYSVOL（GPT）変更の監査：ファイルアクセス監査
+- 狙い：配布実体（GPT.INI、Scripts、Preferences XML等）の変更を捕捉する
+- 最低限の観測
+  - `\\<domain>\SYSVOL\<domain>\Policies\{GUID}\` 配下でのファイル変更（作成/更新/削除）
+- 実務メモ
+  - ここもSACL（ファイル/フォルダ監査）設計が前提。監査対象は“Policies配下”を中心に、ノイズを制御する
+
+#### 7-3 クライアント側の適用ログ：GroupPolicy/Operational と gpresult
+- 狙い：「変更が、実際にどの端末に適用されたか」を確定する（影響範囲の裏取り）
+- 使い分け（現場）
+  - 個別端末：`gpresult`（適用/拒否GPOと理由）
+  - 体系：GroupPolicy/Operational（適用開始/完了、適用一覧、拒否理由など）
+  - 深掘り：GPSvcのデバッグログ（適用トラブルや取得失敗の原因切り分け）
+
+---
+
+## 結果の意味（この出力が示す状態：何が言える/言えない）
+### 言える（最低限）
+- GPOはGPC（AD）とGPT（SYSVOL）で構成され、適用範囲はgPLink等のリンク情報で決まる
+- 主体Sが
+  - (a) GPOを編集できる（GPOのDACL上の権限）
+  - (b) OU/Domainにリンクを変更できる（OU/DomainのgPLinkを触れる権限）
+  - (c) 新規作成できる（作成委任）
+  のどれを持つかにより、永続化の成立条件が変わる
+- 影響範囲は、リンク先（OU/Domain/Site）と継承・強制・ブロック・フィルタで根拠付きに確定できる
+
+### 言えない（この時点で断言しない）
+- 即座に侵害できる（到達性、監視、資格情報強度、端末側制御で成立は変わる）
+- “そのまま”本番で検証してよい（変更は広範囲影響になり得るため、検証OUでの安全設計が前提）
+
+---
+
+## 攻撃者視点での利用（意思決定：どれを先に見るか）
+> ここは手口列挙ではなく、優先度付けの軸として使う。
+
+### 優先順位の原則（実務）
+1) 高価値OU/Domainに対する Link権限（gPLink変更）が緩い
+2) 影響が広いGPO（上位OU/Domain、Enforced）に対する Edit権限が緩い
+3) Create権限＋Link権限が同一主体に揃う（“好きに刺せる”）
+4) gPCFileSysPathの参照先を変えられる（配布の信頼境界が崩れる）
+
+### “危険度が跳ねる状態”の例（状態で書く）
+- 低権限に近い主体が、Domain直下/上位OUのgPLinkを書ける
+- 既にスクリプト/Preferences（タスク/サービス/レジストリ等）を配るGPOに対して、編集権限が委任されている
+- Default系GPO（全域に効く）に対する編集権限が過剰
+- 監査（AD変更/SYSVOL変更）が無く、変更が追えない
+
+---
+
+## 次に試すこと（仮説A/B：条件で手が変わる）
+### 仮説A：OU/DomainのgPLinkを書ける主体が見つかった（Link権限）
+- 次の一手
+  - そのOU配下の資産価値（Tier）を確定し、影響範囲を明記
+  - 主体が「どのGPOをリンクできるか（既存GPO）」と「新規作成できるか（Create）」を確認
+  - `15_acl_abuse` でOUのDACLを裏取りし、レポートにACE根拠を残す
+
+### 仮説B：特定GPOに編集権限が見つかった（Edit権限）
+- 次の一手
+  - そのGPOがどこにリンクされ、誰に適用されるか（Step 2/5）を確定
+  - GPOレポート（XML）で永続化に繋がるカテゴリが含まれるかを検査（変更せず危険度を高める）
+  - 監査（GPC/GPT）とバックアップ運用の有無を確認し、是正に繋げる
+
+### 仮説C：gPCFileSysPathが想定外、または変更できそう（参照境界）
+- 次の一手
+  - 参照先の共有（SMB）の管理主体・ACL・署名/アクセス制御を確認
+  - “参照先変更の監査”が取れるか（GPC属性の監査）を確認し、最優先で是正計画へ
+
+### 仮説D：目立つ権限緩和が見つからない
+- 次の一手
+  - 変更監査が整っているか（整っていないなら将来の改変点として是正提案）
+  - 代替の横展開経路（`14_delegation` / `13_adcs` / `10_ntlm_relay` / `18_winrm` / `19_rdp` / `20_mssql`）へ主軸を移し、GPOは“防御設定の前提確認”として維持する
+
+---
+
+## 手を動かす検証（04_labsと連動：安全に差分が出る設計）
+> 目的：本番での危険な変更を避けつつ、「GPOの二重構造」「リンクの影響」「監査ログ」を観測で理解する。
+
+### Lab最小構成
+- DC（AD DS + SYSVOL）
+- メンバーサーバ（管理対象：Computer GPO適用）
+- クライアント端末（User GPO適用）
+- OUを3つ
+  - OU_Tier0（DC/管理）
+  - OU_Servers（メンバーサーバ）
+  - OU_Workstations（クライアント）
+
+### 変数（1つずつ変える）
+- Linkの変化：OUにリンク/解除、リンク順序、Enforced、Block Inheritance
+- Filterの変化：Security Filtering（対象グループ）、WMI Filter（OS条件など）
+- GPO内容：無害な設定（壁紙/バナー/ログ設定など）だけを入れて差分を観測
+
+### 観測点（必須）
+- AD（GPC/OU）
+  - GPOの `versionNumber`, `gPCFileSysPath`, `whenChanged`
+  - OUの `gPLink`, `gPOptions`
+- SYSVOL（GPT）
+  - `GPT.INI` の差分
+  - Machine/User配下の差分（設定がファイルにどう落ちるか）
+- クライアント
+  - gpresult（適用/拒否の理由）
+  - GroupPolicy/Operational（適用開始/完了、適用一覧）
+
+### 巻き戻し（必須）
+- 変更前にスナップショット
+- 変更は“検証OUだけ”に限定
+- 変更ログ（誰がいつ何を変えたか）をLabでも残す（監査設計の練習）
+
+---
+
+## ガイドライン対応（ASVS / WSTG / PTES / MITRE ATT&CK：毎回）
+- ASVS：GPO権限（作成/編集/リンク）と監査（AD変更＋SYSVOL変更）を最小権限・職務分離・変更管理で統制することが、認証基盤/端末基盤の境界維持に直結する。
+- WSTG：WebがAD連携する環境では、GPOが端末/サーバの防御と認証挙動を変えるため、WSTGの認証/セッション/認可評価の“前提条件”として観測・固定する。
+- PTES：列挙（GPO/リンク/ACL）→成立条件（作成/編集/リンク）→影響（適用範囲）→是正（権限分離/Tier）→検知（変更監査＋適用ログ）で閉じる。
+- ATT&CK：GPOは正規の構成管理であり、権限が崩れるとPersistence/Defense Evasion/Lateral Movementに接続する“広域な配布チャネル”になる。
+
+---
+
+## 深掘りリンク（作成済み / 予定：最大8件）
+- `05_scanning_到達性把握（nmap_masscan）.md`
+- `07_pivot_tunneling（ssh_socks_chisel）.md`
+- `11_ldap_enum_ディレクトリ境界（匿名_bind）.md`
+- `14_delegation（unconstrained_constrained_RBCD）.md`
+- `15_acl_abuse（AD権限グラフ）.md`
+- `18_winrm_psremoting_到達性と権限.md`
+- `19_rdp_設定と認証（NLA）.md`
+- `20_mssql_横展開（xp_cmdshell_linkedserver）.md`
